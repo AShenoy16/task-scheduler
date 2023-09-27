@@ -49,7 +49,13 @@ public class Graph {
         }
     }
 
-    private void findStartNodes() {
+    //TODO Implement getChildrenNodes method
+    public ArrayList<Node> getChildrenNodes(Node node) {
+        ArrayList<Node> childrenNodes = new ArrayList<>();
+        return childrenNodes;
+    }
+
+        private void findStartNodes() {
         for (int j = 0;  j < n; j++) {
             int count = 0;
             for (int i = 0; i < n; i++) {
