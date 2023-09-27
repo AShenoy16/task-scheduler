@@ -2,10 +2,14 @@ package algorithm.astar;
 
 import model.Graph;
 import model.Node;
+import model.Schedule;
+import model.Task;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+
+import static java.lang.Math.max;
 
 public class CalculateCostFunction {
     private Graph graph;
@@ -35,9 +39,34 @@ public class CalculateCostFunction {
         return bottomLevel;
     }
 
-    public void getCostFunction(){}
 
-    // this gets the cost function
+
+    // this returns cost value for a partial solution, so need to pass in a schedule
+    // this will then be added to a priority queue that we run for a*
+    // this determines wheter we explore the partial solution further or not
+
+    public int getScheduleCost(ArrayList<Task> partialTasks){
+
+        // loop through all the tasks in a given partial solution
+        // can either pass this or a schdule
+        int cost = 0;
+
+        for (Task task: partialTasks){
+
+            int startTime = task.getStartTime();
+
+            // calculate lower bound
+            // heuristic = max(start time of scheduled tasks plus their bottom level)
+            cost = Math.max(cost, startTime + bottomLevelMap.get(task.getNode()));
+
+        }
+
+        return cost;
+
+    }
+
+
     public void setCostFunction(){}
+
 
 }
