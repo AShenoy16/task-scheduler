@@ -1,14 +1,18 @@
 package model;
 
-import java.util.ArrayList;
-
 public class Node {
+    private int id;
     private int val;
-    private ArrayList<Edge> edges;
-    char label;
-    public Node(char label, int val) {
-        this.label = label;
+    public Node(int id, int val) {
+        this.id = id;
         this.val = val;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public int getVal() {
+        return val;
+    }
 }
