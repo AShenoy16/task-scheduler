@@ -9,9 +9,11 @@ import java.util.HashMap;
 
 public class CalculateCostFunction {
     private Graph graph;
-    public static HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
+    public HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
 
-    public void getBottomLevelMap(){}
+    public HashMap<Node,Integer> getBottomLevelMap(){
+        return bottomLevelMap;
+    }
     public int setBottomLevelMap(Node node){
         for (Node child : graph.getChildrenNodes(node)) {
             // Recursive call to start from exit nodes
