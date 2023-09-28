@@ -21,6 +21,5 @@ public class TestFileRead {
         assertArrayEquals(g.getAdjacencyMatrix()[1], new int[] {0,0,0,0,19,4,21});
         assertArrayEquals(g.getAdjacencyMatrix()[2], new int[] {0,0,0,0,0,0,0});
         assertArrayEquals(g.getAdjacencyMatrix()[6], new int[] {0,0,0,0,0,0,0});
-
     }
 }
