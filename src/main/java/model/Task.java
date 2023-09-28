@@ -11,6 +11,7 @@ public class Task {
         this.node = node;
         this.startTime = startTime;
         this.finishTime = finishTime;
+        // what processor it's assigned to.
         this.processor = processor;
     }
 

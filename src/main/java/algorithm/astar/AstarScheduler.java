@@ -32,6 +32,8 @@ public class AstarScheduler {
 
             //expand partialSchdule into children and compute cost function for each child
 
+
+
                 //create new schules and then for every possible child that can happen
                     // create and add the new tasks that can be in these schedules
 
@@ -40,6 +42,14 @@ public class AstarScheduler {
             // add all new child schedules to open prio queue
             open.add();
         }
+    }
+
+    public void createPartialSchedule(){
+
+
+
+        
+
     }
 
 }
