@@ -55,7 +55,6 @@ public class CalculateCostFunction {
 
         for (Task task: tasks){
 
-
             int startTime = task.getStartTime();
 
             // calculate lower bound
