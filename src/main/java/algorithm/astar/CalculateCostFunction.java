@@ -5,9 +5,7 @@ import model.Node;
 import model.Schedule;
 import model.Task;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 import static java.lang.Math.max;
 
@@ -69,5 +67,18 @@ public class CalculateCostFunction {
 
     }
 
+    // TODO fix this
+    public List<Map.Entry<Node, Integer>> getBottomLevel() {
 
+        List<Map.Entry<Node, Integer>> bottomLevelList = new ArrayList<>(bottomLevelMap.entrySet());
+
+        bottomLevelList.sort(Comparator.comparing(Map.Entry::getValue));
+
+//
+//        // sort list
+//        Collections.sort(bottomLevelList, Comparator.comparing(Map.Entry::getValue));
+
+        return bottomLevelList;
+
+    }
 }
