@@ -30,4 +30,7 @@ public class Task {
         return node;
     }
 
+
+    // worst comes to worst, overrirde isEquals
+
 }

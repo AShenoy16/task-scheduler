@@ -39,19 +39,22 @@ public class CalculateCostFunction {
         return bottomLevel;
     }
 
-
-
-    // this returns cost value for a partial solution, so need to pass in a schedule
+    // this returns cost value for a partial solution, so need to pass in a schedule or tasks
+    // in a schedule
     // this will then be added to a priority queue that we run for a*
     // this determines wheter we explore the partial solution further or not
 
-    public int getScheduleCost(ArrayList<Task> partialTasks){
+    public int getScheduleCost(Schedule currentSchedule){
 
         // loop through all the tasks in a given partial solution
         // can either pass this or a schdule
         int cost = 0;
 
-        for (Task task: partialTasks){
+        ArrayList<Task> tasks = currentSchedule.getTask();
+
+
+        for (Task task: tasks){
+
 
             int startTime = task.getStartTime();
 
