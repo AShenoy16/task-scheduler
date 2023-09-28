@@ -9,6 +9,7 @@ public class Schedule {
     private ArrayList<Task> tasks;
     private int numProcessors;
 
+    private int cost;
     private Task task;
 
     // need to create new instances each time to represent each new partial solution
@@ -17,6 +18,8 @@ public class Schedule {
     public Schedule(ArrayList<Task> tasks, int numProcessors) {
         this.numProcessors = numProcessors;
         this.tasks = tasks;
+        //TODO maybe optimise
+        this.cost = Integer.MAX_VALUE;
     }
 
     // first entry node added
@@ -25,10 +28,13 @@ public class Schedule {
         this.numProcessors = numProcessors;
     }
 
-    public ArrayList<Task> getTask() {
+    public ArrayList<Task> getTasks() {
         return tasks;
     }
 
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
     // create a new schedule
     // create first schedule into
     // intial state = empty = nothing inside in

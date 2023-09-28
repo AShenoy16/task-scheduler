@@ -12,6 +12,8 @@ import java.util.HashMap;
 import static java.lang.Math.max;
 
 public class CalculateCostFunction {
+    // possibly make this class a singleton - reasoning - because we will need to use the getScheduleCost method
+    // Maybe make method into a static method?
     private Graph graph;
     public HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
 
@@ -44,13 +46,13 @@ public class CalculateCostFunction {
     // this will then be added to a priority queue that we run for a*
     // this determines wheter we explore the partial solution further or not
 
-    public int getScheduleCost(Schedule currentSchedule){
+    public void setScheduleCost(Schedule currentSchedule){
 
         // loop through all the tasks in a given partial solution
         // can either pass this or a schdule
         int cost = 0;
 
-        ArrayList<Task> tasks = currentSchedule.getTask();
+        ArrayList<Task> tasks = currentSchedule.getTasks();
 
 
         for (Task task: tasks){
@@ -63,12 +65,9 @@ public class CalculateCostFunction {
 
         }
 
-        return cost;
+        currentSchedule.setCost(cost);
 
     }
-
-
-    public void setCostFunction(){}
 
 
 }
