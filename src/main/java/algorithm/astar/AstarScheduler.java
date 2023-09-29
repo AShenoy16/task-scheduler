@@ -28,9 +28,6 @@ public class AstarScheduler {
         // return the hashmap
 
 
-
-
-
         // get first entry node
 
         while (open.size() != 0){

@@ -12,6 +12,7 @@ public class Schedule {
     private int cost;
     private Task task;
 
+
     // need to create new instances each time to represent each new partial solution
 
     // this
@@ -38,7 +39,6 @@ public class Schedule {
     // create a new schedule
     // create first schedule into
     // intial state = empty = nothing inside in
-
 
 
 

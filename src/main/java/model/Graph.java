@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Graph {
     private final int n;
@@ -49,13 +50,42 @@ public class Graph {
         }
     }
 
+    // this is given a schedule and sees what child nodes are valid
     //TODO Implement getChildrenNodes method
-    public ArrayList<Node> getChildrenNodes(Node node) {
-        ArrayList<Node> childrenNodes = new ArrayList<>();
-        return childrenNodes;
+    private ArrayList<Node> getChildrenNodes(Node node) {
+        ArrayList<Node> childNodes = new ArrayList<>();
+
+        int row = node.getId();
+
+        for (int j = 0; j < n; j++) {
+            if (adjacencyMatrix[row][j] > 0) {
+                // get the node with correct value
+                Node childNode = new Node(j);
+                childNodes.add(childNode);
+            }
+        }
+
+        return childNodes;
     }
 
-        private void findStartNodes() {
+    private ArrayList<Node> getParentNodes(Node node) {
+        ArrayList<Node> parentNodes = new ArrayList<>();
+
+        int col = node.getId();
+
+        for (int i = 0; i < n; i++) {
+            if (adjacencyMatrix[i][col] > 0) {
+                //get node with correct getter
+                Node parentNode = new Node(i);
+                parentNodes.add(parentNode);
+            }
+        }
+
+        return parentNodes;
+    }
+
+
+    private void findStartNodes() {
         for (int j = 0;  j < n; j++) {
             int count = 0;
             for (int i = 0; i < n; i++) {
@@ -83,4 +113,47 @@ public class Graph {
             }
         }
     }
+
+
+//    public ArrayList<Node> getValidChildrenNodes(Schedule schedule) {
+//        ArrayList<Node> childrenNodes = new ArrayList<>();
+//
+//        ArrayList<Task> tasks = schedule.getTasks();
+//        HashSet<Node> taskNodes = new HashSet<>();
+//
+//        // Create a set of nodes from the tasks for efficient lookup
+//        for (Task task : tasks) {
+//            Node node = task.getNode();
+//            taskNodes.add(node);
+//        }
+//
+//        for (Task task : tasks) {
+//            Node node = task.getNode();
+//            ArrayList<Node> children = getChildrenNodes(node);
+//
+//            for (Node child : children) {
+//                ArrayList<Node> parents = getParentNodes(child);
+//
+//                boolean allParentsInTasks = true;
+//
+//                for (Node parent : parents) {
+//                    // Check if all parents are in the current tasks using the taskNodes set
+//                    if (!taskNodes.contains(parent)) {
+//                        allParentsInTasks = false;
+//                        break; // No need to continue checking parents if one is not in tasks
+//                    }
+//                }
+//
+//                if (allParentsInTasks) {
+//                    childrenNodes.add(child);
+//                }
+//            }
+//        }
+//
+//        return childrenNodes;
+//    }
+
+
+
+
 }
