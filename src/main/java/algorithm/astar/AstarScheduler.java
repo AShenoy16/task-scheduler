@@ -27,7 +27,7 @@ public class AstarScheduler {
         }
 
         //TODO optimise getting the valid entry nodes
-//        List<Node> filteredEntryNodes = // filter on graph.getStartNodes()
+        List<Node> filteredEntryNodes = // filter on graph.getStartNodes()
 
 
         // return the hashmap
@@ -71,14 +71,14 @@ public class AstarScheduler {
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
         //TODO Call method or anything to get the valid child tasks
-//        for(Node entryNode : entryNodes){
-//            for(int i = 1 ; i <= numOfProcessors; i++){
-//                Task task = new Task(entryNode, 0, entryNode.getVal(), i);
-//                Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
-//                calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-//                newSchedules.add(newlyMadeSchedule);
-//            }
-//        }
+        for(Node entryNode : entryNodes){
+            for(int i = 1 ; i <= numOfProcessors; i++){
+                Task task = new Task(entryNode, 0, entryNode.getVal(), i);
+                Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
+                calculateCostFunction.setScheduleCost(newlyMadeSchedule);
+                newSchedules.add(newlyMadeSchedule);
+            }
+        }
         // FOR EVERY CHILD TASK
             // for every processor
                 //TODO create method calculate start times
