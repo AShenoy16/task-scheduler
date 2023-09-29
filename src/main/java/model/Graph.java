@@ -52,7 +52,7 @@ public class Graph {
 
     // this is given a schedule and sees what child nodes are valid
     //TODO Implement getChildrenNodes method
-    private ArrayList<Node> getChildrenNodes(Node node) {
+    public ArrayList<Node> getChildrenNodes(Node node) {
         ArrayList<Node> childNodes = new ArrayList<>();
 
         int row = node.getId();

@@ -25,7 +25,7 @@ public class Schedule {
 
     // first entry node added
     public Schedule(Task intialTask, int numProcessors){
-        this.task = intialTask;
+        this.tasks = new ArrayList<>(List.of(intialTask));
         this.numProcessors = numProcessors;
     }
 

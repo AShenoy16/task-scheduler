@@ -2,6 +2,7 @@ package algorithm.astar;
 import model.Graph;
 import model.Node;
 import model.Schedule;
+import model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,19 @@ public class AstarScheduler {
             calculateCostFunction.setBottomLevelMap(entryNode);
         }
 
+        //TODO (maybe) optimise getting the valid entry nodes
+        List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
+        if(validEntryNodes.isEmpty()){
+            System.out.println("Why are entry nodes empty????");
+            return null;
+        }
+
+        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
+        open.addAll(initialSchedules);
+        
         // return the hashmap
 
-
+        // get the sorted list descending order,
         // get first entry node
 
         while (open.size() != 0){
@@ -50,16 +61,16 @@ public class AstarScheduler {
             open.addAll(newList);
         }
     }
-    public List<Schedule> initialSchedules(List<Node> entryNodes){
+    public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numOfProcessors){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
-        // FOR EVERY entry node create new TASK
-        // create new schedule with new task make sure added task is early as possible
-        // calculate and set cost
-        CalculateCostFunction calculateCostFunction = new CalculateCostFunction();
-        calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-        // add schedule to list of schedules
 
+        for(Node entryNode : entryNodes){
+            Task task = new Task(entryNode, 0, entryNode.getVal(), 1);
+            Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
+            calculateCostFunction.setScheduleCost(newlyMadeSchedule);
+            newSchedules.add(newlyMadeSchedule);
+        }
 
         return newSchedules;
     }
@@ -67,7 +78,14 @@ public class AstarScheduler {
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
         //TODO Call method or anything to get the valid child tasks
-
+        for(Node entryNode : entryNodes){
+            for(int i = 1 ; i <= numOfProcessors; i++){
+                Task task = new Task(entryNode, 0, entryNode.getVal(), i);
+                Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
+                calculateCostFunction.setScheduleCost(newlyMadeSchedule);
+                newSchedules.add(newlyMadeSchedule);
+            }
+        }
         // FOR EVERY CHILD TASK
             // for every processor
                 //TODO create method calculate start times
