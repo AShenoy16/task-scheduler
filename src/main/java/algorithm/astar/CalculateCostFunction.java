@@ -64,7 +64,7 @@ public class CalculateCostFunction {
         // can either pass this or a schdule
         int cost = 0;
 
-        ArrayList<Task> tasks = currentSchedule.getTasks();
+        List<Task> tasks = currentSchedule.getTasks();
 
 
         for (Task task: tasks){

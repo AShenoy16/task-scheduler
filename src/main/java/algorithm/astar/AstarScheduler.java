@@ -133,7 +133,9 @@ public class AstarScheduler {
                 earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
 
                 Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
-                Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
+                List<Task> newTasks = schedule.getTasks();
+                newTasks.add(task);
+                Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
                 newSchedules.add(newlyMadeSchedule);
             }
