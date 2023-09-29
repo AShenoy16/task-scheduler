@@ -6,8 +6,8 @@ public class Graph {
     private final int n;
     private int[][] adjacencyMatrix;
     private ArrayList<Integer> nodeWeightings;
-    private ArrayList<Integer> startNodes = new ArrayList<>();
-    private ArrayList<Integer> endNodes = new ArrayList<>();
+    private ArrayList<Node> startNodes = new ArrayList<>();
+    private ArrayList<Node> endNodes = new ArrayList<>();
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
         adjacencyMatrix = new int[n][n];
@@ -25,11 +25,11 @@ public class Graph {
         return adjacencyMatrix;
     }
 
-    public ArrayList<Integer> getStartNodes() {
+    public ArrayList<Node> getStartNodes() {
         return startNodes;
     }
 
-    public ArrayList<Integer> getEndNodes() {
+    public ArrayList<Node> getEndNodes() {
         return endNodes;
     }
 
