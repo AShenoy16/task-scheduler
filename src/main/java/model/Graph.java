@@ -4,7 +4,6 @@ import algorithm.astar.CalculateCostFunction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
 
 public class Graph {
     private final int n;
@@ -17,7 +16,7 @@ public class Graph {
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
         adjacencyMatrix = new int[n][n];
-        mapNodeLabels(nodes);
+        fillNodeWeightings(nodes);
         fillAdjacencyMatrix(edges);
         findStartNodes();
         findEndNodes();
@@ -43,12 +42,26 @@ public class Graph {
         return nodeWeightings;
     }
 
-    private void mapNodeLabels(ArrayList<Node> nodes) {
+    /**
+     * Fill nodeWeightings array
+     * Nodes are mapped by id to index.
+     * E.g. the weight of id 3 node will be stored in index 3 of nodeWeightings
+     *
+     * @param nodes Nodes from dot file to process
+     */
+    private void fillNodeWeightings(ArrayList<Node> nodes) {
         nodeWeightings = new ArrayList<>(n);
         for (Node n : nodes) {
             nodeWeightings.add(n.getId(), n.getVal());
         }
     }
+
+    /**
+     * Create outgoing edges adjacency matrix.
+     * Row represents source node, column represents destination node
+     *
+     * @param edges Edges from dot file to process
+     */
     private void fillAdjacencyMatrix(ArrayList<Edge> edges) {
         for (Edge e : edges) {
             adjacencyMatrix[e.getSrcId()][e.getDestId()] = e.getWeight();
@@ -65,7 +78,7 @@ public class Graph {
         for (int j = 0; j < n; j++) {
             if (adjacencyMatrix[row][j] > 0) {
                 // get the node with correct value
-                Node childNode = new Node(j);
+                Node childNode = createNodeById(j);
                 childNodes.add(childNode);
             }
         }
@@ -81,7 +94,7 @@ public class Graph {
         for (int i = 0; i < n; i++) {
             if (adjacencyMatrix[i][col] > 0) {
                 //get node with correct getter
-                Node parentNode = new Node(i);
+                Node parentNode = createNodeById(i);
                 parentNodes.add(parentNode);
             }
         }
@@ -100,7 +113,7 @@ public class Graph {
             }
 
             if (count == n) {
-                startNodes.add(j);
+                startNodes.add(createNodeById(j));
             }
         }
     }
@@ -114,9 +127,20 @@ public class Graph {
             }
 
             if (count == n) {
-                endNodes.add(i);
+                endNodes.add(createNodeById(i));
             }
         }
+    }
+
+    /**
+     * Construct a new node object by id.
+     * Usable when nodeWeightings is filled.
+     *
+     * @param id id to create Node with
+     * @return created Node
+     */
+    private Node createNodeById(int id) {
+        return new Node(id, nodeWeightings.get(id));
     }
 
     /**
@@ -138,8 +162,8 @@ public class Graph {
             // Check if the node is not in the allNodes
             if (!allNodes.contains(node)) {
                 // if not in all nodes, it means it's not in the schedule
-                // if it is in all nodes means it is part of scheudle
-                // we want max bottom lvl value NOT currently in scheulde
+                // if it is in all nodes means it is part of schedule
+                // we want max bottom lvl value NOT currently in schedule
                 // if flag is true we update bottomLevelValue
                 if(flag){
                     bottomLevelValue = calculateCostFunction.bottomLevelofNode(node);
@@ -148,7 +172,7 @@ public class Graph {
                 flag = false;
 
                 // if there is ever a case where the bottom level value is greater
-                // than the current cost function calcualted, it means we've reached
+                // than the current cost function calculated, it means we've reached
                 // a node with a smaller bottom level value, which must be done
                 // afterwards, so we break
                 if(bottomLevelValue > calculateCostFunction.bottomLevelofNode(node)){
