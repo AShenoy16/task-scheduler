@@ -44,7 +44,7 @@ public class AstarScheduler {
         while (open.size() != 0){
             Schedule partialSchdule = open.poll();
 
-            if(partialSchdule.isCompleteSchedule()){
+            if(partialSchdule.isCompleteSchedule(graph)){
                 return partialSchdule;
             }
             //expand partialSchedule into children and compute cost function for each child
