@@ -26,10 +26,16 @@ public class AstarScheduler {
             calculateCostFunction.setBottomLevelMap(entryNode);
         }
 
-        //TODO optimise getting the valid entry nodes
-        List<Node> filteredEntryNodes = // filter on graph.getStartNodes()
+        //TODO (maybe) optimise getting the valid entry nodes
+        List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
+        if(validEntryNodes.isEmpty()){
+            System.out.println("Why are entry nodes empty????");
+            return null;
+        }
 
-
+        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
+        open.addAll(initialSchedules);
+        
         // return the hashmap
         // get the sorted list descending order,
         // get first entry node
@@ -54,7 +60,7 @@ public class AstarScheduler {
             open.addAll(newList);
         }
     }
-    public List<Schedule> initialSchedules(List<Node> entryNodes, int numOfProcessors){
+    public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numOfProcessors){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
 
