@@ -46,7 +46,7 @@ public class AstarScheduler {
         while (open.size() != 0){
             Schedule partialSchedule = open.poll();
 
-            if(partialSchedule.isCompleteSchedule()){
+            if(partialSchedule.isCompleteSchedule(graph)){
                 return partialSchedule;
             }
             //expand partialSchedule into children and compute cost function for each child
@@ -66,6 +66,9 @@ public class AstarScheduler {
             // add all new child schedules to open prio queue
             open.addAll(newSchedules);
         }
+        
+        //TODO add proper fail state?
+        return null;
     }
     public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numOfProcessors){
         // create empty list of schedules

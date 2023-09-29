@@ -53,6 +53,11 @@ public class Schedule {
 
     }
 
+    public boolean isCompleteSchedule(Graph graph){
+
+        return(tasks.size() == graph.getAdjacencyMatrix().length);
+    }
+
 
 
 }
