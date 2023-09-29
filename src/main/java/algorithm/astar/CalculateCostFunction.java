@@ -67,17 +67,27 @@ public class CalculateCostFunction {
 
     }
 
+    /**
+     * This method returns the nodes ordered in descending order by their bottom level
+     * as a list of nodes, needed for the start of a*
+     * @return
+     */
     public List<Node> getBottomLevel() {
 
         List<Map.Entry<Node, Integer>> bottomLevelList = new ArrayList<>(bottomLevelMap.entrySet());
 
-        bottomLevelList.sort(Comparator.comparing(Map.Entry::getValue));
+//        bottomLevelList.sort(Comparator.comparing(Map.Entry::getValue));
+        // above should work if this doesn't
+        // reversed order sort
+        bottomLevelList.sort(Map.Entry.<Node, Integer>comparingByValue().reversed());
+
 
         List<Node> bottomLevelOrder = new ArrayList<>();
 
         for (Map.Entry<Node, Integer> entry : bottomLevelList) {
             bottomLevelOrder.add(entry.getKey());
         }
+
 
         return bottomLevelOrder;
 
