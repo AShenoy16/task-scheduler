@@ -72,7 +72,7 @@ public class CalculateCostFunction {
      * as a list of nodes, needed for the start of a*
      * @return
      */
-    public List<Node> getBottomLevel() {
+    public List<Node> getSortedBottomLevel() {
 
         List<Map.Entry<Node, Integer>> bottomLevelList = new ArrayList<>(bottomLevelMap.entrySet());
 
@@ -111,6 +111,26 @@ public class CalculateCostFunction {
         }
 
         return nodesWithMaxValue;
+
+    }
+
+    public List<Node> getHighestBottomLevelNodeMaxValue(int maxBottomLevelValue){
+
+        // Collect keys associated with the highest value
+        List<Node> nodesWithMaxValue = new ArrayList<>();
+        for (Map.Entry<Node, Integer> entry : bottomLevelMap.entrySet()) {
+            if (entry.getValue() == maxBottomLevelValue) {
+                nodesWithMaxValue.add(entry.getKey());
+            }
+        }
+
+        return nodesWithMaxValue;
+
+    }
+
+    public int bottomLevelofNode(Node node){
+
+        return bottomLevelMap.get(node);
 
     }
 }

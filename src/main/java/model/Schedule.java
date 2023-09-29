@@ -41,5 +41,18 @@ public class Schedule {
     // intial state = empty = nothing inside in
 
 
+    // get all the nodes in a current schedule
+    public ArrayList<Node> getAllNodes(){
+
+        ArrayList<Node> allNodes = new ArrayList<>();
+        for(Task task: tasks){
+            allNodes.add(task.getNode());
+        }
+
+        return allNodes;
+
+    }
+
+
 
 }

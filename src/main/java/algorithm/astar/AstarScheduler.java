@@ -81,6 +81,7 @@ public class AstarScheduler {
         for(Node entryNode : entryNodes){
             for(int i = 1 ; i <= numOfProcessors; i++){
                 Task task = new Task(entryNode, 0, entryNode.getVal(), i);
+                //remove from sortedBottomList
                 Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
                 newSchedules.add(newlyMadeSchedule);

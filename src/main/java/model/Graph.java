@@ -1,7 +1,10 @@
 package model;
 
+import algorithm.astar.CalculateCostFunction;
+
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class Graph {
     private final int n;
@@ -114,44 +117,52 @@ public class Graph {
         }
     }
 
+    /**
+     * This will get all the valid children nodes of a particular schedule
+     * @param schedule
+     * @param sortedBottomList
+     * @return
+     */
+    public ArrayList<Node> getValidChildrenNodes(Schedule schedule, List<Node> sortedBottomList) {
+        ArrayList<Node> childrenNodes = new ArrayList<>();
+        ArrayList<Node> allNodes = schedule.getAllNodes();
+        CalculateCostFunction calculateCostFunction = new CalculateCostFunction();
 
-//    public ArrayList<Node> getValidChildrenNodes(Schedule schedule) {
-//        ArrayList<Node> childrenNodes = new ArrayList<>();
-//
-//        ArrayList<Task> tasks = schedule.getTasks();
-//        HashSet<Node> taskNodes = new HashSet<>();
-//
-//        // Create a set of nodes from the tasks for efficient lookup
-//        for (Task task : tasks) {
-//            Node node = task.getNode();
-//            taskNodes.add(node);
-//        }
-//
-//        for (Task task : tasks) {
-//            Node node = task.getNode();
-//            ArrayList<Node> children = getChildrenNodes(node);
-//
-//            for (Node child : children) {
-//                ArrayList<Node> parents = getParentNodes(child);
-//
-//                boolean allParentsInTasks = true;
-//
-//                for (Node parent : parents) {
-//                    // Check if all parents are in the current tasks using the taskNodes set
-//                    if (!taskNodes.contains(parent)) {
-//                        allParentsInTasks = false;
-//                        break; // No need to continue checking parents if one is not in tasks
-//                    }
-//                }
-//
-//                if (allParentsInTasks) {
-//                    childrenNodes.add(child);
-//                }
-//            }
-//        }
-//
-//        return childrenNodes;
-//    }
+        boolean flag = true;
+
+        int bottomLevelValue = Integer.MIN_VALUE;
+
+        for (Node node : sortedBottomList) {
+            // Check if the node is not in the allNodes
+            if (!allNodes.contains(node)) {
+                // if not in all nodes, it means it's not in the schedule
+                // if it is in all nodes means it is part of scheudle
+                // we want max bottom lvl value NOT currently in scheulde
+                // if flag is true we update bottomLevelValue
+                if(flag){
+                    bottomLevelValue = calculateCostFunction.bottomLevelofNode(node);
+                }
+
+                flag = false;
+
+                // if there is ever a case where the bottom level value is greater
+                // than the current cost function calcualted, it means we've reached
+                // a node with a smaller bottom level value, which must be done
+                // afterwards, so we break
+                if(bottomLevelValue > calculateCostFunction.bottomLevelofNode(node)){
+                    break;
+                }
+
+                // if bottom level value == then we have something with the same bottom level
+                childrenNodes.add(node);
+
+            }
+        }
+
+        // return children nodes
+        return childrenNodes;
+    }
+
 
 
 
