@@ -13,10 +13,17 @@ public class CalculateCostFunction {
     // possibly make this class a singleton - reasoning - because we will need to use the getScheduleCost method
     // Maybe make method into a static method?
     private Graph graph;
-    public HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
+
+    // STATIC - temporary fix, multiple CalculateCostFunction instances are created, avoid querying empty bottomLevelMap
+    public static HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
 
     public HashMap<Node,Integer> getBottomLevelMap(){
         return bottomLevelMap;
+    }
+
+    public CalculateCostFunction() {}
+    public CalculateCostFunction(Graph graph) {
+        this.graph = graph;
     }
     public int setBottomLevelMap(Node node){
         for (Node child : graph.getChildrenNodes(node)) {

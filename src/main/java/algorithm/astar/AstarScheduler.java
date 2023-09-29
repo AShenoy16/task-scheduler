@@ -12,15 +12,18 @@ import java.util.PriorityQueue;
 public class AstarScheduler {
 
 
-    private PriorityQueue<Schedule> open;
+    private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
 
-    private CalculateCostFunction calculateCostFunction = new CalculateCostFunction();
+    private CalculateCostFunction calculateCostFunction;
     public Schedule run(Graph graph, int numProcessors){
         // calculate bottom level for each node, this can be done by calling setBottomLevelMap on each entry node
         // add first scheule to prio queue
 
         // if need to, have a for loop for all the possible entry nodes
         // but I think we don't need this as A* should take care of it
+
+        // TODO remove default constructor of CalculateCostFunction if possible (may need to extract methods + graph class is coupled)
+        calculateCostFunction = new CalculateCostFunction(graph);
 
         // set bottom level values for every node
         for (Node entryNode : graph.getStartNodes()) {
