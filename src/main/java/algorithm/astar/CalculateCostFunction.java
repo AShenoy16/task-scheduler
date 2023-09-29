@@ -32,13 +32,20 @@ public class CalculateCostFunction {
         }
 
         // Get maximum bottom level value out of children nodes
-        int maxChildBottomLevel = graph.getChildrenNodes(node).stream()
-                .mapToInt(Node::getVal)
-                .max()
-                .orElse(0);
+//        int maxChildBottomLevel = graph.getChildrenNodes(node).stream()
+//                .mapToInt(bottomLevelMap.get(node))
+//                .max()
+//                .orElse(0);
+
+        int maxBottomLevelValue = 0;
+        for(Node childNode : graph.getChildrenNodes(node)){
+            if(bottomLevelMap.containsKey(childNode)){
+                maxBottomLevelValue = Math.max(maxBottomLevelValue, bottomLevelMap.get(childNode));
+            }
+        }
 
         // Calculate bottom level value
-        int bottomLevel = maxChildBottomLevel + node.getVal();
+        int bottomLevel = maxBottomLevelValue + node.getVal();
 
         // Save bottom level value to map
         bottomLevelMap.put(node,bottomLevel);
