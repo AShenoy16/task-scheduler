@@ -92,4 +92,25 @@ public class CalculateCostFunction {
         return bottomLevelOrder;
 
     }
+
+    public List<Node> getHighestBottomLevelNodes(){
+        // Find the highest value in the HashMap, this valeu should belong to an entry node
+        int maxValue = Integer.MIN_VALUE;
+        for (Integer value : bottomLevelMap.values()) {
+            if (value > maxValue) {
+                maxValue = value;
+            }
+        }
+
+        // Collect keys associated with the highest value
+        List<Node> nodesWithMaxValue = new ArrayList<>();
+        for (Map.Entry<Node, Integer> entry : bottomLevelMap.entrySet()) {
+            if (entry.getValue() == maxValue) {
+                nodesWithMaxValue.add(entry.getKey());
+            }
+        }
+
+        return nodesWithMaxValue;
+
+    }
 }
