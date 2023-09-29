@@ -1,4 +1,5 @@
 package algorithm.astar;
+import model.Graph;
 import model.Node;
 import model.Schedule;
 
@@ -11,7 +12,7 @@ public class AstarScheduler {
 
     private PriorityQueue<Schedule> open;
 
-    public Schedule run(){
+    public Schedule run(Graph graph, int numProcessors){
         // calculate bottom level for each node, this can be done by calling setBottomLevelMap on each entry node
         // add first scheule to prio queue
 
