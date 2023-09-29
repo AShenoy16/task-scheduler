@@ -67,18 +67,19 @@ public class CalculateCostFunction {
 
     }
 
-    // TODO fix this
-    public List<Map.Entry<Node, Integer>> getBottomLevel() {
+    public List<Node> getBottomLevel() {
 
         List<Map.Entry<Node, Integer>> bottomLevelList = new ArrayList<>(bottomLevelMap.entrySet());
 
         bottomLevelList.sort(Comparator.comparing(Map.Entry::getValue));
 
-//
-//        // sort list
-//        Collections.sort(bottomLevelList, Comparator.comparing(Map.Entry::getValue));
+        List<Node> bottomLevelOrder = new ArrayList<>();
 
-        return bottomLevelList;
+        for (Map.Entry<Node, Integer> entry : bottomLevelList) {
+            bottomLevelOrder.add(entry.getKey());
+        }
+
+        return bottomLevelOrder;
 
     }
 }
