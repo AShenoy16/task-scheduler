@@ -3,12 +3,14 @@ package model;
 import algorithm.astar.CalculateCostFunction;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.*;
 
 public class Graph {
     private final int n;
     private int[][] adjacencyMatrix;
+    //Maybe implement hashmap instead as its easier
+//    private HashMap<Node, List<Node>> adjacencyMap = new HashMap<>();
     private ArrayList<Integer> nodeWeightings;
     private ArrayList<Node> startNodes = new ArrayList<>();
     private ArrayList<Node> endNodes = new ArrayList<>();
@@ -71,7 +73,7 @@ public class Graph {
         return childNodes;
     }
 
-    private ArrayList<Node> getParentNodes(Node node) {
+    public ArrayList<Node> getParentNodes(Node node) {
         ArrayList<Node> parentNodes = new ArrayList<>();
 
         int col = node.getId();

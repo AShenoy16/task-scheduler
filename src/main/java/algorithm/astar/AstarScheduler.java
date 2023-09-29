@@ -5,6 +5,7 @@ import model.Schedule;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -33,32 +34,37 @@ public class AstarScheduler {
             return null;
         }
 
+        List<Node>  sortedList =  calculateCostFunction.getSortedBottomLevel();
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
-        
+
         // return the hashmap
 
         // get the sorted list descending order,
         // get first entry node
 
         while (open.size() != 0){
-            Schedule partialSchdule = open.poll();
+            Schedule partialSchedule = open.poll();
 
-            if(partialSchdule.isCompleteSchedule()){
-                return partialSchdule;
+            if(partialSchedule.isCompleteSchedule()){
+                return partialSchedule;
             }
             //expand partialSchedule into children and compute cost function for each child
 
 
 
+
                 //create new schules and then for every possible child that can happen
                 // (make sure that it's valid child, all parents of that child are already in schedule)
+
+            List<Schedule> newSchedules = createPartialSchedules(graph.getValidChildrenNodes(partialSchedule, sortedList), numProcessors, partialSchedule, graph);
+
                     // create the new tasks that can be in these schedules
-            List<Schedule> newList = createPartialSchedules();
+
                 // tell prio queue to know cost function for the scheulde
 
             // add all new child schedules to open prio queue
-            open.addAll(newList);
+            open.addAll(newSchedules);
         }
     }
     public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numOfProcessors){
@@ -74,30 +80,58 @@ public class AstarScheduler {
 
         return newSchedules;
     }
-    public List<Schedule> createPartialSchedules(Schedule schedule){
+    public List<Schedule> createPartialSchedules(List<Node> validChildNodes, int numOfProcessors, Schedule schedule, Graph graph){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
-        //TODO Call method or anything to get the valid child tasks
-        for(Node entryNode : entryNodes){
-            for(int i = 1 ; i <= numOfProcessors; i++){
-                Task task = new Task(entryNode, 0, entryNode.getVal(), i);
-                //remove from sortedBottomList
+
+        //TODO optimise
+        for(Node validChildNode : validChildNodes){
+            // find latest time for particular processor
+            // from the schedule, find task with latest finish times in each processor
+            // find parent with latest finish times including any possible edge values
+            // get minimum starting time possible for particular processor
+
+            List<Node> parentNodes = graph.getParentNodes(validChildNode);
+
+            //TODO rename variables, among other other things
+            int earliestStartTimeForProcessor;
+            int latestParentStartTime;
+            int earliestTimeTaskCanStart;
+
+            //
+            for(int processorID = 1 ; processorID <= numOfProcessors; processorID++){
+                earliestStartTimeForProcessor = 0;
+                latestParentStartTime = 0;
+                List<Node> scheduleNodes = schedule.getAllNodes();
+
+                // This for loop gets the start time
+                for(Task task : schedule.getTasks()){
+                    // this will get the latest finish time of any task for a particular processor (processorID)
+                    if(task.getProcessor() == processorID && task.getFinishTime() > earliestStartTimeForProcessor){
+                        earliestStartTimeForProcessor = task.getFinishTime();
+                    }
+
+                    // This checks if the task is a parent task
+                    if(parentNodes.contains(task.getNode())){
+                        int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validChildNode.getId()];
+
+                        // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
+                        if(task.getProcessor() == processorID && latestParentStartTime > task.getFinishTime()){
+                            latestParentStartTime = task.getFinishTime();
+                        } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
+                            latestParentStartTime = task.getFinishTime() + edgeWeight;
+                        }
+                    }
+                }
+
+                earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
+
+                Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
                 Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
                 newSchedules.add(newlyMadeSchedule);
             }
         }
-        // FOR EVERY CHILD TASK
-            // for every processor
-                //TODO create method calculate start times
-
-                // instantiate task with processor
-                // create new schedule with new task make sure added task is early as possible
-                 // calculate and set cost
-        CalculateCostFunction calculateCostFunction = new CalculateCostFunction();
-        calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-                // add schedule to list of schedules
-
 
         return newSchedules;
 
