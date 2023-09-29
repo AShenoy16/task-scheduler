@@ -55,7 +55,7 @@ public class Graph {
         return childrenNodes;
     }
 
-        private void findStartNodes() {
+    private void findStartNodes() {
         for (int j = 0;  j < n; j++) {
             int count = 0;
             for (int i = 0; i < n; i++) {
