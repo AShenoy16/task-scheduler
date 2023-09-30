@@ -22,10 +22,6 @@ public class PartialSolution {
         this.childrenQueue = new HashMap<>();
         this.scheduledTask = scheduledTask;
         this.processorTimes = new int[numProcessors];
-
-//        processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
-
-//        this.visitedNodes.add(scheduledTask.getNode());
     }
 
     /**

@@ -60,16 +60,16 @@ public class BranchAndBound {
         for (int i = 0; i < outgoingEdgeWeights.length; i++) {// 'i' represents the outgoing edge node
             if (outgoingEdgeWeights[i] != 0) {
                 // if node already visited then continue with for loop
-                if (partialSolution.getVisitedNodes().contains(graph.getNodes().get(i))) {
+                if (partialSolution.getVisitedNodes().contains(graph.getNodes()[i])) {
                     continue;
                 }
                 // adds current task as dependency of dest node
-                if (partialSolution.getChildrenQueue().containsKey(graph.getNodes().get(i))) {
-                    partialSolution.getChildrenQueue().get(graph.getNodes().get(i)).add(currentTask);
+                if (partialSolution.getChildrenQueue().containsKey(graph.getNodes()[i])) {
+                    partialSolution.getChildrenQueue().get(graph.getNodes()[i]).add(currentTask);
                 } else {
                     List<ScheduledTask> children = new ArrayList<>();
                     children.add(currentTask);
-                    partialSolution.getChildrenQueue().put(graph.getNodes().get(i), children);
+                    partialSolution.getChildrenQueue().put(graph.getNodes()[i], children);
                 }
             }
         }
@@ -116,7 +116,7 @@ public class BranchAndBound {
                 // create new partial solution with new task for this child and add it to dfs branch and bound recursion
                 ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
                 PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask);
-                newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes().get(destNode.getId()).getVal();
+                newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
                 dfs(newPartialSolution);
             }
         }
@@ -150,7 +150,7 @@ public class BranchAndBound {
     private boolean isFullyVisited(PartialSolution partialSolution, Node destNode) {
         for (int row = 0; row < graph.getN(); row++) {
             // 'row' being source node, 'destNode' being dest, check if source node is fully visited
-            if (graph.getAdjacencyMatrix()[row][destNode.getId()] != 0 && !partialSolution.getVisitedNodes().contains(graph.getNodes().get(row))) {
+            if (graph.getAdjacencyMatrix()[row][destNode.getId()] != 0 && !partialSolution.getVisitedNodes().contains(graph.getNodes()[row])) {
                 return false;
             }
         }
