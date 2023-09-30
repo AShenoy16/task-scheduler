@@ -1,6 +1,8 @@
 import algorithms.BranchAndBound;
+import algorithms.Schedule;
 import io.IOHandler;
 import model.Graph;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,6 +17,8 @@ public class TestBranchAndBound {
     public void RunBranchAndBound() throws IOException {
         Graph g = IOHandler.readDot(directory + "example.dot");
         BranchAndBound branchAndBound = new BranchAndBound();
-        branchAndBound.run(2, g);
+        Schedule schedule = branchAndBound.run(2, g);
+        assertEquals(schedule.getShortestPath(), 8);
+        // need to test for tasks in schedules
     }
 }

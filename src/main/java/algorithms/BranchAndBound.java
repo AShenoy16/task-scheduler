@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class BranchAndBound {
+    private int shortestPath;
+
     public Schedule run(int numProcesses, Graph graph){
         // initialise new state to keep track of current shortest path
         State state = new State(numProcesses, graph);
@@ -21,7 +23,16 @@ public class BranchAndBound {
             partialSolution.getRootQueue().putAll(rootQueue);
             dfs(state, partialSolution);
         }
-        return null;
+        List<ScheduledTask> scheduledTasksList = new ArrayList<>();
+        ScheduledTask shortestPathTask = state.getCurrentShortestTask();
+
+        while (shortestPathTask != null) {
+            scheduledTasksList.add(shortestPathTask);
+            shortestPathTask = shortestPathTask.getParent();
+        }
+        Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
+        schedule.setShortestPath(shortestPath);
+        return schedule;
     }
 
 
@@ -98,6 +109,7 @@ public class BranchAndBound {
             pathLength = Math.max(pathLength, task.getStartTime() + task.getNode().getVal());
             task = task.getParent();
         }
+        shortestPath = pathLength;
         System.out.println("New Shortest Path: " + pathLength);
     }
 

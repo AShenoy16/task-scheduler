@@ -14,4 +14,29 @@ public class Schedule {
         this.numProcesses = numProcesses;
         this.scheduledTaskList = scheduledTaskList;
     }
+
+    public int getNumProcesses() {
+        return numProcesses;
+    }
+
+    public void setNumProcesses(int numProcesses) {
+        this.numProcesses = numProcesses;
+    }
+
+    public List<ScheduledTask> getScheduledTaskList() {
+        return scheduledTaskList;
+    }
+
+    public void setScheduledTaskList(List<ScheduledTask> scheduledTaskList) {
+        this.scheduledTaskList = scheduledTaskList;
+    }
+
+    public int getShortestPath() {
+        return shortestPath;
+    }
+
+    public void setShortestPath(int shortestPath) {
+        this.shortestPath = shortestPath;
+    }
+
 }
