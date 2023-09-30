@@ -9,17 +9,16 @@ import model.Node;
 public class ScheduledTask {
     private int startTime;
     private int processorId;
-    private Integer node;
-    private int taskTime;
+    private Node node;
     private ScheduledTask parent;
 
-    public ScheduledTask(int startTime, int processorId, Integer node, int taskTime ,ScheduledTask parent){
+    public ScheduledTask(int startTime, int processorId, Node node,ScheduledTask parent){
         this.startTime = startTime;
         this.processorId = processorId;
         this.node = node;
         this.parent = parent;
-        this.taskTime = taskTime;
     }
+
     public int getStartTime(){
         return startTime;
     }
@@ -27,11 +26,11 @@ public class ScheduledTask {
         return processorId;
     }
 
-    public int getNode(){
+    public Node getNode(){
         return node;
     }
 
-    public int getTaskTime(){
-        return taskTime;
+    public ScheduledTask getParent() {
+        return parent;
     }
 }
