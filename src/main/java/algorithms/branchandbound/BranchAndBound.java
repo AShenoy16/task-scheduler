@@ -24,7 +24,7 @@ public class BranchAndBound {
         for(Node n : graph.getStartNodes()){
             ScheduledTask task = new ScheduledTask(0,0, n,null);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses);
-            partialSolution.getRootQueue().put(n, new ArrayList<>());
+            partialSolution.getChildrenQueue().put(n, new ArrayList<>());
             dfs(partialSolution); // start recursive dfs branch and bound
         }
 
@@ -42,6 +42,10 @@ public class BranchAndBound {
     }
 
 
+    /**
+     * recursive dfs branch and bound algorithm
+     * @param partialSolution the partial solution of this iteration
+     */
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
         int pathTime = getCurrentLatestTaskTime(currentTask);
@@ -51,54 +55,65 @@ public class BranchAndBound {
             return;
         }
 
+        // add children of current node to queue of partial solution
         int[] outgoingEdgeWeights = graph.getAdjacencyMatrix()[currentTask.getNode().getId()];
         for (int i = 0; i < outgoingEdgeWeights.length; i++) {// 'i' represents the outgoing edge node
             if (outgoingEdgeWeights[i] != 0) {
+                // if node already visited then continue with for loop
                 if (partialSolution.getVisitedNodes().contains(graph.getNodes().get(i))) {
                     continue;
                 }
-                if (partialSolution.getRootQueue().containsKey(graph.getNodes().get(i))) {
-                    partialSolution.getRootQueue().get(graph.getNodes().get(i)).add(currentTask);
+                // adds current task as dependency of dest node
+                if (partialSolution.getChildrenQueue().containsKey(graph.getNodes().get(i))) {
+                    partialSolution.getChildrenQueue().get(graph.getNodes().get(i)).add(currentTask);
                 } else {
-                    ArrayList<ScheduledTask> children = new ArrayList<>();
+                    List<ScheduledTask> children = new ArrayList<>();
                     children.add(currentTask);
-                    partialSolution.getRootQueue().put(graph.getNodes().get(i), children);
+                    partialSolution.getChildrenQueue().put(graph.getNodes().get(i), children);
                 }
             }
         }
 
-        if (partialSolution.getRootQueue().size() == 0) {
+        // update current shortest path and task if queue is empty and is shorter
+        if (partialSolution.getChildrenQueue().size() == 0) {
             if (pathTime < currentShortestPath) {
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
-                
+
+                // print path on console
                 printCurrentPath(currentTask);
             }
         }
 
-        for (Map.Entry<Node, List<ScheduledTask>> childNode : partialSolution.getRootQueue().entrySet()) {
-            // 'i' is processors
-            for (int i = 0; i < numProcessors; i++) {
+        // branch and bound algorithm for queued children
+        for (Map.Entry<Node, List<ScheduledTask>> childNode : partialSolution.getChildrenQueue().entrySet()) {
+            for (int i = 0; i < numProcessors; i++) {// 'i' is processors to consider for each queued childNode
                 int earliestStartTime = 0;
 
                 Node destNode = childNode.getKey();
-                List<ScheduledTask> scheduledTasks = childNode.getValue();
+                List<ScheduledTask> destNodeDependencies = childNode.getValue();
 
+                // ensure all previous tasks of destNode is visited
                 if (!isFullyVisited(partialSolution, destNode)) {
                     continue;
                 }
 
-                for (ScheduledTask scheduledTask : scheduledTasks) {
-                    int finishTime = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
+                // iterates over each dependency of destNode, and gets the time it can start at earliest
+                for (ScheduledTask dependency : destNodeDependencies) {
+                    int finishTime = dependency.getStartTime() + dependency.getNode().getVal();
 
-                    if (scheduledTask.getProcessorId() != i) {
-                        finishTime += graph.getAdjacencyMatrix()[scheduledTask.getNode().getId()][destNode.getId()];
+                    // if dependency is not on the same processor, account for communication delay
+                    if (dependency.getProcessorId() != i) {
+                        finishTime += graph.getAdjacencyMatrix()[dependency.getNode().getId()][destNode.getId()];
                     }
 
                     // return the earliest start time for this task
                     earliestStartTime = Math.max(finishTime, earliestStartTime);
                 }
+                // check if processor is free after earliestStartTime
                 int possibleStartTime = Math.max(earliestStartTime, partialSolution.getProcessorTimes()[i]);
+
+                // create new partial solution with new task for this child and add it to dfs branch and bound recursion
                 ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
                 PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask);
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes().get(destNode.getId()).getVal();
@@ -134,7 +149,7 @@ public class BranchAndBound {
 
     private boolean isFullyVisited(PartialSolution partialSolution, Node destNode) {
         for (int row = 0; row < graph.getN(); row++) {
-            // 'row' being source node, 'node' being dest, check if source node is fully visited
+            // 'row' being source node, 'destNode' being dest, check if source node is fully visited
             if (graph.getAdjacencyMatrix()[row][destNode.getId()] != 0 && !partialSolution.getVisitedNodes().contains(graph.getNodes().get(row))) {
                 return false;
             }

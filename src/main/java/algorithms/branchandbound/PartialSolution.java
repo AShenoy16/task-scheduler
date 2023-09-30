@@ -8,9 +8,8 @@ import java.util.*;
  */
 public class PartialSolution {
     private List<Node> visitedNodes;
-    private Map<Node, List<ScheduledTask>> rootQueue;
+    private Map<Node, List<ScheduledTask>> childrenQueue;
     private int[] processorTimes;
-
     private ScheduledTask scheduledTask;
 
     /**
@@ -20,34 +19,40 @@ public class PartialSolution {
      */
     public PartialSolution(ScheduledTask scheduledTask, int numProcessors){
         this.visitedNodes = new ArrayList<>();
-        this.rootQueue = new HashMap<>();
+        this.childrenQueue = new HashMap<>();
         this.scheduledTask = scheduledTask;
         this.processorTimes = new int[numProcessors];
 
 //        processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
 
-        this.visitedNodes.add(scheduledTask.getNode());
+//        this.visitedNodes.add(scheduledTask.getNode());
     }
 
+    /**
+     * Partial solution for child tasks
+     * @param ParentPartialSolution the parent of this partial solution
+     * @param task the task added to the queue
+     */
     public PartialSolution(PartialSolution ParentPartialSolution, ScheduledTask task) {
+        this.childrenQueue = new HashMap<>();
         this.visitedNodes = new ArrayList<>();
         this.visitedNodes.addAll(ParentPartialSolution.visitedNodes);
 
-        this.rootQueue = new HashMap<>();
-        for (Map.Entry<Node, List<ScheduledTask>> nodeDependencyPair : ParentPartialSolution.rootQueue.entrySet()) {
-            Node node = nodeDependencyPair.getKey();
-            List<ScheduledTask> dependencyList = nodeDependencyPair.getValue();
+        for (Map.Entry<Node, List<ScheduledTask>> dependencyTuple : ParentPartialSolution.childrenQueue.entrySet()) {
+            Node node = dependencyTuple.getKey();
 
-            List<ScheduledTask> clonedList = new ArrayList<>(dependencyList);
-            rootQueue.put(node, clonedList);
+            // clone new separate dependency list for this partial solution
+            List<ScheduledTask> dependencyList = dependencyTuple.getValue();
+            List<ScheduledTask> cloneDependencyList = new ArrayList<>(dependencyList);
+            childrenQueue.put(node, cloneDependencyList);
         }
 
+        // assign a copy of processor times for this partial solution
         this.processorTimes = Arrays.copyOf(ParentPartialSolution.processorTimes, ParentPartialSolution.processorTimes.length);
+
         this.scheduledTask = task;
-
-        this.visitedNodes.add(task.getNode());
-
-        this.rootQueue.remove(task.getNode());
+        this.visitedNodes.add(task.getNode());//add task node as visited in visited array
+        this.childrenQueue.remove(task.getNode());//remove node from queue
     }
 
     public List<Node> getVisitedNodes() {
@@ -62,7 +67,7 @@ public class PartialSolution {
         return scheduledTask;
     }
 
-    public Map<Node, List<ScheduledTask>> getRootQueue(){
-        return rootQueue;
+    public Map<Node, List<ScheduledTask>> getChildrenQueue(){
+        return childrenQueue;
     }
 }
