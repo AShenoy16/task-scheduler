@@ -5,85 +5,95 @@ import model.Schedule;
 import org.junit.After;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestAStarScheduling {
     final String directory = "src/test/graphs/";
+    IOHandler io;
     Graph graph;
     AstarScheduler scheduler;
     Schedule schedule;
 
     @Test
-    public void TestAStarTwoProcessorsNodes7() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
+    public void TestAStarTwoProcessorsNodes7() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_7_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(28, schedule.getCost());
+        // Need to add output file name logic after CMD argument parsing is completed
+        // Example of how to write output. Possibly create separate IO test later.
+        io.writeDot(schedule,"Nodes_7_OutTree-OUTPUT.dot");
     }
     @Test
-    public void TestAStarFourProcessorsNodes7() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
+    public void TestAStarFourProcessorsNodes7() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_7_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
         assertEquals(22, schedule.getCost());
     }
     @Test
-    public void TestAStarTwoProcessorsNodes8() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_8_Random.dot");
+    public void TestAStarTwoProcessorsNodes8() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_8_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(581, schedule.getCost());
     }
     @Test
-    public void TestAStarFourProcessorsNodes8() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_8_Random.dot");
+    public void TestAStarFourProcessorsNodes8() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_8_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
         assertEquals(581, schedule.getCost());
     }
 
     @Test
-    public void TestAStarTwoProcessorsNodes9() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_9_SeriesParallel.dot");
+    public void TestAStarTwoProcessorsNodes9() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(55, schedule.getCost());
     }
     @Test
-    public void TestAStarFourProcessorsNodes9() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_9_SeriesParallel.dot");
+    public void TestAStarFourProcessorsNodes9() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
         assertEquals(55, schedule.getCost());
     }
     @Test
-    public void TestAStarTwoProcessorsNodes10() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_10_Random.dot");
+    public void TestAStarTwoProcessorsNodes10() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_10_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(50, schedule.getCost());
     }
     @Test
-    public void TestAStarFourProcessorsNodes10() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_10_Random.dot");
+    public void TestAStarFourProcessorsNodes10() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_10_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
         assertEquals(50, schedule.getCost());
     }
     @Test
-    public void TestAStarTwoProcessorsNodes11() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_11_OutTree.dot");
+    public void TestAStarTwoProcessorsNodes11() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(350, schedule.getCost());
     }
     @Test
-    public void TestAStarFourProcessorsNode11() throws IOException {
-        graph = IOHandler.readDot(directory + "Nodes_11_OutTree.dot");
+    public void TestAStarFourProcessorsNode11() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
         assertEquals(227, schedule.getCost());

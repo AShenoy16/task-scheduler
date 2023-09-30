@@ -1,43 +1,86 @@
 package io;
 
-import model.Edge;
-import model.Graph;
-import model.Node;
+import model.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 public class IOHandler {
-    public static Graph readDot(String filePath) throws IOException {
-        var nodes = new ArrayList<Node>();
-        var edges = new ArrayList<Edge>();
+    private String edgesString = "";
 
-        var br = new BufferedReader(new FileReader(filePath));
+    /**
+     * Read a .dot file and return a Graph object.
+     *
+     * @param filePath Directory of the .dot file
+     * @return Graph object containing adjacency matrix, start nodes and end nodes
+     */
+    public Graph readDot(String filePath) {
+        try {
+            var nodes = new ArrayList<Node>();
+            var edges = new ArrayList<Edge>();
 
-        String line;
-        while ((line = br.readLine()) != null) {
-            boolean hasWeight = line.contains("Weight");
-            if (!hasWeight || line.contains("}") || line.contains("{")) {
-                continue;
+            var br = new BufferedReader(new FileReader(filePath));
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                boolean hasWeight = line.contains("Weight");
+                if (!hasWeight || line.contains("}") || line.contains("{")) {
+                    continue;
+                }
+                String l = line.replaceAll("\\s", "");
+
+                int weight = Integer.parseInt(l.substring(l.indexOf("=") + 1, l.indexOf("]")));
+
+                boolean isEdge = l.contains("->");
+                if (isEdge) {
+                    int arrowIndex = l.indexOf("-");
+                    int src = Integer.parseInt(l.substring(0, arrowIndex));
+                    int dest = Integer.parseInt(l.substring(arrowIndex + 2, l.indexOf("[")));
+                    edges.add(new Edge(src, dest, weight));
+                    appendToEdgesString(line);
+                } else {
+                    int id = Integer.parseInt(l.substring(0, l.indexOf("[")));
+                    nodes.add(new Node(id, weight));
+                }
             }
-            line = line.replaceAll("\\s", "");
+            return new Graph(nodes, edges);
 
-            int weight = Integer.parseInt(line.substring(line.indexOf("=") + 1, line.indexOf("]")));
-
-            boolean isEdge = line.contains("->");
-            if (isEdge) {
-                int arrowIndex = line.indexOf("-");
-                int src = Integer.parseInt(line.substring(0, arrowIndex));
-                int dest = Integer.parseInt(line.substring(arrowIndex + 2, line.indexOf("[")));
-                edges.add(new Edge(src, dest, weight));
-            } else {
-                int id = Integer.parseInt(line.substring(0, line.indexOf("[")));
-                nodes.add(new Node(id, weight));
-            }
+        } catch (IOException e) {
+            System.out.println(e);
         }
+        return null;
+    }
 
-        return new Graph(nodes, edges);
+    private void appendToEdgesString(String edge) {
+        edgesString += edgesString.isEmpty() ? "\t" + edge : "\n" + "\t" + edge;
+    }
+
+    /**
+     * Write schedule to a .dot file
+     *
+     * @param schedule schedule to create output file from
+     * @param fileName file name of the output file
+     */
+    // TODO after cmd arguments completed: Output file name (INPUT-output.dot or custom)
+    public void writeDot(Schedule schedule, String fileName) {
+        try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)))) {
+            bw.write("digraph \"output" + fileName + "\" {");
+            bw.newLine();
+
+            for (Task t : schedule.getTasks()) {
+                bw.write("\t\t" + t.getNode().getId() + "\t" + "[" + "Weight=" + t.getNode().getVal() + ",Start=" + t.getStartTime() + ",Processor=" + t.getProcessor() + "];");
+                bw.newLine();
+            }
+
+            if (!edgesString.isEmpty()) {
+                bw.write(edgesString);
+                bw.newLine();
+            }
+
+            bw.write("}");
+
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 }
