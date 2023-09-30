@@ -1,20 +1,21 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Graph {
     private final int n;
     private int[][] adjacencyMatrix;
-    private ArrayList<Integer> nodeWeightings;
-    private ArrayList<Integer> startNodes = new ArrayList<>();
-    private ArrayList<Integer> endNodes = new ArrayList<>();
+    private ArrayList<Node> startNodes = new ArrayList<>();
+    private ArrayList<Node> endNodes = new ArrayList<>();
+    private ArrayList<Node> nodes;
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
+        this.nodes = nodes;
         adjacencyMatrix = new int[n][n];
-        mapNodeLabels(nodes);
         fillAdjacencyMatrix(edges);
-        findStartNodes();
-        findEndNodes();
+        findStartNodes(nodes);
+        findEndNodes(nodes);
     }
 
     public int getN() {
@@ -25,31 +26,25 @@ public class Graph {
         return adjacencyMatrix;
     }
 
-    public ArrayList<Integer> getStartNodes() {
+    public ArrayList<Node> getStartNodes() {
         return startNodes;
     }
 
-    public ArrayList<Integer> getEndNodes() {
+    public ArrayList<Node> getEndNodes() {
         return endNodes;
     }
 
-    public ArrayList<Integer> getNodeWeightings() {
-        return nodeWeightings;
+    public ArrayList<Node> getNodes() {
+        return nodes;
     }
 
-    private void mapNodeLabels(ArrayList<Node> nodes) {
-        nodeWeightings = new ArrayList<>(n);
-        for (Node n : nodes) {
-            nodeWeightings.add(n.getId(), n.getVal());
-        }
-    }
     private void fillAdjacencyMatrix(ArrayList<Edge> edges) {
         for (Edge e : edges) {
             adjacencyMatrix[e.getSrcId()][e.getDestId()] = e.getWeight();
         }
     }
 
-    private void findStartNodes() {
+    private void findStartNodes(List<Node> nodes) {
         for (int j = 0;  j < n; j++) {
             int count = 0;
             for (int i = 0; i < n; i++) {
@@ -59,11 +54,11 @@ public class Graph {
             }
 
             if (count == n) {
-                startNodes.add(j);
+                startNodes.add(nodes.get(j));
             }
         }
     }
-    private void findEndNodes() {
+    private void findEndNodes(List<Node> nodes) {
         for (int i = 0; i < n; i++) {
             int count = 0;
             for (int j = 0; j < n; j++) {
@@ -73,7 +68,7 @@ public class Graph {
             }
 
             if (count == n) {
-                endNodes.add(i);
+                endNodes.add(nodes.get(i));
             }
         }
     }
