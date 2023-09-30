@@ -18,7 +18,8 @@ public class IOHandler {
 
         String line;
         while ((line = br.readLine()) != null) {
-            if (line.contains("}") || line.contains("{")) {
+            boolean hasWeight = line.contains("Weight");
+            if (!hasWeight || line.contains("}") || line.contains("{")) {
                 continue;
             }
             line = line.replaceAll("\\s", "");
