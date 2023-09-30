@@ -1,4 +1,4 @@
-package algorithms;
+package algorithms.branchandbound;
 
 import model.Graph;
 import model.Node;

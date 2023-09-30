@@ -1,12 +1,10 @@
-import algorithms.BranchAndBound;
-import algorithms.Schedule;
+import algorithms.branchandbound.BranchAndBound;
+import algorithms.branchandbound.Schedule;
 import io.IOHandler;
 import model.Graph;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
