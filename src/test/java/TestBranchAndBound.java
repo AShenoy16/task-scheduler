@@ -74,20 +74,20 @@ public class TestBranchAndBound {
         assertEquals(50, schedule.getShortestPath());
     }
 
-//    @Test
-//    public void TestBnBTwoProcessorsNodes11() throws IOException {
-//        Graph g = IOHandler.readDot(directory + "Nodes_11_OutTree.dot");
-//        BranchAndBound scheduler = new BranchAndBound();
-//        Schedule schedule = scheduler.run(g, 2);
-//        assertEquals(350, schedule.getShortestPath());
-//    }
-//    @Test
-//    public void TestBnBFourProcessorsNode11() throws IOException {
-//        Graph g = IOHandler.readDot(directory + "Nodes_11_OutTree.dot");
-//        BranchAndBound scheduler = new BranchAndBound();
-//        Schedule schedule = scheduler.run(g, 4);
-//        assertEquals(227, schedule.getShortestPath());
-//    }
+    @Test
+    public void TestBnBTwoProcessorsNodes11() throws IOException {
+        Graph g = IOHandler.readDot(directory + "Nodes_11_OutTree.dot");
+        BranchAndBound scheduler = new BranchAndBound();
+        Schedule schedule = scheduler.run(g, 2);
+        assertEquals(350, schedule.getShortestPath());
+    }
+    @Test
+    public void TestBnBFourProcessorsNode11() throws IOException {
+        Graph g = IOHandler.readDot(directory + "Nodes_11_OutTree.dot");
+        BranchAndBound scheduler = new BranchAndBound();
+        Schedule schedule = scheduler.run(g, 4);
+        assertEquals(227, schedule.getShortestPath());
+    }
 
     @Test
     public void TestBNBOneProcessorsExample() throws IOException {
