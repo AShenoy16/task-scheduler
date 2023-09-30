@@ -1,4 +1,4 @@
-package algorithms.branchandbound;
+package algorithm.branchandbound;
 
 import model.Graph;
 import model.Node;
@@ -22,9 +22,16 @@ public class BranchAndBound {
 
         // iterate over each entry nodes
         for(Node n : graph.getStartNodes()){
+            Map<Node, List<ScheduledTask>> childrenQueue = new HashMap<>();
+            // add multiple entry nodes to queue or algorithm will not be able to visit children
+            for (Node m : graph.getStartNodes()) {
+                if (n != m) {
+                    childrenQueue.put(m, new ArrayList<>());
+                }
+            }
             ScheduledTask task = new ScheduledTask(0,0, n,null);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses);
-            partialSolution.getChildrenQueue().put(n, new ArrayList<>());
+            partialSolution.getChildrenQueue().putAll(childrenQueue);
             dfs(partialSolution); // start recursive dfs branch and bound
         }
 

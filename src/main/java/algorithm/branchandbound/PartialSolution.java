@@ -1,4 +1,4 @@
-package algorithms.branchandbound;
+package algorithm.branchandbound;
 import model.Node;
 
 import java.util.*;
@@ -13,7 +13,7 @@ public class PartialSolution {
     private ScheduledTask scheduledTask;
 
     /**
-     * Partial solution for root level tasks
+     * Partial solution for the first root level node
      * @param scheduledTask the scheduled task of this partial solution
      * @param numProcessors number of processors that can perform this task
      */
@@ -22,6 +22,10 @@ public class PartialSolution {
         this.childrenQueue = new HashMap<>();
         this.scheduledTask = scheduledTask;
         this.processorTimes = new int[numProcessors];
+
+        // updates root node
+        processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
+        this.visitedNodes.add(scheduledTask.getNode());
     }
 
     /**
