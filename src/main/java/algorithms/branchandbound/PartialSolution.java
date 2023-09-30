@@ -13,6 +13,11 @@ public class PartialSolution {
 
     private ScheduledTask scheduledTask;
 
+    /**
+     * Partial solution for root level tasks
+     * @param scheduledTask the scheduled task of this partial solution
+     * @param numProcessors number of processors that can perform this task
+     */
     public PartialSolution(ScheduledTask scheduledTask, int numProcessors){
         this.visitedNodes = new ArrayList<>();
         this.rootQueue = new HashMap<>();

@@ -14,15 +14,16 @@ public class BranchAndBound {
     public Schedule run(Graph graph, int numProcesses){
         // initialise new state to keep track of current shortest path
         State state = new State(numProcesses, graph);
-        Map<Node, List<ScheduledTask>> rootQueue = new HashMap<>();
 
+        // iterate over each entry nodes
         for(Node n : graph.getStartNodes()){
-            rootQueue.put(n, new ArrayList<>());
             ScheduledTask task = new ScheduledTask(0,0, n,null);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses);
-            partialSolution.getRootQueue().putAll(rootQueue);
-            dfs(state, partialSolution);
+            partialSolution.getRootQueue().put(n, new ArrayList<>());
+            dfs(state, partialSolution); // start recursive dfs branch and bound
         }
+
+        // returns a schedule of the shortest path found
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
         ScheduledTask shortestPathTask = state.getCurrentShortestTask();
 
@@ -38,8 +39,9 @@ public class BranchAndBound {
 
     private void dfs(State state, PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
-        int pathTime = currentTask.getStartTime() + currentTask.getNode().getVal();
+        int pathTime = getCurrentLatestTaskTime(currentTask);
 
+        // bound the search of this node
         if (pathTime >= state.getCurrentShortestPath()) {
             return;
         }
@@ -49,7 +51,8 @@ public class BranchAndBound {
             if (outgoingEdgeWeights[i] != 0) {
                 if (partialSolution.getVisitedNodes().contains(state.getGraph().getNodes().get(i))) {
                     continue;
-                } else if (partialSolution.getRootQueue().containsKey(state.getGraph().getNodes().get(i))) {
+                }
+                if (partialSolution.getRootQueue().containsKey(state.getGraph().getNodes().get(i))) {
                     partialSolution.getRootQueue().get(state.getGraph().getNodes().get(i)).add(currentTask);
                 } else {
                     ArrayList<ScheduledTask> children = new ArrayList<>();
@@ -100,17 +103,29 @@ public class BranchAndBound {
 
     }
 
+    private int getCurrentLatestTaskTime(ScheduledTask currentTask) {
+        int pathTime = 0;
+        while (currentTask != null) {
+            if (currentTask.getStartTime() + currentTask.getNode().getVal() > pathTime) {
+                pathTime = currentTask.getStartTime() + currentTask.getNode().getVal();
+            }
+            currentTask = currentTask.getParent();
+        }
+        return pathTime;
+    }
+
     private void printCurrentPath(ScheduledTask task) {
         int pathLength = 0;
+        System.out.println("New Shortest Task: " + task.getNode().getId());
 
         System.out.println("Start | Finish | Node ID | Processor ID");
-        while (task.getParent() != null) {
+        while (task != null) {
             System.out.println(task.getStartTime() + " | " + (task.getStartTime()+task.getNode().getVal()) + " | " + task.getNode().getId() + " | " + task.getProcessorId());
             pathLength = Math.max(pathLength, task.getStartTime() + task.getNode().getVal());
             task = task.getParent();
         }
         shortestPath = pathLength;
-        System.out.println("New Shortest Path: " + pathLength);
+        System.out.println("New Shortest Path: " + pathLength + "\n");
     }
 
     private boolean isFullyVisited(State state, PartialSolution partialSolution, Node destNode) {

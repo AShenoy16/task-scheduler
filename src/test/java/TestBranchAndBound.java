@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestBranchAndBound {
@@ -88,5 +87,21 @@ public class TestBranchAndBound {
         BranchAndBound scheduler = new BranchAndBound();
         Schedule schedule = scheduler.run(g, 4);
         assertEquals(227, schedule.getShortestPath());
+    }
+
+    @Test
+    public void TestBNBOneProcessorsExample() throws IOException {
+        Graph g = IOHandler.readDot(directory + "example.dot");
+        BranchAndBound scheduler = new BranchAndBound();
+        Schedule schedule = scheduler.run(g, 1);
+        assertEquals(10, schedule.getShortestPath());
+    }
+
+    @Test
+    public void TestBNBTwoProcessorsExample() throws IOException {
+        Graph g = IOHandler.readDot(directory + "example.dot");
+        BranchAndBound scheduler = new BranchAndBound();
+        Schedule schedule = scheduler.run(g, 2);
+        assertEquals(8, schedule.getShortestPath());
     }
 }
