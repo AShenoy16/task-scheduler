@@ -122,7 +122,7 @@ public class AstarScheduler {
                         int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validChildNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-                        if(task.getProcessor() == processorID && latestParentStartTime > task.getFinishTime()){
+                        if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
                             latestParentStartTime = task.getFinishTime();
                         } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
                             latestParentStartTime = task.getFinishTime() + edgeWeight;
@@ -133,7 +133,7 @@ public class AstarScheduler {
                 earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
 
                 Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
-                List<Task> newTasks = schedule.getTasks();
+                List<Task> newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
