@@ -149,10 +149,9 @@ public class Graph {
      * @param sortedBottomList
      * @return
      */
-    public ArrayList<Node> getValidChildrenNodes(Schedule schedule, List<Node> sortedBottomList) {
+    public ArrayList<Node> getValidChildrenNodes(Schedule schedule, List<Node> sortedBottomList, CalculateCostFunction calculateCostFunction) {
         ArrayList<Node> childrenNodes = new ArrayList<>();
         ArrayList<Node> allNodes = schedule.getAllNodes();
-        CalculateCostFunction calculateCostFunction = new CalculateCostFunction();
 
         boolean flag = true;
 
@@ -166,7 +165,7 @@ public class Graph {
                 // we want max bottom lvl value NOT currently in schedule
                 // if flag is true we update bottomLevelValue
                 if(flag){
-                    bottomLevelValue = calculateCostFunction.bottomLevelofNode(node);
+                    bottomLevelValue = calculateCostFunction.getBottomLevelMap().get(node);
                 }
 
                 flag = false;
