@@ -13,13 +13,6 @@ public class TestAStarScheduling {
     final String directory = "src/test/graphs/";
 
     @Test
-    public void TestAStar() throws IOException {
-        Graph g = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
-        AstarScheduler scheduler = new AstarScheduler();
-        var schedule = scheduler.run(g, 1);
-
-    }
-    @Test
     public void TestAStarTwoProcessorsNodes7() throws IOException {
         Graph g = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
         AstarScheduler scheduler = new AstarScheduler();

@@ -10,7 +10,7 @@ public class Graph {
     private int[][] adjacencyMatrix;
     //Maybe implement hashmap instead as its easier
 //    private HashMap<Node, List<Node>> adjacencyMap = new HashMap<>();
-    private ArrayList<Integer> nodeWeightings;
+    private int[] nodeWeightings;
     private ArrayList<Node> startNodes = new ArrayList<>();
     private ArrayList<Node> endNodes = new ArrayList<>();
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
@@ -38,7 +38,7 @@ public class Graph {
         return endNodes;
     }
 
-    public ArrayList<Integer> getNodeWeightings() {
+    public int[] getNodeWeightings() {
         return nodeWeightings;
     }
 
@@ -50,9 +50,9 @@ public class Graph {
      * @param nodes Nodes from dot file to process
      */
     private void fillNodeWeightings(ArrayList<Node> nodes) {
-        nodeWeightings = new ArrayList<>(n);
+        nodeWeightings = new int[n];
         for (Node n : nodes) {
-            nodeWeightings.add(n.getId(), n.getVal());
+            nodeWeightings[n.getId()] = n.getVal();
         }
     }
 
@@ -140,7 +140,7 @@ public class Graph {
      * @return created Node
      */
     private Node createNodeById(int id) {
-        return new Node(id, nodeWeightings.get(id));
+        return new Node(id, nodeWeightings[id]);
     }
 
     /**
