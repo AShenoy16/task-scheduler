@@ -12,15 +12,18 @@ import java.util.PriorityQueue;
 public class AstarScheduler {
 
 
-    private PriorityQueue<Schedule> open;
+    private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
 
-    private CalculateCostFunction calculateCostFunction = new CalculateCostFunction();
+    private CalculateCostFunction calculateCostFunction;
     public Schedule run(Graph graph, int numProcessors){
         // calculate bottom level for each node, this can be done by calling setBottomLevelMap on each entry node
         // add first scheule to prio queue
 
         // if need to, have a for loop for all the possible entry nodes
         // but I think we don't need this as A* should take care of it
+
+        // TODO remove default constructor of CalculateCostFunction if possible (may need to extract methods + graph class is coupled)
+        calculateCostFunction = new CalculateCostFunction(graph);
 
         // set bottom level values for every node
         for (Node entryNode : graph.getStartNodes()) {
@@ -119,7 +122,7 @@ public class AstarScheduler {
                         int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validChildNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-                        if(task.getProcessor() == processorID && latestParentStartTime > task.getFinishTime()){
+                        if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
                             latestParentStartTime = task.getFinishTime();
                         } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
                             latestParentStartTime = task.getFinishTime() + edgeWeight;
@@ -130,7 +133,9 @@ public class AstarScheduler {
                 earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
 
                 Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
-                Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
+                List<Task> newTasks = new ArrayList<>(schedule.getTasks());
+                newTasks.add(task);
+                Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
                 newSchedules.add(newlyMadeSchedule);
             }

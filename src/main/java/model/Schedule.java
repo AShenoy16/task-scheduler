@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Schedule {
 
-    private ArrayList<Task> tasks;
+    private List<Task> tasks;
     private int numProcessors;
 
     private int cost;
@@ -16,7 +16,7 @@ public class Schedule {
     // need to create new instances each time to represent each new partial solution
 
     // this
-    public Schedule(ArrayList<Task> tasks, int numProcessors) {
+    public Schedule(List<Task> tasks, int numProcessors) {
         this.numProcessors = numProcessors;
         this.tasks = tasks;
         //TODO maybe optimise
@@ -29,7 +29,7 @@ public class Schedule {
         this.numProcessors = numProcessors;
     }
 
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
@@ -51,6 +51,10 @@ public class Schedule {
 
         return allNodes;
 
+    }
+
+    public int getCost() {
+        return cost;
     }
 
     public boolean isCompleteSchedule(Graph graph){

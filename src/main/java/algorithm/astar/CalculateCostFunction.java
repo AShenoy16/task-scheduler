@@ -13,10 +13,17 @@ public class CalculateCostFunction {
     // possibly make this class a singleton - reasoning - because we will need to use the getScheduleCost method
     // Maybe make method into a static method?
     private Graph graph;
-    public HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
+
+    // STATIC - temporary fix, multiple CalculateCostFunction instances are created, avoid querying empty bottomLevelMap
+    public static HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
 
     public HashMap<Node,Integer> getBottomLevelMap(){
         return bottomLevelMap;
+    }
+
+    public CalculateCostFunction() {}
+    public CalculateCostFunction(Graph graph) {
+        this.graph = graph;
     }
     public int setBottomLevelMap(Node node){
         for (Node child : graph.getChildrenNodes(node)) {
@@ -25,13 +32,20 @@ public class CalculateCostFunction {
         }
 
         // Get maximum bottom level value out of children nodes
-        int maxChildBottomLevel = graph.getChildrenNodes(node).stream()
-                .mapToInt(Node::getVal)
-                .max()
-                .orElse(0);
+//        int maxChildBottomLevel = graph.getChildrenNodes(node).stream()
+//                .mapToInt(bottomLevelMap.get(node))
+//                .max()
+//                .orElse(0);
+
+        int maxBottomLevelValue = 0;
+        for(Node childNode : graph.getChildrenNodes(node)){
+            if(bottomLevelMap.containsKey(childNode)){
+                maxBottomLevelValue = Math.max(maxBottomLevelValue, bottomLevelMap.get(childNode));
+            }
+        }
 
         // Calculate bottom level value
-        int bottomLevel = maxChildBottomLevel + node.getVal();
+        int bottomLevel = maxBottomLevelValue + node.getVal();
 
         // Save bottom level value to map
         bottomLevelMap.put(node,bottomLevel);
@@ -50,7 +64,7 @@ public class CalculateCostFunction {
         // can either pass this or a schdule
         int cost = 0;
 
-        ArrayList<Task> tasks = currentSchedule.getTasks();
+        List<Task> tasks = currentSchedule.getTasks();
 
 
         for (Task task: tasks){
