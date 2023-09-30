@@ -13,6 +13,8 @@ public class Graph {
     private int[] nodeWeightings;
     private ArrayList<Node> startNodes = new ArrayList<>();
     private ArrayList<Node> endNodes = new ArrayList<>();
+    private Node[] nodes;
+
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
         adjacencyMatrix = new int[n][n];
@@ -20,6 +22,7 @@ public class Graph {
         fillAdjacencyMatrix(edges);
         findStartNodes();
         findEndNodes();
+        orderNodes(nodes);
     }
 
     public int getN() {
@@ -188,8 +191,15 @@ public class Graph {
         return childrenNodes;
     }
 
+    private void orderNodes(List<Node> unorderedNodes) {
+        this.nodes = new Node[unorderedNodes.size()];
+        for (Node node : unorderedNodes) {
+            nodes[node.getId()] = node;
+        }
+    }
 
-
-
+    public Node[] getNodes() {
+        return nodes;
+    }
 
 }
