@@ -20,13 +20,13 @@ public class TestAStarScheduling {
 
     }
     @Test
-    public void TestAStarTwoProcessors() throws IOException {
+    public void TestAStarTwoProcessorsNodes7() throws IOException {
         Graph g = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
         AstarScheduler scheduler = new AstarScheduler();
         var schedule = scheduler.run(g, 2);
     }
     @Test
-    public void TestAStarFourProcessors() throws IOException {
+    public void TestAStarFourProcessorsNodes7() throws IOException {
         Graph g = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
         AstarScheduler scheduler = new AstarScheduler();
         var schedule = scheduler.run(g, 4);
