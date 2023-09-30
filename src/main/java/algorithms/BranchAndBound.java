@@ -11,7 +11,7 @@ import java.util.Map;
 public class BranchAndBound {
     private int shortestPath;
 
-    public Schedule run(int numProcesses, Graph graph){
+    public Schedule run(Graph graph, int numProcesses){
         // initialise new state to keep track of current shortest path
         State state = new State(numProcesses, graph);
         Map<Node, List<ScheduledTask>> rootQueue = new HashMap<>();
