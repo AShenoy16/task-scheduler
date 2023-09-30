@@ -64,7 +64,7 @@ public class IOHandler {
     // TODO after cmd arguments completed: Output file name (INPUT-output.dot or custom)
     public void writeDot(Schedule schedule, String fileName) {
         try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)))) {
-            bw.write("digraph \"output" + fileName + "\" {");
+            bw.write("digraph \"" + fileName + "\" {");
             bw.newLine();
 
             for (Task t : schedule.getTasks()) {
