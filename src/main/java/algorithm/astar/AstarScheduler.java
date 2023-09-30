@@ -14,8 +14,10 @@ public class AstarScheduler {
 
     private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
 
+    //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
     public Schedule run(Graph graph, int numProcessors){
+        List<Schedule> newSchedules;
         // calculate bottom level for each node, this can be done by calling setBottomLevelMap on each entry node
         // add first scheule to prio queue
 
@@ -50,6 +52,7 @@ public class AstarScheduler {
             Schedule partialSchedule = open.poll();
 
             if(partialSchedule.isCompleteSchedule(graph)){
+                open.clear();
                 return partialSchedule;
             }
             //expand partialSchedule into children and compute cost function for each child
@@ -60,7 +63,7 @@ public class AstarScheduler {
                 //create new schules and then for every possible child that can happen
                 // (make sure that it's valid child, all parents of that child are already in schedule)
 
-            List<Schedule> newSchedules = createPartialSchedules(graph.getValidChildrenNodes(partialSchedule, sortedList), numProcessors, partialSchedule, graph);
+            newSchedules = createPartialSchedules(graph.getValidChildrenNodes(partialSchedule, sortedList, calculateCostFunction), numProcessors, partialSchedule, graph);
 
                     // create the new tasks that can be in these schedules
 
@@ -89,7 +92,8 @@ public class AstarScheduler {
     public List<Schedule> createPartialSchedules(List<Node> validChildNodes, int numOfProcessors, Schedule schedule, Graph graph){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
-
+        List<Node> parentNodes;
+        List<Task> newTasks;
         //TODO optimise
         for(Node validChildNode : validChildNodes){
             // find latest time for particular processor
@@ -97,7 +101,7 @@ public class AstarScheduler {
             // find parent with latest finish times including any possible edge values
             // get minimum starting time possible for particular processor
 
-            List<Node> parentNodes = graph.getParentNodes(validChildNode);
+            parentNodes = graph.getParentNodes(validChildNode);
 
             //TODO rename variables, among other other things
             int earliestStartTimeForProcessor;
@@ -108,7 +112,6 @@ public class AstarScheduler {
             for(int processorID = 1 ; processorID <= numOfProcessors; processorID++){
                 earliestStartTimeForProcessor = 0;
                 latestParentStartTime = 0;
-                List<Node> scheduleNodes = schedule.getAllNodes();
 
                 // This for loop gets the start time
                 for(Task task : schedule.getTasks()){
@@ -133,7 +136,7 @@ public class AstarScheduler {
                 earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
 
                 Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
-                List<Task> newTasks = new ArrayList<>(schedule.getTasks());
+                newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
