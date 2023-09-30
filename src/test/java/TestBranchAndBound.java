@@ -1,3 +1,4 @@
+import algorithms.BranchAndBound;
 import io.IOHandler;
 import model.Graph;
 import org.junit.Test;
@@ -12,5 +13,8 @@ public class TestBranchAndBound {
     final String directory = "src/test/graphs/";
     @Test
     public void RunBranchAndBound() throws IOException {
+        Graph g = IOHandler.readDot(directory + "example.dot");
+        BranchAndBound branchAndBound = new BranchAndBound();
+        branchAndBound.run(2, g);
     }
 }
