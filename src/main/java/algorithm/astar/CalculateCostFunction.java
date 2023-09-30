@@ -13,9 +13,7 @@ public class CalculateCostFunction {
     // possibly make this class a singleton - reasoning - because we will need to use the getScheduleCost method
     // Maybe make method into a static method?
     private Graph graph;
-
-    // STATIC - temporary fix, multiple CalculateCostFunction instances are created, avoid querying empty bottomLevelMap
-    public static HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
+    private HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
 
     public HashMap<Node,Integer> getBottomLevelMap(){
         return bottomLevelMap;
@@ -95,16 +93,38 @@ public class CalculateCostFunction {
         // reversed order sort
         bottomLevelList.sort(Map.Entry.<Node, Integer>comparingByValue().reversed());
 
+        ArrayList<Node> sinkNodes = graph.getEndNodes();
+        List<Node> sortedSinkNodes = new ArrayList<>();
 
         List<Node> bottomLevelOrder = new ArrayList<>();
 
+        // seperate sink and non sink nodes
         for (Map.Entry<Node, Integer> entry : bottomLevelList) {
-            bottomLevelOrder.add(entry.getKey());
+            Node currentNode = entry.getKey();
+            if(sinkNodes.contains(currentNode)){
+                sortedSinkNodes.add(currentNode);
+                //need to make sure if it's a sink node the one with the least number of parents is first
+            }else{
+                // non sink node
+                bottomLevelOrder.add(currentNode);
+            }
+
         }
+
+        // Sort sink nodes by the number of parents in ascending order
+        sortedSinkNodes.sort(Comparator.comparingInt(this::countParents));
+
+        // Add sorted sink nodes to the end of the order
+        bottomLevelOrder.addAll(sortedSinkNodes);
+
 
 
         return bottomLevelOrder;
 
+    }
+
+    private int countParents(Node node){
+        return graph.getParentNodes(node).size();
     }
 
     public List<Node> getHighestBottomLevelNodes(){
