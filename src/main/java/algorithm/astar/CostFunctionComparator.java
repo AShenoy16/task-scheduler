@@ -10,6 +10,6 @@ import java.util.Comparator;
 public class CostFunctionComparator implements Comparator<Schedule> {
     @Override
     public int compare(Schedule s1, Schedule s2) {
-        return Integer.compare(s2.getCost(), s1.getCost());
+        return Integer.compare(s1.getCost(), s2.getCost());
     }
 }
