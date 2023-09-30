@@ -19,4 +19,11 @@ public class TestAStarScheduling {
         var schedule = scheduler.run(g, 1);
 
     }
+
+    @Test
+    public void TestAStarTwoProcessors() throws IOException {
+        Graph g = IOHandler.readDot(directory + "Nodes_7_OutTree.dot");
+        AstarScheduler scheduler = new AstarScheduler();
+        var schedule = scheduler.run(g, 2);
+    }
 }
