@@ -20,20 +20,23 @@ public class CalculateCostFunction {
     }
 
     public CalculateCostFunction() {}
+
     public CalculateCostFunction(Graph graph) {
         this.graph = graph;
     }
+
+    /**
+     * This method fills the bottomLevelMap hashmap with nodes and their bottom level values.
+     * It will take in a node and set the bottom level values for all descendant nodes including itself.
+     *
+     * @param node The node to set the bottom level value
+     * @return The bottom level value
+     */
     public int setBottomLevelMap(Node node){
         for (Node child : graph.getChildrenNodes(node)) {
             // Recursive call to start from exit nodes
             setBottomLevelMap(child);
         }
-
-        // Get maximum bottom level value out of children nodes
-//        int maxChildBottomLevel = graph.getChildrenNodes(node).stream()
-//                .mapToInt(bottomLevelMap.get(node))
-//                .max()
-//                .orElse(0);
 
         int maxBottomLevelValue = 0;
         for(Node childNode : graph.getChildrenNodes(node)){
@@ -51,46 +54,34 @@ public class CalculateCostFunction {
         return bottomLevel;
     }
 
-    // this returns cost value for a partial solution, so need to pass in a schedule or tasks
-    // in a schedule
-    // this will then be added to a priority queue that we run for a*
-    // this determines wheter we explore the partial solution further or not
-
+    /**
+     * This method sets the cost value for a given schedule
+     * @param currentSchedule The schedule
+     */
     public void setScheduleCost(Schedule currentSchedule){
-
-        // loop through all the tasks in a given partial solution
-        // can either pass this or a schdule
         int cost = 0;
-
         List<Task> tasks = currentSchedule.getTasks();
 
-
         for (Task task: tasks){
-
             int startTime = task.getStartTime();
-
             // calculate lower bound
             // heuristic = max(start time of scheduled tasks plus their bottom level)
             cost = Math.max(cost, startTime + bottomLevelMap.get(task.getNode()));
 
         }
-
         currentSchedule.setCost(cost);
-
     }
 
     /**
      * This method returns the nodes ordered in descending order by their bottom level
-     * as a list of nodes, needed for the start of a*
-     * @return
+     * as a list of nodes, needed for the start of Astar
+     *
+     * @return The list of nodes sorted in reverse order by bottom level value
      */
     public List<Node> getSortedBottomLevel() {
-
         List<Map.Entry<Node, Integer>> bottomLevelList = new ArrayList<>(bottomLevelMap.entrySet());
 
-//        bottomLevelList.sort(Comparator.comparing(Map.Entry::getValue));
-        // above should work if this doesn't
-        // reversed order sort
+        // Reversed order sort
         bottomLevelList.sort(Map.Entry.<Node, Integer>comparingByValue().reversed());
 
         ArrayList<Node> sinkNodes = graph.getEndNodes();
@@ -98,37 +89,39 @@ public class CalculateCostFunction {
 
         List<Node> bottomLevelOrder = new ArrayList<>();
 
-        // seperate sink and non sink nodes
+        // Separate exit and non exit nodes
         for (Map.Entry<Node, Integer> entry : bottomLevelList) {
             Node currentNode = entry.getKey();
             if(sinkNodes.contains(currentNode)){
                 sortedSinkNodes.add(currentNode);
-                //need to make sure if it's a sink node the one with the least number of parents is first
+                // Need to make sure if it's an exit node the one with the least number of parents is first
             }else{
-                // non sink node
+                // Non exit node
                 bottomLevelOrder.add(currentNode);
             }
-
         }
 
-        // Sort sink nodes by the number of parents in ascending order
+        // Sort exit nodes by the number of parents in ascending order
         sortedSinkNodes.sort(Comparator.comparingInt(this::countParents));
 
         // Add sorted sink nodes to the end of the order
         bottomLevelOrder.addAll(sortedSinkNodes);
 
-
-
         return bottomLevelOrder;
 
     }
 
+    /**
+     * This method counts the number of parents of a particular node
+     * @param node The node
+     * @return The number of parents
+     */
     private int countParents(Node node){
         return graph.getParentNodes(node).size();
     }
 
     public List<Node> getHighestBottomLevelNodes(){
-        // Find the highest value in the HashMap, this valeu should belong to an entry node
+        // Find the highest value in the HashMap, this value should belong to an entry node
         int maxValue = Integer.MIN_VALUE;
         for (Integer value : bottomLevelMap.values()) {
             if (value > maxValue) {
@@ -136,7 +129,7 @@ public class CalculateCostFunction {
             }
         }
 
-        // Collect keys associated with the highest value
+        // Collect nodes associated with the highest value
         List<Node> nodesWithMaxValue = new ArrayList<>();
         for (Map.Entry<Node, Integer> entry : bottomLevelMap.entrySet()) {
             if (entry.getValue() == maxValue) {
@@ -145,26 +138,14 @@ public class CalculateCostFunction {
         }
 
         return nodesWithMaxValue;
-
     }
 
-    public List<Node> getHighestBottomLevelNodeMaxValue(int maxBottomLevelValue){
-
-        // Collect keys associated with the highest value
-        List<Node> nodesWithMaxValue = new ArrayList<>();
-        for (Map.Entry<Node, Integer> entry : bottomLevelMap.entrySet()) {
-            if (entry.getValue() == maxBottomLevelValue) {
-                nodesWithMaxValue.add(entry.getKey());
-            }
-        }
-
-        return nodesWithMaxValue;
-
-    }
-
+    /**
+     * This method gets the bottom level value of a particular node
+     * @param node The node
+     * @return The bottom level value
+     */
     public int bottomLevelofNode(Node node){
-
         return bottomLevelMap.get(node);
-
     }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class AstarScheduler {
-    
+
     private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
 
     //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
