@@ -21,9 +21,9 @@ public class TestAStarScheduling {
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(28, schedule.getCost());
-        // Need to add output file name logic after CMD argument parsing is completed
-        // Example of how to write output. Possibly create separate IO test later.
-        io.writeDot(schedule,"Nodes_7_OutTree-OUTPUT.dot");
+//        // Need to add output file name logic after CMD argument parsing is completed
+//        // Example of how to write output. Possibly create separate IO test later.
+//        io.writeDot(schedule,"Nodes_7_OutTree-OUTPUT.dot");
     }
     @Test
     public void TestAStarFourProcessorsNodes7() {

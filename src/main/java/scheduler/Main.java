@@ -18,7 +18,10 @@ public class Main {
 
         if(argsLength > 2){
             //Get option arguments
-            outputFileName = getOutputFileName(args);
+            String customName =getOutputFileName(args);
+            if(customName != null){
+                outputFileName = customName;
+            }
         }
 
         System.out.println("Starting schedule creation...");
@@ -28,17 +31,22 @@ public class Main {
         AstarScheduler scheduler = new AstarScheduler();
         Schedule schedule = scheduler.run(graph, numProcessors);
 
-
         io.writeDot(schedule, outputFileName);
+
+        System.out.println("created!");
     }
 
-    public static String getOutputFileName(String[] args) {
+    private static String getOutputFileName(String[] args) {
         for (int i = 2; i < args.length; i++) {
-            if ("-o".equals(args[i]) && i + 1 < args.length) {
-                // get output file
-                return args[i + 1];
+            if (args[i].equals("-o")) {
+                if(i + 1 <= args.length){
+                    // get output file
+                    return args[i + 1] + ".dot";
+                } else {
+                    throw new RuntimeException("Output filename not specified");
+                }
             }
         }
-        return ""; // Return an empty string if -o is not found or if it's not followed by a value
+        return null; // Return an empty string if -o is not found or if it's not followed by a value
     }
 }
