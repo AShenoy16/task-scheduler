@@ -8,8 +8,6 @@ import java.util.List;
 public class Graph {
     private final int n;
     private int[][] adjacencyMatrix;
-    //Maybe implement hashmap instead as its easier
-//    private HashMap<Node, List<Node>> adjacencyMap = new HashMap<>();
     private int[] nodeWeightings;
     private ArrayList<Node> startNodes = new ArrayList<>();
     private ArrayList<Node> endNodes = new ArrayList<>();
@@ -71,11 +69,15 @@ public class Graph {
         }
     }
 
-    // this is given a schedule and sees what child nodes are valid
-    //TODO Implement getChildrenNodes method
+
+    /**
+     * This method gets the children nodes of a particular node
+     *
+     * @param node The node
+     * @return A list of nodes that is the children of the particular node
+     */
     public ArrayList<Node> getChildrenNodes(Node node) {
         ArrayList<Node> childNodes = new ArrayList<>();
-
         int row = node.getId();
 
         for (int j = 0; j < n; j++) {
@@ -89,6 +91,12 @@ public class Graph {
         return childNodes;
     }
 
+    /**
+     * This method gets the parent nodes of a particular node
+     *
+     * @param node The node
+     * @return A list of nodes that is the parent(s) of the particular node
+     */
     public ArrayList<Node> getParentNodes(Node node) {
         ArrayList<Node> parentNodes = new ArrayList<>();
 
@@ -106,6 +114,9 @@ public class Graph {
     }
 
 
+    /**
+     * This method sets all the entry nodes
+     */
     private void findStartNodes() {
         for (int j = 0;  j < n; j++) {
             int count = 0;
@@ -120,6 +131,10 @@ public class Graph {
             }
         }
     }
+
+    /**
+     * This method sets oll the exit nodes
+     */
     private void findEndNodes() {
         for (int i = 0; i < n; i++) {
             int count = 0;
@@ -139,18 +154,19 @@ public class Graph {
      * Construct a new node object by id.
      * Usable when nodeWeightings is filled.
      *
-     * @param id id to create Node with
-     * @return created Node
+     * @param id The id to create Node with
+     * @return The created Node
      */
     private Node createNodeById(int id) {
         return new Node(id, nodeWeightings[id]);
     }
 
     /**
-     * This will get all the valid children nodes of a particular schedule
-     * @param schedule
-     * @param sortedBottomList
-     * @return
+     * This will get all the valid children nodes of a particular schedule given a sorted bottom level value list
+     *
+     * @param schedule The schedule
+     * @param sortedBottomList The sorted bottom level value list
+     * @return A list of valid children nodes
      */
     public ArrayList<Node> getValidChildrenNodes(Schedule schedule, List<Node> sortedBottomList, CalculateCostFunction calculateCostFunction) {
         ArrayList<Node> childrenNodes = new ArrayList<>();
@@ -191,6 +207,10 @@ public class Graph {
         return childrenNodes;
     }
 
+    /**
+     * This method orders the nodes
+     * @param unorderedNodes A list of unordered nodes
+     */
     private void orderNodes(List<Node> unorderedNodes) {
         this.nodes = new Node[unorderedNodes.size()];
         for (Node node : unorderedNodes) {
