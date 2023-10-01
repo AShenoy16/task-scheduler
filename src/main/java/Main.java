@@ -13,6 +13,7 @@ public class Main {
         String inputFileName = args[0];
         String outputFileName = inputFileName + "-output.dot";
         int numProcessors = Integer.parseInt(args[1]);
+        String tempOutPut = getOutputFileName(args);
 
         System.out.println("Starting schedule creation...");
 
@@ -24,5 +25,15 @@ public class Main {
 
 
         io.writeDot(schedule, outputFileName);
+    }
+
+    public static String getOutputFileName(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if ("-o".equals(args[i]) && i + 1 < args.length) {
+                // get output file
+                return args[i + 1];
+            }
+        }
+        return ""; // Return an empty string if -o is not found or if it's not followed by a value
     }
 }
