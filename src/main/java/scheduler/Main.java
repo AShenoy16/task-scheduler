@@ -1,3 +1,4 @@
+package scheduler;
 import algorithm.astar.AstarScheduler;
 import io.IOHandler;
 import model.Graph;
