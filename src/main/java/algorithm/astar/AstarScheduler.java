@@ -10,20 +10,21 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class AstarScheduler {
-
-
+    
     private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
 
     //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
+
+    /**
+     * This runs the Astar algorithm on a input graph and number of processors
+     *
+     * @param graph The input graph
+     * @param numProcessors The number of processors
+     * @return A complete schedule
+     */
     public Schedule run(Graph graph, int numProcessors){
         List<Schedule> newSchedules;
-        // calculate bottom level for each node, this can be done by calling setBottomLevelMap on each entry node
-        // add first scheule to prio queue
-
-        // if need to, have a for loop for all the possible entry nodes
-        // but I think we don't need this as A* should take care of it
-
         // TODO remove default constructor of CalculateCostFunction if possible (may need to extract methods + graph class is coupled)
         calculateCostFunction = new CalculateCostFunction(graph);
 
@@ -32,7 +33,6 @@ public class AstarScheduler {
             calculateCostFunction.setBottomLevelMap(entryNode);
         }
 
-        //TODO (maybe) optimise getting the valid entry nodes
         List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
         if(validEntryNodes.isEmpty()){
             System.out.println("Why are entry nodes empty????");
@@ -43,11 +43,6 @@ public class AstarScheduler {
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
 
-        // return the hashmap
-
-        // get the sorted list descending order,
-        // get first entry node
-
         while (open.size() != 0){
             Schedule partialSchedule = open.poll();
 
@@ -55,31 +50,26 @@ public class AstarScheduler {
                 open.clear();
                 return partialSchedule;
             }
-            //expand partialSchedule into children and compute cost function for each child
-
-
-
-
-                //create new schules and then for every possible child that can happen
-                // (make sure that it's valid child, all parents of that child are already in schedule)
-
             newSchedules = createPartialSchedules(graph.getValidChildrenNodes(partialSchedule, sortedList, calculateCostFunction), numProcessors, partialSchedule, graph);
-
-                    // create the new tasks that can be in these schedules
-
-                // tell prio queue to know cost function for the scheulde
-
-            // add all new child schedules to open prio queue
             open.addAll(newSchedules);
         }
         
         //TODO add proper fail state?
         return null;
     }
+
+    /**
+     * This method creates the initial schedules using the valid entry nodes
+     *
+     * @param entryNodes The valid entry nodes
+     * @param numOfProcessors The number of processors
+     * @return A list of the initial schedules
+     */
     public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numOfProcessors){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
 
+        // Create new schedule for every valid entry node
         for(Node entryNode : entryNodes){
             Task task = new Task(entryNode, 0, entryNode.getVal(), 1);
             Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
@@ -89,33 +79,38 @@ public class AstarScheduler {
 
         return newSchedules;
     }
+
+    /**
+     * This method creates new partial schedules based on valid child nodes/tasks
+     *
+     * @param validChildNodes A list of valid child nodes to add on as a task to the schedules
+     * @param numOfProcessors The number of processors
+     * @param schedule The existing schedule
+     * @param graph The graph
+     * @return A new list of partial schedules with the an additional task added
+     */
     public List<Schedule> createPartialSchedules(List<Node> validChildNodes, int numOfProcessors, Schedule schedule, Graph graph){
-        // create empty list of schedules
+        // create empty list of schedules, parent nodes and new tasks to add
         List<Schedule> newSchedules = new ArrayList<>();
         List<Node> parentNodes;
         List<Task> newTasks;
+
         //TODO optimise
         for(Node validChildNode : validChildNodes){
-            // find latest time for particular processor
-            // from the schedule, find task with latest finish times in each processor
-            // find parent with latest finish times including any possible edge values
-            // get minimum starting time possible for particular processor
-
             parentNodes = graph.getParentNodes(validChildNode);
 
-            //TODO rename variables, among other other things
             int earliestStartTimeForProcessor;
             int latestParentStartTime;
             int earliestTimeTaskCanStart;
 
-            //
+            // Add Task for each processor
             for(int processorID = 1 ; processorID <= numOfProcessors; processorID++){
                 earliestStartTimeForProcessor = 0;
                 latestParentStartTime = 0;
 
-                // This for loop gets the start time
+                // Get all existing task in schedule to get latest starting time
                 for(Task task : schedule.getTasks()){
-                    // this will get the latest finish time of any task for a particular processor (processorID)
+                    // This will get the latest finish time of any task for a particular processor (processorID)
                     if(task.getProcessor() == processorID && task.getFinishTime() > earliestStartTimeForProcessor){
                         earliestStartTimeForProcessor = task.getFinishTime();
                     }
@@ -133,13 +128,19 @@ public class AstarScheduler {
                     }
                 }
 
+                // Set latest starting time
                 earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
 
+                // Add task
                 Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+
+                // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
+
+                // Add potential schedule
                 newSchedules.add(newlyMadeSchedule);
             }
         }
