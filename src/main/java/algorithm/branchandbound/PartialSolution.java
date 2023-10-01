@@ -30,25 +30,20 @@ public class PartialSolution {
 
     /**
      * Partial solution for child tasks
-     * @param ParentPartialSolution the parent of this partial solution
+     * @param parentPartialSolution the parent of this partial solution
      * @param task the task added to the queue
      */
-    public PartialSolution(PartialSolution ParentPartialSolution, ScheduledTask task) {
+    public PartialSolution(PartialSolution parentPartialSolution, ScheduledTask task) {
         this.childrenQueue = new HashMap<>();
         this.visitedNodes = new ArrayList<>();
-        this.visitedNodes.addAll(ParentPartialSolution.visitedNodes);
+        this.visitedNodes.addAll(parentPartialSolution.visitedNodes);
 
-        for (Map.Entry<Node, List<ScheduledTask>> dependencyTuple : ParentPartialSolution.childrenQueue.entrySet()) {
-            Node node = dependencyTuple.getKey();
-
-            // clone new separate dependency list for this partial solution
-            List<ScheduledTask> dependencyList = dependencyTuple.getValue();
-            List<ScheduledTask> cloneDependencyList = new ArrayList<>(dependencyList);
-            childrenQueue.put(node, cloneDependencyList);
-        }
+        parentPartialSolution.childrenQueue.forEach((node, dependencyList) -> {
+            childrenQueue.put(node, new ArrayList<>(dependencyList));
+        });
 
         // assign a copy of processor times for this partial solution
-        this.processorTimes = Arrays.copyOf(ParentPartialSolution.processorTimes, ParentPartialSolution.processorTimes.length);
+        this.processorTimes = Arrays.copyOf(parentPartialSolution.processorTimes, parentPartialSolution.processorTimes.length);
 
         this.scheduledTask = task;
         this.visitedNodes.add(task.getNode());//add task node as visited in visited array

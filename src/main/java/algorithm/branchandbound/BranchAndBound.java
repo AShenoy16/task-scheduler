@@ -82,23 +82,22 @@ public class BranchAndBound {
         }
 
         // update current shortest path and task if queue is empty and is shorter
-        if (partialSolution.getChildrenQueue().size() == 0) {
-            if (pathTime < currentShortestPath) {
-                currentShortestPath = pathTime;
-                currentShortestTask = currentTask;
+        if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
+            currentShortestPath = pathTime;
+            currentShortestTask = currentTask;
 
-                // print path on console
-                printCurrentPath(currentTask);
-            }
+            // print path on console
+            printCurrentPath(currentTask);
+
         }
 
         // branch and bound algorithm for queued children
-        for (Map.Entry<Node, List<ScheduledTask>> childNode : partialSolution.getChildrenQueue().entrySet()) {
+        partialSolution.getChildrenQueue().forEach((destNode, dependencyList) -> {
             for (int i = 0; i < numProcessors; i++) {// 'i' is processors to consider for each queued childNode
                 int earliestStartTime = 0;
 
-                Node destNode = childNode.getKey();
-                List<ScheduledTask> destNodeDependencies = childNode.getValue();
+//                Node destNode = childNode.getKey();
+//                List<ScheduledTask> destNodeDependencies = childNode.getValue();
 
                 // ensure all previous tasks of destNode is visited
                 if (!isFullyVisited(partialSolution, destNode)) {
@@ -106,12 +105,13 @@ public class BranchAndBound {
                 }
 
                 // iterates over each dependency of destNode, and gets the time it can start at earliest
-                for (ScheduledTask dependency : destNodeDependencies) {
+                for (ScheduledTask dependency : dependencyList) {
                     int finishTime = dependency.getStartTime() + dependency.getNode().getVal();
 
                     // if dependency is not on the same processor, account for communication delay
                     if (dependency.getProcessorId() != i) {
-                        finishTime += graph.getAdjacencyMatrix()[dependency.getNode().getId()][destNode.getId()];
+                        int communicationDelay = graph.getAdjacencyMatrix()[dependency.getNode().getId()][destNode.getId()];
+                        finishTime += communicationDelay;
                     }
 
                     // return the earliest start time for this task
@@ -126,8 +126,7 @@ public class BranchAndBound {
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
                 dfs(newPartialSolution);
             }
-        }
-
+        });
     }
 
     private int getCurrentLatestTaskTime(ScheduledTask currentTask) {
