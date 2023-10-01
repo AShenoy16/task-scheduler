@@ -14,6 +14,14 @@ public class Main {
         }
         String inputFileName = args[0];
         String outputFileName = inputFileName + "-output.dot";
+
+        // remove .dot extension from input file name when including in output file name
+        int lastDotIndex = inputFileName.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            // Remove the file extension
+            outputFileName = inputFileName.substring(0, lastDotIndex) + "-output.dot";
+        }
+
         int numProcessors = Integer.parseInt(args[1]);
 
         if(argsLength > 2){
