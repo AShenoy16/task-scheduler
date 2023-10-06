@@ -35,6 +35,53 @@ public class Schedule {
         return tasks;
     }
 
+    /**
+     * get all the tasks for a particular processor id
+     * @param processorId
+     * @return
+     */
+    private List<Task> getTaskByProcessor(int processorId){
+        List<Task> allTasks = this.getTasks();
+
+        ArrayList<Task> processorTask = new ArrayList<>();
+
+        for(Task task: allTasks){
+            if(task.getProcessor() == processorId){
+                processorTask.add(task);
+            }
+
+        }
+
+        return processorTask;
+    }
+
+
+    /**
+     * This method gets the dependencies for a particular task (node)
+     * @param node
+     * @param graph
+     * @return
+     */
+    private List<Task> getDependencies(Node node, Graph graph){
+        // get the parents of this node
+
+        ArrayList<Node> parentNodes = graph.getParentNodes(node);
+
+        ArrayList<Task> dependencies = new ArrayList<>();
+
+        // get the dependent tasks for this scheulde
+
+        for(Task task: tasks){
+            if(parentNodes.contains(task.getNode())){
+                dependencies.add(task);
+            }
+        }
+
+        return dependencies;
+
+
+    }
+
     public void setCost(int cost) {
         this.cost = cost;
     }
@@ -51,6 +98,75 @@ public class Schedule {
         }
 
         return allNodes;
+    }
+
+
+    public boolean isValidScheduleNoOverlap(){
+
+        for( int i = 1; i <= this.numProcessors; i++){
+            // loop through all the processors
+            // get all the tasks on that processor
+            List<Task> sortedTasks = getTaskByProcessor(i);
+
+            for(int j = 0; j < sortedTasks.size() - 1; j++){
+                Task currentTask = sortedTasks.get(j);
+                Task nextTask = sortedTasks.get(j + 1);
+
+                //make sure there's no overlap
+
+
+                if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
+                        currentTask.getFinishTime() <= nextTask.getStartTime() &&
+                        nextTask.getStartTime() < nextTask.getFinishTime())) {
+                    return false;
+                }
+            }
+
+        }
+
+        return true;
+
+    }
+
+
+    public boolean isValidScheduleSatisfyDependencies(Graph graph){
+
+        List<Task> tasks = this.getTasks();
+
+        for(Task task: tasks){
+            Node node = task.getNode();
+            List<Task> dependencies = getDependencies(node, graph);
+
+            for(Task dependency: dependencies){
+                // if parent on the same processor as child
+                // make sure dependency finish time > task start time
+                // no communication cost
+                if(dependency.getProcessor() == task.getProcessor()){
+
+                    // dependency not yet finished but child already started
+                    if (dependency.getFinishTime() > task.getStartTime()){
+                        return false;
+                    }
+
+                }else{
+                    // Parent, child on different processors, need to account for
+                    // communication cost
+
+                    //get the edge weight from parent to child from the graph
+
+                    int edgeWeight = graph.getAdjacencyMatrix()[dependency.getNode().getId()][task.getNode().getId()];
+
+                    if(task.getStartTime() < dependency.getFinishTime() + edgeWeight){
+                        return false;
+                    }
+                }
+            }
+
+
+        }
+
+        return true;
+
     }
 
     public int getCost() {

@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestAStarScheduling {
     final String directory = "src/test/graphs/";
@@ -31,6 +32,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(22, schedule.getCost());
     }
     @Test
@@ -39,6 +41,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_8_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(581, schedule.getCost());
     }
     @Test
@@ -47,6 +50,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_8_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(581, schedule.getCost());
     }
 
@@ -56,6 +60,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(55, schedule.getCost());
     }
     @Test
@@ -64,6 +69,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(55, schedule.getCost());
     }
     @Test
@@ -72,6 +78,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_10_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(50, schedule.getCost());
     }
     @Test
@@ -80,6 +87,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_10_Random.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(50, schedule.getCost());
     }
     @Test
@@ -88,6 +96,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(350, schedule.getCost());
     }
     @Test
@@ -96,6 +105,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph) && schedule.isValidScheduleNoOverlap());
         assertEquals(227, schedule.getCost());
     }
     @After
