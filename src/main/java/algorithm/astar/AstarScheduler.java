@@ -149,4 +149,44 @@ public class AstarScheduler {
 
     }
 
+    public void createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph){
+        List<List<Node>> threadNodes = new ArrayList<>();
+        int size = validNodes.size();
+        int chunkSize = (int) Math.ceil((double) size / numThreads);
+
+        // Split valid nodes between the threads equally
+        for (int i = 0; i < size; i += chunkSize) {
+            int end = Math.min(size, i + chunkSize);
+            threadNodes.add(validNodes.subList(i, end));
+        }
+
+
+        // Assign thread the different nodes
+        try {
+            var threads = new ArrayList<Thread>();
+
+            for (int i = 0; i < numThreads; i++) {
+                // Can probably optimise this
+                if(i > threadNodes.size()){
+                    break;
+                }
+                var thread = new Thread(() -> {
+                    // Not 100% sure if this will work
+                    createPartialSchedules(threadNodes.get(i), numOfProcessors, schedule, graph);
+                });
+
+                threads.add(thread);
+                thread.start();
+            }
+
+            // Wait for all threads to run before running main thread
+            for (var thread : threads) {
+                thread.join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
 }
