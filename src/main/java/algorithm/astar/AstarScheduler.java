@@ -39,7 +39,7 @@ public class AstarScheduler {
             return null;
         }
 
-        List<Node>  sortedList =  calculateCostFunction.getSortedBottomLevel();
+        List<Node> sortedList =  calculateCostFunction.getSortedBottomLevel();
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
 
@@ -47,10 +47,16 @@ public class AstarScheduler {
             Schedule partialSchedule = open.poll();
 
             if(partialSchedule.isCompleteSchedule(graph)){
-                open.clear();
-                return partialSchedule;
+                if(partialSchedule.isValidScheduleNoOverlap() && partialSchedule.isValidScheduleSatisfyDependencies(graph)){
+                    open.clear();
+                    return partialSchedule;
+                }else{
+                    continue;
+                }
+
             }
-            newSchedules = createPartialSchedules(graph.getValidChildrenNodes(partialSchedule, sortedList, calculateCostFunction), numProcessors, partialSchedule, graph);
+
+            newSchedules = createPartialSchedules(partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph);
             open.addAll(newSchedules);
         }
         
@@ -83,21 +89,25 @@ public class AstarScheduler {
     /**
      * This method creates new partial schedules based on valid child nodes/tasks
      *
-     * @param validChildNodes A list of valid child nodes to add on as a task to the schedules
+     * @param validNodes A list of valid nodes to add on as a task to the schedules
      * @param numOfProcessors The number of processors
      * @param schedule The existing schedule
      * @param graph The graph
      * @return A new list of partial schedules with the an additional task added
      */
-    public List<Schedule> createPartialSchedules(List<Node> validChildNodes, int numOfProcessors, Schedule schedule, Graph graph){
+    public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph){
         // create empty list of schedules, parent nodes and new tasks to add
         List<Schedule> newSchedules = new ArrayList<>();
         List<Node> parentNodes;
         List<Task> newTasks;
+//
+//        List<Task> freeTasks = schedule.getFreeTasks(graph);
+//
+//        List<Node> validFreeTasks = freeTasks.stream().map(Task::getNode).toList();
 
         //TODO optimise
-        for(Node validChildNode : validChildNodes){
-            parentNodes = graph.getParentNodes(validChildNode);
+        for(Node validNode : validNodes){
+            parentNodes = graph.getParentNodes(validNode);
 
             int earliestStartTimeForProcessor;
             int latestParentStartTime;
@@ -117,7 +127,7 @@ public class AstarScheduler {
 
                     // This checks if the task is a parent task
                     if(parentNodes.contains(task.getNode())){
-                        int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validChildNode.getId()];
+                        int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
                         if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
@@ -132,7 +142,7 @@ public class AstarScheduler {
                 earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
 
                 // Add task
-                Task task = new Task(validChildNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validChildNode.getVal(), processorID);
+                Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
@@ -140,8 +150,11 @@ public class AstarScheduler {
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
 
-                // Add potential schedule
-                newSchedules.add(newlyMadeSchedule);
+                if(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph)){
+                    // Add potential schedule
+                    newSchedules.add(newlyMadeSchedule);
+                }
+
             }
         }
 
@@ -149,44 +162,80 @@ public class AstarScheduler {
 
     }
 
-    public void createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph){
-        List<List<Node>> threadNodes = new ArrayList<>();
-        int size = validNodes.size();
-        int chunkSize = (int) Math.ceil((double) size / numThreads);
-
-        // Split valid nodes between the threads equally
-        for (int i = 0; i < size; i += chunkSize) {
-            int end = Math.min(size, i + chunkSize);
-            threadNodes.add(validNodes.subList(i, end));
-        }
 
 
-        // Assign thread the different nodes
-        try {
-            var threads = new ArrayList<Thread>();
+//    public List<Schedule> expansion(int numOfProcessors, Schedule schedule, Graph graph) {
+//        List<Schedule> newSchedules = new ArrayList<>();
+//        List<Node> freeTaskNodes = schedule.getFreeNodes(graph);
+//
+//        for (Node node : freeTaskNodes) {
+//            // Iterate through all available processors
+//            for (int processor = 1; processor <= numOfProcessors; processor++) {
+//                int earliestStartTimeForProcessor = schedule.getEarliestStartTimeForProcessor(processor);
+//                int latestParentStartTime = schedule.getLatestParentStartTime(node, graph);
+//                int earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
+//
+//                // Create a new task for the free node scheduled on the current processor
+//                Task task = new Task(node, earliestTimeTaskCanStart, earliestTimeTaskCanStart + node.getVal(), processor);
+//
+//                // Clone the existing schedule and add the new task
+//                List<Task> newTasks = new ArrayList<>(schedule.getTasks());
+//                newTasks.add(task);
+//                Schedule newSchedule = new Schedule(newTasks, numOfProcessors);
+//
+//                // Calculate and set the cost for the new schedule
+//                calculateCostFunction.setScheduleCost(newSchedule);
+//
+//                // Add the new schedule to the list
+//                newSchedules.add(newSchedule);
+//            }
+//        }
+//
+//        return newSchedules;
+//    }
 
-            for (int i = 0; i < numThreads; i++) {
-                // Can probably optimise this
-                if(i > threadNodes.size()){
-                    break;
-                }
-                var thread = new Thread(() -> {
-                    // Not 100% sure if this will work
-                    createPartialSchedules(threadNodes.get(i), numOfProcessors, schedule, graph);
-                });
-
-                threads.add(thread);
-                thread.start();
-            }
-
-            // Wait for all threads to run before running main thread
-            for (var thread : threads) {
-                thread.join();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
+//
+//
+//
+//
+//    public void createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph){
+//        List<List<Node>> threadNodes = new ArrayList<>();
+//        int size = validNodes.size();
+//        int chunkSize = (int) Math.ceil((double) size / numThreads);
+//
+//        // Split valid nodes between the threads equally
+//        for (int i = 0; i < size; i += chunkSize) {
+//            int end = Math.min(size, i + chunkSize);
+//            threadNodes.add(validNodes.subList(i, end));
+//        }
+//
+//
+//        // Assign thread the different nodes
+//        try {
+//            var threads = new ArrayList<Thread>();
+//
+//            for (int i = 0; i < numThreads; i++) {
+//                // Can probably optimise this
+//                if(i > threadNodes.size()){
+//                    break;
+//                }
+//                var thread = new Thread(() -> {
+//                    // Not 100% sure if this will work
+//                    createPartialSchedules(threadNodes.get(i), numOfProcessors, schedule, graph);
+//                });
+//
+//                threads.add(thread);
+//                thread.start();
+//            }
+//
+//            // Wait for all threads to run before running main thread
+//            for (var thread : threads) {
+//                thread.join();
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 }

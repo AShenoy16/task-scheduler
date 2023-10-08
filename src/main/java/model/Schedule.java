@@ -3,6 +3,7 @@ package model;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Schedule {
     private List<Task> tasks;
@@ -41,11 +42,10 @@ public class Schedule {
      * @return
      */
     private List<Task> getTaskByProcessor(int processorId){
-        List<Task> allTasks = this.getTasks();
 
         ArrayList<Task> processorTask = new ArrayList<>();
 
-        for(Task task: allTasks){
+        for(Task task: tasks){
             if(task.getProcessor() == processorId){
                 processorTask.add(task);
             }
@@ -69,9 +69,10 @@ public class Schedule {
 
         ArrayList<Task> dependencies = new ArrayList<>();
 
-        // get the dependent tasks for this scheulde
 
         for(Task task: tasks){
+            // if a task in the schedule is in the parent nodes
+            // it is a dependency
             if(parentNodes.contains(task.getNode())){
                 dependencies.add(task);
             }
@@ -79,8 +80,72 @@ public class Schedule {
 
         return dependencies;
 
-
     }
+
+    /**
+     * This gets the free tasks for a specific schedule
+     * @param graph
+     * @return
+     */
+    public List<Node> getFreeNodes(Graph graph) {
+        List<Node> freeTaskNodes = new ArrayList<>();
+
+        ArrayList<Node> allScheduleNodes = getAllNodes();
+
+        for (Node node : graph.getNodes()) {
+            // Check if the node is not in the current schedule
+            if (!allScheduleNodes.contains(node)) {
+                List<Node> dependentNodes = getDependencies(node, graph).stream().map(Task::getNode).toList();;
+
+                if(dependentNodes.isEmpty()){
+                    freeTaskNodes.add(node);
+                    continue;
+                }
+
+                // Check if all parent nodes are in the schedule
+                boolean allParentsInSchedule = allScheduleNodes.containsAll(dependentNodes);
+
+                // If all parent nodes are in the schedule, add the node to the list of free nodes
+                if (allParentsInSchedule) {
+                    freeTaskNodes.add(node);
+                }
+            }
+        }
+
+        return freeTaskNodes;
+    }
+
+    public int getEarliestStartTimeForProcessor(int processor) {
+        int earliestStartTime = 0;
+        for (Task task : tasks) {
+            if (task.getProcessor() == processor && task.getFinishTime() > earliestStartTime) {
+                earliestStartTime = task.getFinishTime();
+            }
+        }
+        return earliestStartTime;
+    }
+
+    public int getLatestParentStartTime(Node node, Graph graph) {
+        int latestParentStartTime = 0;
+        List<Node> parentNodes = graph.getParentNodes(node);
+
+        for (Task task : tasks) {
+            if (parentNodes.contains(task.getNode())) {
+                int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][node.getId()];
+                if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
+                    latestParentStartTime = task.getFinishTime() + edgeWeight;
+                }
+            }
+        }
+
+        return latestParentStartTime;
+    }
+
+
+
+
+
+
 
     public void setCost(int cost) {
         this.cost = cost;
@@ -113,8 +178,6 @@ public class Schedule {
                 Task nextTask = sortedTasks.get(j + 1);
 
                 //make sure there's no overlap
-
-
                 if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
                         currentTask.getFinishTime() <= nextTask.getStartTime() &&
                         nextTask.getStartTime() < nextTask.getFinishTime())) {
@@ -130,8 +193,6 @@ public class Schedule {
 
 
     public boolean isValidScheduleSatisfyDependencies(Graph graph){
-
-        List<Task> tasks = this.getTasks();
 
         for(Task task: tasks){
             Node node = task.getNode();
@@ -161,7 +222,6 @@ public class Schedule {
                     }
                 }
             }
-
 
         }
 
