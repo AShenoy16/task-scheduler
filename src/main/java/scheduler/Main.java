@@ -69,4 +69,18 @@ public class Main {
             e.printStackTrace();
         }
     }
+    private static String getOutputFileName(String[] args) {
+        for (int i = 2; i < args.length; i++) {
+            if (args[i].equals("-o")) {
+                if(i + 1 < args.length){
+                    // get output file
+                    return args[i + 1] + ".dot";
+                } else {
+                    // this throws when empty string after -o
+                    throw new RuntimeException("Output filename not specified");
+                }
+            }
+        }
+        return null;
+    }
 }

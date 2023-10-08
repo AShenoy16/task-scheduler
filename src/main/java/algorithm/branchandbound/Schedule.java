@@ -3,7 +3,8 @@ package algorithm.branchandbound;
 import java.util.List;
 
 /**
- * The schedule class keeps track of all tasks with a scheduled task list. Used at the end of algorithm
+ * The schedule class keeps track of all tasks with a scheduled task list. Used at the end of the algorithm to return
+ * the optimal schedule
  */
 public class Schedule {
     private int numProcesses;

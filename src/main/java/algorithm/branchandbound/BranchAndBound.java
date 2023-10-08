@@ -8,12 +8,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The branch and bound class is needed to run the dfs branch and bound algorithm.
+ */
 public class BranchAndBound {
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
     private ScheduledTask currentShortestTask;
 
+    /**
+     * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
+     * be called first before the dfs method
+     * @param graph - input graph by the user
+     * @param numProcesses - number of processors specified by the user
+     * @return an optimal schedule found by the branch and bound algorithm
+     */
     public Schedule run(Graph graph, int numProcesses){
         this.graph = graph;
         this.numProcessors = numProcesses;
@@ -50,8 +60,8 @@ public class BranchAndBound {
 
 
     /**
-     * recursive dfs branch and bound algorithm
-     * @param partialSolution the partial solution of this iteration
+     * recursive dfs branch and bound algorithm, that will recursively iterate for each new partial solution
+     * @param partialSolution the partial solution of this dfs iteration
      */
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
@@ -82,23 +92,19 @@ public class BranchAndBound {
         }
 
         // update current shortest path and task if queue is empty and is shorter
-        if (partialSolution.getChildrenQueue().size() == 0) {
-            if (pathTime < currentShortestPath) {
-                currentShortestPath = pathTime;
-                currentShortestTask = currentTask;
+        if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
+            currentShortestPath = pathTime;
+            currentShortestTask = currentTask;
 
-                // print path on console
-                printCurrentPath(currentTask);
-            }
+            // print path on console
+            printCurrentPath(currentTask);
+
         }
 
         // branch and bound algorithm for queued children
-        for (Map.Entry<Node, List<ScheduledTask>> childNode : partialSolution.getChildrenQueue().entrySet()) {
+        partialSolution.getChildrenQueue().forEach((destNode, dependencyList) -> {
             for (int i = 0; i < numProcessors; i++) {// 'i' is processors to consider for each queued childNode
                 int earliestStartTime = 0;
-
-                Node destNode = childNode.getKey();
-                List<ScheduledTask> destNodeDependencies = childNode.getValue();
 
                 // ensure all previous tasks of destNode is visited
                 if (!isFullyVisited(partialSolution, destNode)) {
@@ -106,12 +112,13 @@ public class BranchAndBound {
                 }
 
                 // iterates over each dependency of destNode, and gets the time it can start at earliest
-                for (ScheduledTask dependency : destNodeDependencies) {
+                for (ScheduledTask dependency : dependencyList) {
                     int finishTime = dependency.getStartTime() + dependency.getNode().getVal();
 
                     // if dependency is not on the same processor, account for communication delay
                     if (dependency.getProcessorId() != i) {
-                        finishTime += graph.getAdjacencyMatrix()[dependency.getNode().getId()][destNode.getId()];
+                        int communicationDelay = graph.getAdjacencyMatrix()[dependency.getNode().getId()][destNode.getId()];
+                        finishTime += communicationDelay;
                     }
 
                     // return the earliest start time for this task
@@ -126,10 +133,15 @@ public class BranchAndBound {
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
                 dfs(newPartialSolution);
             }
-        }
-
+        });
     }
 
+    /**
+     * This helper function will return the latest task time from the partial solution of this current task, as current
+     * task may not truly represent the latest task time.
+     * @param currentTask - the current task of the dfs recursion
+     * @return - the total path length of the partial solution of the current task
+     */
     private int getCurrentLatestTaskTime(ScheduledTask currentTask) {
         int pathTime = 0;
         while (currentTask != null) {
@@ -141,6 +153,11 @@ public class BranchAndBound {
         return pathTime;
     }
 
+    /**
+     * Prints out the schedule whenever a new shorter complete schedule is found.
+     * It displays start time, end time, node ID, and processor ID of each task in the schedule
+     * @param task - the task of the new schedule
+     */
     private void printCurrentPath(ScheduledTask task) {
         int pathLength = 0;
         System.out.println("New Shortest Task: " + task.getNode().getId());
@@ -154,6 +171,13 @@ public class BranchAndBound {
         System.out.println("New Shortest Path: " + pathLength + "\n");
     }
 
+    /**
+     * This helper function checks whether the destination node has all dependencies visited already before it can be
+     * visited
+     * @param partialSolution - the current partial solution in the dfs recursion
+     * @param destNode - the destination node to check if it can be visited
+     * @return true if dependencies of destNode is full visited, false if not
+     */
     private boolean isFullyVisited(PartialSolution partialSolution, Node destNode) {
         for (int row = 0; row < graph.getN(); row++) {
             // 'row' being source node, 'destNode' being dest, check if source node is fully visited

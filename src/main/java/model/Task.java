@@ -11,7 +11,6 @@ public class Task {
         this.node = node;
         this.startTime = startTime;
         this.finishTime = finishTime;
-        // what processor it's assigned to.
         this.processor = processor;
     }
 
@@ -30,8 +29,4 @@ public class Task {
     public Node getNode() {
         return node;
     }
-
-
-    // worst comes to worst, overrirde isEquals
-
 }
