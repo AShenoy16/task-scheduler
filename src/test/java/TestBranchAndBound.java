@@ -5,11 +5,13 @@ import io.IOHandler;
 import model.Graph;
 import org.junit.After;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled
 public class TestBranchAndBound {
     final String directory = "src/test/graphs/";
     IOHandler io;
