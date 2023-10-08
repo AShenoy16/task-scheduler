@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.*;
 
 public class AstarScheduler {
 
@@ -24,6 +25,9 @@ public class AstarScheduler {
      * @return A complete schedule
      */
     public Schedule run(Graph graph, int numProcessors){
+        long startTimeNano = System.nanoTime();
+        long finishTimeNano;
+
         List<Schedule> newSchedules;
         // TODO remove default constructor of CalculateCostFunction if possible (may need to extract methods + graph class is coupled)
         calculateCostFunction = new CalculateCostFunction(graph);
@@ -42,21 +46,24 @@ public class AstarScheduler {
         List<Node> sortedList =  calculateCostFunction.getSortedBottomLevel();
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         while (open.size() != 0){
             Schedule partialSchedule = open.poll();
 
             if(partialSchedule.isCompleteSchedule(graph)){
                 if(partialSchedule.isValidScheduleNoOverlap() && partialSchedule.isValidScheduleSatisfyDependencies(graph)){
+                    finishTimeNano = System.nanoTime();
+                    System.out.println("Elapsed Time (Nanoseconds): " + (finishTimeNano - startTimeNano) + " ns");
                     open.clear();
                     return partialSchedule;
-                }else{
-                    continue;
                 }
 
             }
 
             newSchedules = createPartialSchedules(partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph);
+//            newSchedules = createPartialSchedulesThreads(partialSchedule.getFreeNodes(graph), numProcessors, 4, partialSchedule, graph, executorService);
+
             open.addAll(newSchedules);
         }
         
@@ -163,6 +170,98 @@ public class AstarScheduler {
     }
 
 
+    public List<Schedule> createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph, ExecutorService executorService){
+        int size = validNodes.size();
+        int chunkSize = (int) Math.ceil((double) size / numThreads);
+
+        // Create a list of Callable tasks
+        List<Callable<List<Schedule>>> tasks = new ArrayList<>();
+        List<Schedule> schedules = new ArrayList<>();
+
+        for (int i = 0; i < numThreads; i++) {
+            int startIndex = i * chunkSize;
+            int endIndex = Math.min((i + 1) * chunkSize, size);
+
+            if (startIndex >= endIndex) {
+                break; // No more tasks to create
+            }
+
+//            List<Node> threadNodes = validNodes.subList(startIndex, endIndex);
+            tasks.add(() -> new MyCallable(validNodes.subList(startIndex, endIndex), numOfProcessors, schedule, graph).call());
+        }
+
+        try {
+            // Invoke all tasks and collect results
+            List<Future<List<Schedule>>> futures = executorService.invokeAll(tasks);
+            for (Future<List<Schedule>> future : futures) {
+                schedules.addAll(future.get());
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        return schedules;
+//        List<Schedule> schedules = new ArrayList<>();
+//        List<List<Node>> threadNodes = new ArrayList<>();
+//        int size = validNodes.size();
+//        int chunkSize = (int) Math.ceil((double) size / numThreads);
+//
+//        // Split valid nodes between the threads equally
+//        for (int i = 0; i < size; i += chunkSize) {
+//            int end = Math.min(size, i + chunkSize);
+//            threadNodes.add(validNodes.subList(i, end));
+//        }
+//
+//        // Assign thread the different nodes
+//        try {
+//            List<Callable<List<Schedule>>>tasks = new ArrayList<>();
+////            List<Future<List<Schedule>>> futures;
+//            for (int i = 0; i < numThreads; i++) {
+//                if(i >= threadNodes.size()){
+//                    break;
+//                }
+//                tasks.add(new MyCallable(threadNodes.get(i), numOfProcessors, schedule, graph));
+//            }
+//
+////            futures = executorService.invokeAll(tasks);
+//            // Wait for all threads to run before running main thread
+////            executorService.shutdown();
+////            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+//
+//            for (Future<List<Schedule>> future : executorService.invokeAll(tasks)) {
+//                schedules.addAll(future.get());
+//            }
+//
+//            return schedules;
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
+    }
+
+    class MyCallable implements Callable<List<Schedule>> {
+        private List<Node> validNodes;
+        private int numOfProcessors;
+        private Schedule schedule;
+        private Graph graph;
+
+        public MyCallable(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph) {
+            this.validNodes = validNodes;
+            this.numOfProcessors = numOfProcessors;
+            this.schedule = schedule;
+            this.graph = graph;
+        }
+
+        @Override
+        public List<Schedule> call() {
+            // Perform some computation on the sublist
+            return createPartialSchedules(validNodes, numOfProcessors, schedule, graph);
+        }
+    }
 
 //    public List<Schedule> expansion(int numOfProcessors, Schedule schedule, Graph graph) {
 //        List<Schedule> newSchedules = new ArrayList<>();
