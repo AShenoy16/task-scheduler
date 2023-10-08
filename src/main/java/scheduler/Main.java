@@ -10,7 +10,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        visualise();
+        App.main(args);
+//        visualise();
 //        int argsLength = args.length;
 //        if (args == null || argsLength < 2) {
 //            throw new RuntimeException("InputFileName or numProcessors arguments not supplied");

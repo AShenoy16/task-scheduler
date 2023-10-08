@@ -12,7 +12,7 @@ public class App extends Application {
     private Scene scene;
 
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/visualiser.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/visualisation.fxml"));
         return fxmlLoader.load();
     }
 
