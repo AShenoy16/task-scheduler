@@ -143,10 +143,6 @@ public class Schedule {
 
 
 
-
-
-
-
     public void setCost(int cost) {
         this.cost = cost;
     }
@@ -196,16 +192,26 @@ public class Schedule {
 
         for(Task task: tasks){
             Node node = task.getNode();
-            List<Task> dependencies = getDependencies(node, graph);
 
-            for(Task dependency: dependencies){
+            List<Node> dependencies = graph.getDependenciesByNode(node);
+
+//            List<Task> dependencies = getDependencies(node, graph);
+
+            for(Node dependency: dependencies){
                 // if parent on the same processor as child
                 // make sure dependency finish time > task start time
                 // no communication cost
-                if(dependency.getProcessor() == task.getProcessor()){
+
+                Task task1 = getTaskByNode(dependency);
+
+                if(task1 == null){
+                    return false;
+                }
+
+                if(task1.getProcessor() == task.getProcessor()){
 
                     // dependency not yet finished but child already started
-                    if (dependency.getFinishTime() > task.getStartTime()){
+                    if (task1.getFinishTime() > task.getStartTime()){
                         return false;
                     }
 
@@ -215,9 +221,9 @@ public class Schedule {
 
                     //get the edge weight from parent to child from the graph
 
-                    int edgeWeight = graph.getAdjacencyMatrix()[dependency.getNode().getId()][task.getNode().getId()];
+                    int edgeWeight = graph.getAdjacencyMatrix()[task1.getNode().getId()][task.getNode().getId()];
 
-                    if(task.getStartTime() < dependency.getFinishTime() + edgeWeight){
+                    if(task.getStartTime() < task1.getFinishTime() + edgeWeight){
                         return false;
                     }
                 }
@@ -228,6 +234,17 @@ public class Schedule {
         return true;
 
     }
+
+    private Task getTaskByNode(Node node){
+        for(Task task: tasks){
+            if(task.getNode().getId() == node.getId()){
+                return task;
+            }
+        }
+        return null;
+    }
+
+
 
     public int getCost() {
         return cost;

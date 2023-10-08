@@ -29,9 +29,15 @@ public class AstarScheduler {
         calculateCostFunction = new CalculateCostFunction(graph);
 
         // set bottom level values for every node
+        // create dependencies for every entry node
         for (Node entryNode : graph.getStartNodes()) {
             calculateCostFunction.setBottomLevelMap(entryNode);
+            graph.createDependencies(entryNode);
+
         }
+
+
+
 
         List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
         if(validEntryNodes.isEmpty()){
@@ -100,6 +106,9 @@ public class AstarScheduler {
         List<Schedule> newSchedules = new ArrayList<>();
         List<Node> parentNodes;
         List<Task> newTasks;
+
+        // maybe instead of creating free tasks everytime we make a queue or something
+
 //
 //        List<Task> freeTasks = schedule.getFreeTasks(graph);
 //
@@ -154,6 +163,9 @@ public class AstarScheduler {
                     // Add potential schedule
                     newSchedules.add(newlyMadeSchedule);
                 }
+
+                //check if visited an equivalent schedule already using hashes
+
 
             }
         }
