@@ -1,12 +1,10 @@
-import algorithm.astar.AstarScheduler;
 import algorithm.branchandbound.BranchAndBound;
+import algorithm.branchandbound.BranchAndBoundParallel;
 import algorithm.branchandbound.Schedule;
 import io.IOHandler;
 import model.Graph;
 import org.junit.After;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +16,7 @@ public class TestBranchAndBound {
     Schedule schedule;
 
     @Test
-    public void TestBnBTwoProcessorsNodes7() throws IOException {
+    public void TestBnBTwoProcessorsNodes7() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
         scheduler = new BranchAndBound();
@@ -26,7 +24,15 @@ public class TestBranchAndBound {
         assertEquals(28, schedule.getShortestPath());
     }
     @Test
-    public void TestBnBFourProcessorsNodes7() throws IOException {
+    public void TestBnBTwoProcessorsNodes7Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_7_OutTree.dot");
+        var parallelScheduler = new BranchAndBoundParallel();
+        schedule = parallelScheduler.run(graph, 2, 3);
+        assertEquals(28, schedule.getShortestPath());
+    }
+    @Test
+    public void TestBnBFourProcessorsNodes7() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
         scheduler = new BranchAndBound();
@@ -34,7 +40,7 @@ public class TestBranchAndBound {
         assertEquals(22, schedule.getShortestPath());
     }
     @Test
-    public void TestBnBTwoProcessorsNodes8() throws IOException {
+    public void TestBnBTwoProcessorsNodes8() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_8_Random.dot");
         scheduler = new BranchAndBound();
@@ -42,7 +48,7 @@ public class TestBranchAndBound {
         assertEquals(581, schedule.getShortestPath());
     }
     @Test
-    public void TestBnBFourProcessorsNodes8() throws IOException {
+    public void TestBnBFourProcessorsNodes8() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_8_Random.dot");
         scheduler = new BranchAndBound();
@@ -50,7 +56,7 @@ public class TestBranchAndBound {
         assertEquals(581, schedule.getShortestPath());
     }
     @Test
-    public void TestBnBTwoProcessorsNodes9() throws IOException {
+    public void TestBnBTwoProcessorsNodes9() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
         scheduler = new BranchAndBound();
@@ -58,7 +64,7 @@ public class TestBranchAndBound {
         assertEquals(55, schedule.getShortestPath());
     }
     @Test
-    public void TestBnBFourProcessorsNodes9() throws IOException {
+    public void TestBnBFourProcessorsNodes9() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
         scheduler = new BranchAndBound();
@@ -67,7 +73,7 @@ public class TestBranchAndBound {
     }
 
     @Test
-    public void TestBnBTwoProcessorsNodes10() throws IOException {
+    public void TestBnBTwoProcessorsNodes10() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_10_Random.dot");
         scheduler = new BranchAndBound();
@@ -75,7 +81,7 @@ public class TestBranchAndBound {
         assertEquals(50, schedule.getShortestPath());
     }
     @Test
-    public void TestBnBFourProcessorsNodes10() throws IOException {
+    public void TestBnBFourProcessorsNodes10() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_10_Random.dot");
         scheduler = new BranchAndBound();
@@ -84,15 +90,16 @@ public class TestBranchAndBound {
     }
 
     @Test
-    public void TestBnBTwoProcessorsNodes11() throws IOException {
+    public void TestBnBTwoProcessorsNodes11() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         scheduler = new BranchAndBound();
         schedule = scheduler.run(graph, 2);
         assertEquals(350, schedule.getShortestPath());
     }
+
     @Test
-    public void TestBnBFourProcessorsNode11() throws IOException {
+    public void TestBnBFourProcessorsNode11() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         scheduler = new BranchAndBound();
@@ -101,7 +108,16 @@ public class TestBranchAndBound {
     }
 
     @Test
-    public void TestBNBOneProcessorsExample() throws IOException {
+    public void TestBnBFourProcessorsNode11Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Nodes_11_OutTree.dot");
+        var parallelScheduler = new BranchAndBoundParallel();
+        schedule = parallelScheduler.run(graph, 4, 3);
+        assertEquals(227, schedule.getShortestPath());
+    }
+
+    @Test
+    public void TestBNBOneProcessorsExample() {
         io = new IOHandler();
         graph = io.readDot(directory + "example.dot");
         scheduler = new BranchAndBound();
@@ -110,7 +126,7 @@ public class TestBranchAndBound {
     }
 
     @Test
-    public void TestBNBTwoProcessorsExample() throws IOException {
+    public void TestBNBTwoProcessorsExample() {
         io = new IOHandler();
         graph = io.readDot(directory + "example.dot");
         scheduler = new BranchAndBound();
