@@ -51,7 +51,7 @@ public class AstarParallelisation {
             }
 
             List<Schedule> newSchedules = createPartialSchedulesParallel(
-                    partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph, executorService);
+                    partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph);
 
             open.addAll(newSchedules);
         }
@@ -72,52 +72,16 @@ public class AstarParallelisation {
     }
 
     public List<Schedule> createPartialSchedulesParallel(
-            List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph, ExecutorService executorService) {
+            List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph) {
 
-        // Create a list of Callable tasks for creating partial schedules in parallel
-
-        // validNodes.parallelStream() creates a parallel stream of `validNodes`,
-        // allowing for concurrent processing of nodes.
-
-        long startTime = (System.nanoTime());
-        List<Callable<List<Schedule>>> partialSchedules = validNodes.parallelStream()
-                .map(validNode -> (Callable<List<Schedule>>) () ->
-                        createPartialSchedules(validNode, numOfProcessors, schedule, graph))
+        // concurrently handle valid node partial schedule creation
+        // map each validNode to a list of partial schedules created by createPartialSchedules
+        // return the list
+        return validNodes.parallelStream()
+                .flatMap(validNode -> createPartialSchedules(validNode, numOfProcessors, schedule, graph).stream())
                 .collect(Collectors.toList());
-        long elapse = System.nanoTime() - startTime;
-        System.out.println(elapse);
-
-
-        // synchronised list to safely get all partial schedules from the tasks
-
-        List<Schedule> newSchedules = Collections.synchronizedList(new ArrayList<>());
-
-        try {
-            // invoke all the tasks in paralell
-            List<Future<List<Schedule>>> futures = executorService.invokeAll(partialSchedules);
-            for (Future<List<Schedule>> future : futures) {
-                // adds to newSchedules list in threadsafe manner
-
-                List<Schedule> allPartialSchdules = future.get();
-
-                for(Schedule newlyMadeSchedule : allPartialSchdules){
-                    // if it's a valid schedule add otherwise not
-                    if(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph)){
-                        // Add potential schedule
-                        newSchedules.add(newlyMadeSchedule);
-                    }
-                }
-
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-
-
-        return newSchedules;
     }
+
 
     public List<Schedule> createPartialSchedules(Node validNode, int numOfProcessors, Schedule schedule, Graph graph) {
 
