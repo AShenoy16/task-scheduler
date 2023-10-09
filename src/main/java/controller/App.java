@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,11 +18,14 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/visualisation.fxml"));
         scene = new Scene(fxmlLoader.load(), 640, 480);
         this.visualisationController = fxmlLoader.getController();
-        this.visualisationController.initialize();
         stage.setTitle("Scheduling Algorithm Visualisation");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        Platform.runLater(() -> {
+            visualisationController.initialize();
+            visualisationController.startScheduler();
+        });
     }
 
     public void setControllerGraph(){
