@@ -16,7 +16,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/visualisation.fxml"));
-        scene = new Scene(fxmlLoader.load(), 640, 480);
+        scene = new Scene(fxmlLoader.load(), 770, 580);
         this.visualisationController = fxmlLoader.getController();
         stage.setTitle("Scheduling Algorithm Visualisation");
         stage.setScene(scene);

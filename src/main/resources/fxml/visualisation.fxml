@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
       <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="601.8665161132812">
          <font>
@@ -16,34 +16,34 @@
       </Text>
       <HBox prefHeight="100.0" prefWidth="200.0">
          <children>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="195.0" prefWidth="211.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Current Best">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Current Best" textAlignment="CENTER" wrappingWidth="256.1432647705078">
                      <font>
                         <Font size="26.0" />
                      </font>
                   </Text>
-                  <Label fx:id="bestCurrentText" />
+                  <Label fx:id="bestCurrentText" prefHeight="160.0" prefWidth="260.0" />
                </children>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="195.0" prefWidth="235.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CPU" textAlignment="CENTER">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CPU" textAlignment="CENTER" wrappingWidth="257.410400390625">
                      <font>
                         <Font size="26.0" />
                      </font>
                   </Text>
-                  <Canvas fx:id="cpuWheel" height="87.0" width="94.0" />
+                  <Canvas fx:id="cpuWheel" height="161.0" width="258.0" />
                </children>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="195.0" prefWidth="201.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Memory">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Memory" textAlignment="CENTER" wrappingWidth="256.41468811035156">
                      <font>
                         <Font size="26.0" />
                      </font>
                   </Text>
-                  <Canvas fx:id="memoryWheel" height="94.0" width="108.0" />
+                  <Canvas fx:id="memoryWheel" height="160.0" width="254.0" />
                </children>
             </VBox>
          </children>
