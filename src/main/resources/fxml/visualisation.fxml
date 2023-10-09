@@ -3,6 +3,7 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
@@ -24,6 +25,7 @@
                      </font>
                   </Text>
                   <Label fx:id="bestCurrentText" prefHeight="160.0" prefWidth="260.0" />
+                  <Label fx:id="bestCurrentText1" layoutX="10.0" layoutY="45.0" prefHeight="160.0" prefWidth="260.0" />
                </children>
             </VBox>
             <VBox prefHeight="195.0" prefWidth="235.0">
@@ -33,7 +35,16 @@
                         <Font size="26.0" />
                      </font>
                   </Text>
-                  <Canvas fx:id="cpuWheel" height="161.0" width="258.0" />
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Canvas fx:id="cpuWheel" height="161.0" width="258.0" />
+                        <Label fx:id="cpuText">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </StackPane>
                </children>
             </VBox>
             <VBox prefHeight="195.0" prefWidth="201.0">
@@ -43,7 +54,16 @@
                         <Font size="26.0" />
                      </font>
                   </Text>
-                  <Canvas fx:id="memoryWheel" height="160.0" width="254.0" />
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Canvas fx:id="memoryWheel" height="161.0" width="252.0" />
+                        <Label fx:id="memoryText">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </StackPane>
                </children>
             </VBox>
          </children>

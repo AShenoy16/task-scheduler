@@ -35,6 +35,12 @@ public class VisualisationController {
     @FXML
     private Canvas memoryWheel;
 
+    @FXML
+    private Label cpuText;
+
+    @FXML
+    private Label memoryText;
+
     private GraphicsContext cpuGC;
     private GraphicsContext memoryGC;
     private OperatingSystemMXBean osBean;
@@ -58,8 +64,17 @@ public class VisualisationController {
     }
 
     private void updateWheels() {
+        // Calculate CPU usage (between 0.0 and 1.0)
+        cpuUsage = osBean.getProcessCpuLoad();
+        if (cpuUsage < 0) {
+            cpuUsage = 0;
+        }
+        // Calculate memory usage
+        MemoryUsage heapMemoryUsage = memoryBean.getHeapMemoryUsage();
+        memoryUsage = (double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax();
 
-
+        cpuText.setText(String.format("%.2f", cpuUsage*100) + "%");
+        memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");;
 
 
         System.out.println("cpu process " + osBean.getProcessCpuLoad());
@@ -69,49 +84,26 @@ public class VisualisationController {
         updateMemory();
     }
     private void updateCPU(){
-        // Calculate CPU usage (between 0.0 and 1.0)
-        cpuUsage = osBean.getProcessCpuLoad();
-        if (cpuUsage < 0) {
-            cpuUsage = 0;
-        }
         // Define the dimensions of the ring
         double ringWidth = 10.0; // Width of the ring (adjust as needed)
         double centerX = cpuWheel.getWidth() / 2.0;
         double centerY = cpuWheel.getHeight() / 2.0;
         double radius = Math.min(cpuWheel.getWidth(), cpuWheel.getHeight()) / 2.0 - ringWidth / 2.0;
 
-        // Clear the memory canvas
+        // Clear the CPU canvas
         cpuGC.clearRect(0, 0, cpuWheel.getWidth(), cpuWheel.getHeight());
 
         // Draw the outer circle (ring)
-        cpuGC.setStroke(Color.BLUEVIOLET); // Set the outline color
+        cpuGC.setStroke(Color.BLACK); // Set the outline color
         cpuGC.setLineWidth(ringWidth); // Set the ring width
         cpuGC.strokeArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 0, 360, ArcType.OPEN);
-
-        // You can set the memory usage as the angle to fill the ring
-        double angleToFill = 360 * cpuUsage;
-
-        // Calculate the starting and ending angles for the filled arc
-        double startAngle = 90; // Start from the top
-        double endAngle = startAngle + angleToFill; // Calculate the end angle
-
-        // Calculate the coordinates of the points on the arc
-        double startX = centerX - radius * Math.cos(Math.toRadians(startAngle));
-        double startY = centerY - radius * Math.sin(Math.toRadians(startAngle));
-        double endX = centerX - radius * Math.cos(Math.toRadians(endAngle));
-        double endY = centerY - radius * Math.sin(Math.toRadians(endAngle));
 
         // Draw the outline of the filled portion of the ring
         cpuGC.setStroke(Color.BLUE); // Set the outline color
         cpuGC.setLineWidth(ringWidth); // Set the outline width
-        cpuGC.strokeLine(startX, startY, endX, endY);
-
+        cpuGC.strokeArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 90, -360 * cpuUsage, ArcType.OPEN);
     }
     private void updateMemory(){
-        // Calculate memory usage
-        MemoryUsage heapMemoryUsage = memoryBean.getHeapMemoryUsage();
-        memoryUsage = (double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax();
-
         // Define the dimensions of the ring
         double ringWidth = 10.0; // Width of the ring (adjust as needed)
         double centerX = memoryWheel.getWidth() / 2.0;
@@ -122,27 +114,14 @@ public class VisualisationController {
         memoryGC.clearRect(0, 0, memoryWheel.getWidth(), memoryWheel.getHeight());
 
         // Draw the outer circle (ring)
-        memoryGC.setStroke(Color.BLUEVIOLET); // Set the outline color
+        memoryGC.setStroke(Color.BLACK); // Set the outline color
         memoryGC.setLineWidth(ringWidth); // Set the ring width
         memoryGC.strokeArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 0, 360, ArcType.OPEN);
 
-        // You can set the memory usage as the angle to fill the ring
-        double angleToFill = 360 * memoryUsage;
-
-        // Calculate the starting and ending angles for the filled arc
-        double startAngle = 90; // Start from the top
-        double endAngle = startAngle + angleToFill; // Calculate the end angle
-
-        // Calculate the coordinates of the points on the arc
-        double startX = centerX - radius * Math.cos(Math.toRadians(startAngle));
-        double startY = centerY - radius * Math.sin(Math.toRadians(startAngle));
-        double endX = centerX - radius * Math.cos(Math.toRadians(endAngle));
-        double endY = centerY - radius * Math.sin(Math.toRadians(endAngle));
-
         // Draw the outline of the filled portion of the ring
-        memoryGC.setStroke(Color.GREEN); // Set the outline color
+        memoryGC.setStroke(Color.BLUE); // Set the outline color
         memoryGC.setLineWidth(ringWidth); // Set the outline width
-        memoryGC.strokeLine(startX, startY, endX, endY);
+        memoryGC.strokeArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 90, -360 * memoryUsage, ArcType.OPEN);
 
     }
 
