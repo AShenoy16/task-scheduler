@@ -1,5 +1,6 @@
 package algorithm.branchandbound;
 
+import controller.VisualisationController;
 import model.Graph;
 import model.Node;
 
@@ -16,6 +17,8 @@ public class BranchAndBound {
     private Graph graph;
     private int currentShortestPath;
     private ScheduledTask currentShortestTask;
+
+    private VisualisationController controller;
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -58,7 +61,6 @@ public class BranchAndBound {
         return schedule;
     }
 
-
     /**
      * recursive dfs branch and bound algorithm, that will recursively iterate for each new partial solution
      * @param partialSolution the partial solution of this dfs iteration
@@ -94,6 +96,9 @@ public class BranchAndBound {
         // update current shortest path and task if queue is empty and is shorter
         if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
             currentShortestPath = pathTime;
+            // update visualisation
+
+            controller.setBestText(currentShortestPath);
             currentShortestTask = currentTask;
 
             // print path on console
@@ -186,6 +191,10 @@ public class BranchAndBound {
             }
         }
         return true;
+    }
+
+    public void setController(VisualisationController controller){
+        this.controller = controller;
     }
 
 }

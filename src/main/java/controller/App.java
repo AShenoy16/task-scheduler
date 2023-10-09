@@ -10,22 +10,25 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private Scene scene;
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/visualisation.fxml"));
-        return fxmlLoader.load();
-    }
-
-    public static void main(String[] args) {
-        launch();
-    }
+    private VisualisationController visualisationController;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("visualiser"), 640, 480);
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/visualisation.fxml"));
+        scene = new Scene(fxmlLoader.load(), 640, 480);
+        this.visualisationController = fxmlLoader.getController();
+        this.visualisationController.initialize();
         stage.setTitle("Scheduling Algorithm Visualisation");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+    }
+
+    public void setControllerGraph(){
+        visualisationController.setControllerGraph();
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 }

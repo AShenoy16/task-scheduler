@@ -1,17 +1,22 @@
 package scheduler;
 import algorithm.astar.AstarScheduler;
+import algorithm.branchandbound.BranchAndBound;
+import algorithm.branchandbound.Schedule;
+import com.sun.javafx.application.PlatformImpl;
 import controller.App;
+import controller.VisualisationController;
 import io.IOHandler;
 import model.Graph;
-import model.Schedule;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        App.main(args);
-//        visualise();
+
+        visualise();
+
+
 //        int argsLength = args.length;
 //        if (args == null || argsLength < 2) {
 //            throw new RuntimeException("InputFileName or numProcessors arguments not supplied");
@@ -63,12 +68,13 @@ public class Main {
     }
 
     public static void visualise(){
-        App visualisation = new App();
-        try {
-            visualisation.start(new Stage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        PlatformImpl.startup(() -> {
+            App visualisation = new App();
+            try {
+                visualisation.start(new Stage());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }});
     }
     private static String getOutputFileName(String[] args) {
         for (int i = 2; i < args.length; i++) {
