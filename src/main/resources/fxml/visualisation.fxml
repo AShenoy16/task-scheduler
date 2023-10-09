@@ -8,58 +8,65 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<VBox id="stage" fx:id="stage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="770.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
-      <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="601.8665161132812">
+      <Text id="titleText" fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="771.644287109375">
          <font>
-            <Font name="JetBrains Mono Light Nerd Font Complete Mono Windows Compatible" size="28.0" />
+            <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
          </font>
       </Text>
-      <HBox prefHeight="100.0" prefWidth="200.0">
+      <HBox id="iconsSection" prefHeight="150.0" prefWidth="784.0" stylesheets="@../css/visualisation.css">
          <children>
-            <VBox prefHeight="195.0" prefWidth="211.0">
+            <VBox id="bestCurrentSection" prefHeight="195.0" prefWidth="211.0" stylesheets="@../css/visualisation.css">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Current Best" textAlignment="CENTER" wrappingWidth="256.1432647705078">
+                  <Text id="bestCurrentTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Best" textAlignment="CENTER" wrappingWidth="256.1432647705078">
                      <font>
-                        <Font size="26.0" />
+                        <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
                      </font>
                   </Text>
-                  <Label fx:id="bestCurrentText" prefHeight="160.0" prefWidth="260.0" />
-                  <Label fx:id="bestCurrentText1" layoutX="10.0" layoutY="45.0" prefHeight="160.0" prefWidth="260.0" />
-               </children>
-            </VBox>
-            <VBox prefHeight="195.0" prefWidth="235.0">
-               <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CPU" textAlignment="CENTER" wrappingWidth="257.410400390625">
-                     <font>
-                        <Font size="26.0" />
-                     </font>
-                  </Text>
-                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                  <StackPane id="bestCurrentPane" prefHeight="112.0" prefWidth="200.0" stylesheets="@../css/visualisation.css">
                      <children>
-                        <Canvas fx:id="cpuWheel" height="161.0" width="258.0" />
-                        <Label fx:id="cpuText">
+                        <Label id="bestCurrentText" fx:id="bestCurrentText" prefHeight="86.0" prefWidth="140.0" style="-fx-alignment: center;" stylesheets="@../css/visualisation.css" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS">
                            <font>
-                              <Font size="24.0" />
+                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
                            </font>
                         </Label>
                      </children>
                   </StackPane>
                </children>
             </VBox>
-            <VBox prefHeight="195.0" prefWidth="201.0">
+            <VBox id="cpuSection" maxHeight="-Infinity" prefHeight="195.0" prefWidth="235.0" stylesheets="@../css/visualisation.css">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Memory" textAlignment="CENTER" wrappingWidth="256.41468811035156">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CPU" textAlignment="CENTER" wrappingWidth="257.410400390625">
+                     <font>
+                        <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
+                     </font>
+                  </Text>
+                  <StackPane id="cpuPane" prefHeight="150.0" prefWidth="258.0" stylesheets="@../css/visualisation.css">
+                     <children>
+                        <Canvas id="cpuIcon" fx:id="cpuWheel" height="100.0" width="100.0" />
+                        <Label id="cpuText" fx:id="cpuText" stylesheets="@../css/visualisation.css">
+                           <font>
+                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </StackPane>
+               </children>
+            </VBox>
+            <VBox id="memorySection" prefHeight="195.0" prefWidth="201.0" stylesheets="@../css/visualisation.css">
+               <children>
+                  <Text id="memoryTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="Memory" textAlignment="CENTER" wrappingWidth="243.08135986328125">
                      <font>
                         <Font size="26.0" />
                      </font>
                   </Text>
-                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                  <StackPane id="memoryPane" prefHeight="100.0" prefWidth="222.0" stylesheets="@../css/visualisation.css">
                      <children>
-                        <Canvas fx:id="memoryWheel" height="161.0" width="252.0" />
-                        <Label fx:id="memoryText">
+                        <Canvas id="memoryIcon" fx:id="memoryWheel" height="100.0" width="100.0" />
+                        <Label id="memoryText" fx:id="memoryText" stylesheets="@../css/visualisation.css">
                            <font>
-                              <Font size="24.0" />
+                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
                            </font>
                         </Label>
                      </children>

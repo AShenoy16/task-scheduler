@@ -1,0 +1,16 @@
+#bestCurrentSection{
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+#bestCurrentText{
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+#cpuSection{
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+#memorySection{
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}

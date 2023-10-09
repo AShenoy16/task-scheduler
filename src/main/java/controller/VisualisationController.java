@@ -76,10 +76,6 @@ public class VisualisationController {
         cpuText.setText(String.format("%.2f", cpuUsage*100) + "%");
         memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");;
 
-
-        System.out.println("cpu process " + osBean.getProcessCpuLoad());
-        System.out.println("memory " + memoryUsage);
-
         updateCPU();
         updateMemory();
     }
