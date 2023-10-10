@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 
@@ -34,27 +35,20 @@ public class BranchAndBoundParallel {
         this.numProcessors = numProcesses;
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
-
-        // Initialize static ForkJoinPool thread manager
         pool = new ForkJoinPool(numCores);
 
-        // iterate over each entry nodes
-        for(Node n : graph.getStartNodes()){
-            Map<Node, List<ScheduledTask>> childrenQueue = new HashMap<>();
-            // add multiple entry nodes to queue or algorithm will not be able to visit children
-            for (Node m : graph.getStartNodes()) {
-                if (n != m) {
-                    childrenQueue.put(m, new ArrayList<>());
-                }
-            }
-            ScheduledTask task = new ScheduledTask(0,0, n,null);
+        graph.getStartNodes().forEach(startNode -> {
+            Map<Node, List<ScheduledTask>> childrenQueue = graph.getStartNodes().stream()
+                    .filter(node -> !node.equals(startNode))
+                    .collect(Collectors.toMap(node -> node, node -> new ArrayList<>()));
+
+            ScheduledTask task = new ScheduledTask(0, 0, startNode, null);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
             pool.invoke(new dfs(partialSolution));
-        }
+        });
 
-        // returns a schedule of the shortest path found
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
         ScheduledTask shortestPathTask = currentShortestTask;
 
@@ -62,6 +56,7 @@ public class BranchAndBoundParallel {
             scheduledTasksList.add(shortestPathTask);
             shortestPathTask = shortestPathTask.getParent();
         }
+
         Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
         schedule.setShortestPath(currentShortestPath);
         return schedule;
@@ -93,20 +88,12 @@ public class BranchAndBoundParallel {
 
             // add children of current node to queue of partial solution
             int[] outgoingEdgeWeights = graph.getAdjacencyMatrix()[currentTask.getNode().getId()];
-            for (int i = 0; i < outgoingEdgeWeights.length; i++) {// 'i' represents the outgoing edge node
-                if (outgoingEdgeWeights[i] != 0) {
-                    // if node already visited then continue with for loop
-                    if (partialSolution.getVisitedNodes().contains(graph.getNodes()[i])) {
-                        continue;
-                    }
+
+            for (int i = 0; i < outgoingEdgeWeights.length; i++) {
+                // 'i' represents the outgoing edge node
+                if (outgoingEdgeWeights[i] != 0 && !partialSolution.getVisitedNodes().contains(graph.getNodes()[i])) {
                     // adds current task as dependency of dest node
-                    if (partialSolution.getChildrenQueue().containsKey(graph.getNodes()[i])) {
-                        partialSolution.getChildrenQueue().get(graph.getNodes()[i]).add(currentTask);
-                    } else {
-                        List<ScheduledTask> children = new ArrayList<>();
-                        children.add(currentTask);
-                        partialSolution.getChildrenQueue().put(graph.getNodes()[i], children);
-                    }
+                    partialSolution.getChildrenQueue().computeIfAbsent(graph.getNodes()[i], k -> new ArrayList<>()).add(currentTask);;
                 }
             }
 
@@ -169,9 +156,11 @@ public class BranchAndBoundParallel {
      */
     private int getCurrentLatestTaskTime(ScheduledTask currentTask) {
         int pathTime = 0;
+        int finishTime;
         while (currentTask != null) {
-            if (currentTask.getStartTime() + currentTask.getNode().getVal() > pathTime) {
-                pathTime = currentTask.getStartTime() + currentTask.getNode().getVal();
+            finishTime = currentTask.getStartTime() + currentTask.getNode().getVal();
+            if (finishTime > pathTime) {
+                pathTime = finishTime;
             }
             currentTask = currentTask.getParent();
         }
