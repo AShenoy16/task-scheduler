@@ -1,12 +1,10 @@
 package algorithm.branchandbound;
 
+import algorithm.astar.CalculateCostFunction;
 import model.Graph;
 import model.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The branch and bound class is needed to run the dfs branch and bound algorithm.
@@ -16,6 +14,10 @@ public class BranchAndBound {
     private Graph graph;
     private int currentShortestPath;
     private ScheduledTask currentShortestTask;
+
+    private HashMap<Node, Integer> bottomLevels;
+
+    private final HashSet<Integer> visitedSchedules = new HashSet<>();
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -30,9 +32,18 @@ public class BranchAndBound {
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
 
+        CalculateCostFunction calculateCostFunction = new CalculateCostFunction(graph);
+
+        for(Node node: graph.getStartNodes()){
+            calculateCostFunction.setBottomLevelMap(node);
+        }
+
+        bottomLevels = calculateCostFunction.getBottomLevelMap();
+
         // iterate over each entry nodes
         for(Node n : graph.getStartNodes()){
             Map<Node, List<ScheduledTask>> childrenQueue = new HashMap<>();
+
             // add multiple entry nodes to queue or algorithm will not be able to visit children
             for (Node m : graph.getStartNodes()) {
                 if (n != m) {
@@ -72,6 +83,16 @@ public class BranchAndBound {
             return;
         }
 
+
+        //make sure tasks are scheduled by bottom level
+
+        // remove any schedules we have already visited
+        if(visitedSchedules.contains(partialSolution.hashCode())){
+            return;
+        }
+
+        visitedSchedules.add(partialSolution.hashCode());
+
         // add children of current node to queue of partial solution
         int[] outgoingEdgeWeights = graph.getAdjacencyMatrix()[currentTask.getNode().getId()];
         for (int i = 0; i < outgoingEdgeWeights.length; i++) {// 'i' represents the outgoing edge node
@@ -95,11 +116,17 @@ public class BranchAndBound {
         if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
             currentShortestPath = pathTime;
             currentShortestTask = currentTask;
+            int hashCode = partialSolution.getScheduledTask().hashCode();
 
             // print path on console
             printCurrentPath(currentTask);
 
         }
+
+        // expansion in psuedocode
+
+        // this loops over all the free tasks
+        // and creates new state with the task as early as possible
 
         // branch and bound algorithm for queued children
         partialSolution.getChildrenQueue().forEach((destNode, dependencyList) -> {
@@ -127,10 +154,28 @@ public class BranchAndBound {
                 // check if processor is free after earliestStartTime
                 int possibleStartTime = Math.max(earliestStartTime, partialSolution.getProcessorTimes()[i]);
 
+                // if tasks bottom level + earliest start time can't beat fastest time
+                // just skip
+                if(earliestStartTime + bottomLevels.get(destNode) >= currentShortestPath){
+                    continue;
+                }
+
                 // create new partial solution with new task for this child and add it to dfs branch and bound recursion
                 ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
+
+
+
+                // check if newPartial Solution is valid
+                // if startTime + task bottom level can't beat current fast time -> skip
+
+
+
+
+
                 PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask);
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
+
+
                 dfs(newPartialSolution);
             }
         });

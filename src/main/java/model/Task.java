@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Task {
 
     private Node node;
@@ -30,6 +32,16 @@ public class Task {
         return node;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return startTime == task.startTime && processor == task.processor && Objects.equals(node, task.node);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(node.getId(), startTime, processor);
+    }
 }

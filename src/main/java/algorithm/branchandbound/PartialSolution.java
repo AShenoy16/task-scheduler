@@ -1,5 +1,6 @@
 package algorithm.branchandbound;
 import model.Node;
+import model.Task;
 
 import java.util.*;
 
@@ -12,6 +13,10 @@ public class PartialSolution {
     private int[] processorTimes;
     private ScheduledTask scheduledTask;
 
+    private List<Task> allTasks;
+
+
+
     /**
      * Partial solution for the first root level node
      * @param scheduledTask the scheduled task of this partial solution
@@ -22,10 +27,13 @@ public class PartialSolution {
         this.childrenQueue = new HashMap<>();
         this.scheduledTask = scheduledTask;
         this.processorTimes = new int[numProcessors];
+        this.allTasks = new ArrayList<>();
 
         // updates root node
         processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
         this.visitedNodes.add(scheduledTask.getNode());
+        // add all scheduled tasks to task
+        this.allTasks.add(scheduledTask.toTask());
     }
 
     /**
@@ -48,6 +56,11 @@ public class PartialSolution {
         this.scheduledTask = task;
         this.visitedNodes.add(task.getNode());//add task node as visited in visited array
         this.childrenQueue.remove(task.getNode());//remove node from queue
+
+        // Add the current task to the list of all tasks
+        this.allTasks = new ArrayList<>(parentPartialSolution.allTasks);
+        this.allTasks.add(task.toTask());
+
     }
 
     public List<Node> getVisitedNodes() {
@@ -64,5 +77,13 @@ public class PartialSolution {
 
     public Map<Node, List<ScheduledTask>> getChildrenQueue(){
         return childrenQueue;
+    }
+
+
+    // hash code if two PartialSolution instances have exactly the same tasks
+    // (i.e., all the same nodes, on the same processors with the same start times) in the same order.
+    @Override
+    public int hashCode() {
+        return allTasks.hashCode();
     }
 }
