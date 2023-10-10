@@ -2,16 +2,22 @@ package controller;
 
 import algorithm.branchandbound.BranchAndBound;
 import algorithm.branchandbound.Schedule;
+import algorithm.branchandbound.ScheduledTask;
 import io.IOHandler;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.ArcType;
@@ -24,6 +30,11 @@ import model.Graph;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import com.sun.management.OperatingSystemMXBean;
 
 public class VisualisationController {
@@ -34,14 +45,21 @@ public class VisualisationController {
     private Canvas cpuWheel;
     @FXML
     private Canvas memoryWheel;
+    @FXML
+    private StackedBarChart<String, Number> scheduleBarChart;
 
     private GraphicsContext cpuGC;
     private GraphicsContext memoryGC;
     private OperatingSystemMXBean osBean;
     private MemoryMXBean memoryBean;
     private double cpuUsage;
-
     private double memoryUsage;
+    private int numProcessors;
+    private String[] processorNames;
+    private int[] processorStartTimes;
+    private ScheduledExecutorService scheduledExecutorService;
+    private boolean isFinished = false;
+    private BranchAndBound bnb;
 
 
     public void initialize() {
@@ -55,6 +73,63 @@ public class VisualisationController {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateWheels()));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+    }
+
+    public void initializeBarChart() {
+        processorNames = new String[numProcessors];
+        processorStartTimes = new int[numProcessors];
+        // initialises array of processor names
+        for (int i = 0; i < numProcessors; i++) {
+            processorNames[i] = "P" + i;
+        }
+        // set processor names as x axis labels
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(processorNames)));
+
+        // create a single thread schedule executor that periodically updates the schedule stacked bar chart
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            ScheduledTask currentScheduledTask = bnb.getCurrentDFSTask();
+            ScheduledTask[] scheduledTasks = new ScheduledTask[currentScheduledTask.getTaskLength()];
+            for (int i = scheduledTasks.length-1; i >= 0; i--) { // reverse order of task nodes
+                scheduledTasks[i] = currentScheduledTask;
+                currentScheduledTask = currentScheduledTask.getParent();
+            }
+            Platform.runLater(() -> {
+                Arrays.fill(processorStartTimes, 0); // reset processor times
+                scheduleBarChart.getData().clear(); // reset stacked bar chart
+                for (ScheduledTask scheduledTask : scheduledTasks) { // create new series for each task
+                    XYChart.Series<String, Number> series = new XYChart.Series<>();
+                    int taskTime = scheduledTask.getNode().getVal();
+                    int startTime = scheduledTask.getStartTime();
+                    int processorID = scheduledTask.getProcessorId();
+                    String processorName = "P" + processorID;
+
+                    // creates a series for when there is a time delay between current task start time and previous
+                    // task finish time. Will be styled as transparent later on
+                    if (scheduledTask.getStartTime() != processorStartTimes[processorID]) {
+                        XYChart.Series<String, Number> seriesNone = new XYChart.Series<>();
+                        seriesNone.getData().add(new XYChart.Data<>(processorName, startTime - processorStartTimes[processorID]));
+                        seriesNone.setName("none");
+                        scheduleBarChart.getData().addAll(seriesNone);
+                    }
+
+                    // creates series of this task
+                    series.getData().add(new XYChart.Data<>(processorName, taskTime));
+                    scheduleBarChart.getData().addAll(series);
+                    processorStartTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + taskTime;
+                }
+
+                // styles the previous mentioned series with time delay as transparent
+                scheduleBarChart.getData().forEach((t) -> {
+                    if (t.getName() != null && t.getName().equals("none")) {
+                        t.getData().forEach((j) -> {
+                            j.getNode().setStyle("-fx-background-color: transparent");
+                        });
+                    }
+                });
+            });
+        }, 0, 500, TimeUnit.MILLISECONDS);
     }
 
     private void updateWheels() {
@@ -149,16 +224,21 @@ public class VisualisationController {
     public void startScheduler() {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
-        Graph graph = io.readDot(directory + "Nodes_7_OutTree.dot");
+        Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         BranchAndBound scheduler = new BranchAndBound();
         scheduler.setController(this);
+        bnb = scheduler;
+        numProcessors = 4;
 
         // Start the scheduler in a separate thread
         Thread schedulerThread = new Thread(() -> {
-            Schedule schedule = scheduler.run(graph, 4);
+            Schedule schedule = scheduler.run(graph, numProcessors);
         });
         schedulerThread.start();
+
+        initializeBarChart();
     }
+
     public void setBestText(int currentShortestPath) {
         Platform.runLater(() -> {
             bestCurrentText.setText(String.valueOf(currentShortestPath));

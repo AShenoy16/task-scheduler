@@ -10,12 +10,14 @@ public class ScheduledTask {
     private int processorId;
     private Node node;
     private ScheduledTask parent;
+    private int taskLength;
 
-    public ScheduledTask(int startTime, int processorId, Node node,ScheduledTask parent){
+    public ScheduledTask(int startTime, int processorId, Node node,ScheduledTask parent, int taskLength){
         this.startTime = startTime;
         this.processorId = processorId;
         this.node = node;
         this.parent = parent;
+        this.taskLength = taskLength;
     }
 
     public int getStartTime(){
@@ -31,5 +33,9 @@ public class ScheduledTask {
 
     public ScheduledTask getParent() {
         return parent;
+    }
+
+    public int getTaskLength() {
+        return taskLength;
     }
 }

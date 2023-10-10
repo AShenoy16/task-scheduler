@@ -19,6 +19,8 @@ public class BranchAndBound {
     private ScheduledTask currentShortestTask;
 
     private VisualisationController controller;
+    private ScheduledTask currentDFSTask;
+
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -42,7 +44,7 @@ public class BranchAndBound {
                     childrenQueue.put(m, new ArrayList<>());
                 }
             }
-            ScheduledTask task = new ScheduledTask(0,0, n,null);
+            ScheduledTask task = new ScheduledTask(0,0, n,null, 1);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
             dfs(partialSolution); // start recursive dfs branch and bound
@@ -67,6 +69,7 @@ public class BranchAndBound {
      */
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
+        currentDFSTask = currentTask;
         int pathTime = getCurrentLatestTaskTime(currentTask);
 
         // bound the search of this node
@@ -96,10 +99,10 @@ public class BranchAndBound {
         // update current shortest path and task if queue is empty and is shorter
         if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
             currentShortestPath = pathTime;
-            // update visualisation
-
-            controller.setBestText(currentShortestPath);
             currentShortestTask = currentTask;
+
+            // update visualisation
+            controller.setBestText(currentShortestPath);
 
             // print path on console
             printCurrentPath(currentTask);
@@ -133,7 +136,7 @@ public class BranchAndBound {
                 int possibleStartTime = Math.max(earliestStartTime, partialSolution.getProcessorTimes()[i]);
 
                 // create new partial solution with new task for this child and add it to dfs branch and bound recursion
-                ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
+                ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask(), partialSolution.getScheduledTask().getTaskLength() + 1);
                 PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask);
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
                 dfs(newPartialSolution);
@@ -195,6 +198,10 @@ public class BranchAndBound {
 
     public void setController(VisualisationController controller){
         this.controller = controller;
+    }
+
+    public ScheduledTask getCurrentDFSTask() {
+        return currentDFSTask;
     }
 
 }
