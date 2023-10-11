@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 public class AstarParallel {
 
-    private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
     private CalculateCostFunction calculateCostFunction;
 
     public Schedule run(Graph graph, int numProcessors) {
