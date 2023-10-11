@@ -4,15 +4,13 @@ import model.Node;
 import model.Schedule;
 import model.Task;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class AstarScheduler {
 
     private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
+    private HashSet<Integer> closed = new HashSet<>();
 
     //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
@@ -64,6 +62,7 @@ public class AstarScheduler {
 
             }
 
+            // sort the freeNodes by bottomLevel
             newSchedules = createPartialSchedules(partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph);
 //            newSchedules = createPartialSchedulesThreads(partialSchedule.getFreeNodes(graph), numProcessors, 4, partialSchedule, graph, executorService);
 
@@ -112,11 +111,6 @@ public class AstarScheduler {
 
         // maybe instead of creating free tasks everytime we make a queue or something
 
-//
-//        List<Task> freeTasks = schedule.getFreeTasks(graph);
-//
-//        List<Node> validFreeTasks = freeTasks.stream().map(Task::getNode).toList();
-
         //TODO optimise
         for(Node validNode : validNodes){
             parentNodes = graph.getParentNodes(validNode);
@@ -162,16 +156,35 @@ public class AstarScheduler {
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
 
-                if(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph)){
-                    // Add potential schedule
-                    newSchedules.add(newlyMadeSchedule);
+                // if not valid skip
+
+                // if both of them are true valid schedule and add to new schedules
+                // if one of them isn't true, predicate is true and go to next iteration
+
+                // Prune 2: remove any invalid schedules
+                if(!(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph))){
+                    continue;
+
                 }
 
-                //check if visited an equivalent schedule already using hashes
+                //if present in either closed or open list, discard the state
+                // Prune 2: removes any duplicates
+
+                //TODO find faster way to check if it's in open
+                if(closed.contains(newlyMadeSchedule.hashCode())){
+                    continue;
+                }
+
+                // not present in closed or open and valid -> add to newSchedules(open)
+
+                newSchedules.add(newlyMadeSchedule);
 
 
             }
         }
+
+        // add schedule to closed
+        closed.add(schedule.hashCode());
 
         return newSchedules;
 

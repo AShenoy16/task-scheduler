@@ -247,5 +247,8 @@ public class Schedule {
     }
 
 
-
+    @Override
+    public int hashCode() {
+        return tasks.hashCode();
+    }
 }
