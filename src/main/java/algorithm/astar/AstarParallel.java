@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class AstarParallel {
 
     private CalculateCostFunction calculateCostFunction;
-
+    private int globalCost = Integer.MAX_VALUE;
     public Schedule run(Graph graph, int numProcessors) {
         calculateCostFunction = new CalculateCostFunction(graph);
         for (Node entryNode : graph.getStartNodes()) {
@@ -31,7 +31,7 @@ public class AstarParallel {
         //TODO Add dynamic number of threads, set to 4 threads for now
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
+        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
         List<Schedule> finalSchedules = new ArrayList<>();
         List<Callable<Schedule>> tasks = new ArrayList<>();
 
@@ -53,17 +53,17 @@ public class AstarParallel {
             // Invoke all tasks and collect results
             List<Future<Schedule>> futures = executorService.invokeAll(tasks);
             for (Future<Schedule> future : futures) {
-                if(future.get() == null){
-                    continue;
+                if(future.get() != null && future.get().getCost() == globalCost){
+                    executorService.shutdown();
+                    return future.get();
                 }
-                finalSchedules.add(future.get());
             }
 
+            return null;
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return getlowestCostSchedule(finalSchedules);
 
     }
 
@@ -87,11 +87,11 @@ public class AstarParallel {
         return lowestCostSchedule;
     }
 
-    public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numProcessors) {
+    public List<Schedule> createInitialSchedules(List<Node> entryNodes) {
         List<Schedule> newSchedules = new ArrayList<>();
         for (Node entryNode : entryNodes) {
             Task task = new Task(entryNode, 0, entryNode.getVal(), 1);
-            Schedule newlyMadeSchedule = new Schedule(task, numProcessors);
+            Schedule newlyMadeSchedule = new Schedule(task);
             calculateCostFunction.setScheduleCost(newlyMadeSchedule);
             newSchedules.add(newlyMadeSchedule);
         }
@@ -103,9 +103,13 @@ public class AstarParallel {
         open2.add(schedule);
         while (open2.size() != 0) {
             Schedule partialSchedule = open2.poll();
-
+            if(globalCost <= partialSchedule.getCost()){
+                open2.clear();
+                return null;
+            }
             if (partialSchedule.isCompleteSchedule(graph)) {
                 open2.clear();
+                globalCost = partialSchedule.getCost();
                 return partialSchedule;
             }
 
@@ -191,7 +195,7 @@ public class AstarParallel {
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
-                Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+                Schedule newlyMadeSchedule = new Schedule(newTasks);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
@@ -213,7 +217,7 @@ public class AstarParallel {
     public List<Schedule> createPartialSchedules(Node validNode, int numOfProcessors, Schedule schedule, Graph graph) {
 
         List<Schedule> newSchedules = new ArrayList<>();
-        List<Node> parentNodes = graph.getParentNodes(validNode);
+        List<Node> parentNodes = graph.getDependenciesByNode(validNode);
         List<Task> newTasks;
 
         int earliestStartTimeForProcessor;
@@ -252,7 +256,7 @@ public class AstarParallel {
             Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
             newTasks = new ArrayList<>(schedule.getTasks());
             newTasks.add(task);
-            Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+            Schedule newlyMadeSchedule = new Schedule(newTasks);
 
             // Set cost
             calculateCostFunction.setScheduleCost(newlyMadeSchedule);

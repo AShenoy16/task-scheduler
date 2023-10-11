@@ -47,7 +47,7 @@ public class AstarScheduler {
         }
 
         List<Node> sortedList =  calculateCostFunction.getSortedBottomLevel();
-        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
+        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
         open.addAll(initialSchedules);
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -78,17 +78,16 @@ public class AstarScheduler {
      * This method creates the initial schedules using the valid entry nodes
      *
      * @param entryNodes The valid entry nodes
-     * @param numOfProcessors The number of processors
      * @return A list of the initial schedules
      */
-    public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numOfProcessors){
+    public List<Schedule> createInitialSchedules(List<Node> entryNodes){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
 
         // Create new schedule for every valid entry node
         for(Node entryNode : entryNodes){
             Task task = new Task(entryNode, 0, entryNode.getVal(), 1);
-            Schedule newlyMadeSchedule = new Schedule(task, numOfProcessors);
+            Schedule newlyMadeSchedule = new Schedule(task);
             calculateCostFunction.setScheduleCost(newlyMadeSchedule);
             newSchedules.add(newlyMadeSchedule);
         }
@@ -158,7 +157,7 @@ public class AstarScheduler {
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
-                Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+                Schedule newlyMadeSchedule = new Schedule(newTasks);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);

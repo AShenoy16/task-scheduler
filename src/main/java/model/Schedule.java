@@ -9,17 +9,14 @@ import java.util.stream.Collectors;
 
 public class Schedule {
     private List<Task> tasks;
-    private int numProcessors;
     private int cost;
 
     /**
      * This creates a new schedule given a list of tasks
      *
      * @param tasks A list of tasks to add to a schedule
-     * @param numProcessors The number of processors
      */
-    public Schedule(List<Task> tasks, int numProcessors) {
-        this.numProcessors = numProcessors;
+    public Schedule(List<Task> tasks) {
         this.tasks = tasks;
         Collections.sort(this.tasks, Comparator.comparingInt(Task::getProcessor));
     }
@@ -28,11 +25,9 @@ public class Schedule {
      * This creates a new initial schedule with only one task (entry node)
      *
      * @param intialTask The initial task to add
-     * @param numProcessors The number of processors
      */
-    public Schedule(Task intialTask, int numProcessors){
+    public Schedule(Task intialTask){
         this.tasks = new ArrayList<>(List.of(intialTask));
-        this.numProcessors = numProcessors;
     }
 
     public List<Task> getTasks() {
