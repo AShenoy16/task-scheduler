@@ -42,6 +42,9 @@ public class Main {
         io.writeDot(schedule, outputFileName);
 
         System.out.println("created!");
+
+        // just for us to see memory usage
+        printMemoryUsage();
     }
 
     private static String getOutputFileName(String[] args) {
@@ -57,5 +60,18 @@ public class Main {
             }
         }
         return null; // Return an empty string if -o is not found or if it's not followed by a value
+    }
+
+    private static void printMemoryUsage() {
+        Runtime runtime = Runtime.getRuntime();
+        long maxMemory = runtime.maxMemory();
+        long totalMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+
+        System.out.println("JVM Max Memory: " + maxMemory / 1024 + " KB");
+        System.out.println("JVM Total Memory: " + totalMemory / 1024 + " KB");
+        System.out.println("JVM Free Memory: " + freeMemory / 1024 + " KB");
+        System.out.println("JVM Used Memory: " + usedMemory / 1024 + " KB");
     }
 }

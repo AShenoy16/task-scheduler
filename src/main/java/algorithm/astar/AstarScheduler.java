@@ -6,6 +6,7 @@ import model.Task;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 public class AstarScheduler {
 
@@ -63,7 +64,14 @@ public class AstarScheduler {
             }
 
             // sort the freeNodes by bottomLevel
-            newSchedules = createPartialSchedules(partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph);
+
+            List<Node> sortedNodes = partialSchedule.getFreeNodes(graph)
+                    .stream()
+                    .sorted(Comparator.comparingInt(node -> calculateCostFunction.bottomLevelofNode(node)))
+                    .toList();
+
+
+            newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph);
 //            newSchedules = createPartialSchedulesThreads(partialSchedule.getFreeNodes(graph), numProcessors, 4, partialSchedule, graph, executorService);
 
             open.addAll(newSchedules);
