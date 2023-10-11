@@ -13,8 +13,8 @@ public class Graph {
     private ArrayList<Node> startNodes = new ArrayList<>();
     private ArrayList<Node> endNodes = new ArrayList<>();
     private Node[] nodes;
-
     private HashMap<Node, List<Node>> dependencies = new HashMap<>();
+    private HashMap<Node, List<Node>> parentNodes = new HashMap<>();
 
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
@@ -88,7 +88,8 @@ public class Graph {
 //        }
 
         // check if getParent nodes works on entry node
-        List<Node> parentNodes = getParentNodes(node);
+        this.parentNodes.putIfAbsent(node, initialiseParentNodes(node));
+        List<Node> parentNodes = this.parentNodes.get(node);
 
         // add parents of specific node
         dependencies.put(node, parentNodes);
@@ -138,7 +139,7 @@ public class Graph {
      * @param node The node
      * @return A list of nodes that is the parent(s) of the particular node
      */
-    public ArrayList<Node> getParentNodes(Node node) {
+    public List<Node> initialiseParentNodes(Node node) {
         ArrayList<Node> parentNodes = new ArrayList<>();
 
         int col = node.getId();
@@ -154,7 +155,21 @@ public class Graph {
         return parentNodes;
     }
 
+    public List<Node> getParentNodes(Node node) {
+//        ArrayList<Node> parentNodes = new ArrayList<>();
+//
+//        int col = node.getId();
+//
+//        for (int i = 0; i < n; i++) {
+//            if (adjacencyMatrix[i][col] > 0) {
+//                //get node with correct getter
+//                Node parentNode = createNodeById(i);
+//                parentNodes.add(parentNode);
+//            }
+//        }
 
+        return this.parentNodes.get(node);
+    }
     /**
      * This method sets all the entry nodes
      */

@@ -154,13 +154,6 @@ public class AstarParallel {
         List<Node> parentNodes;
         List<Task> newTasks;
 
-        // maybe instead of creating free tasks everytime we make a queue or something
-
-//
-//        List<Task> freeTasks = schedule.getFreeTasks(graph);
-//
-//        List<Node> validFreeTasks = freeTasks.stream().map(Task::getNode).toList();
-
         //TODO optimise
         for(Node validNode : validNodes){
             parentNodes = graph.getParentNodes(validNode);

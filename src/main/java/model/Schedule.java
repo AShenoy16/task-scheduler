@@ -65,9 +65,8 @@ public class Schedule {
     private List<Task> getDependencies(Node node, Graph graph){
         // get the parents of this node
 
-        ArrayList<Node> parentNodes = graph.getParentNodes(node);
-
-        ArrayList<Task> dependencies = new ArrayList<>();
+        List<Node> parentNodes = graph.getParentNodes(node);
+        List<Task> dependencies = new ArrayList<>();
 
 
         for(Task task: tasks){
@@ -95,7 +94,7 @@ public class Schedule {
         for (Node node : graph.getNodes()) {
             // Check if the node is not in the current schedule
             if (!allScheduleNodes.contains(node)) {
-                List<Node> dependentNodes = getDependencies(node, graph).stream().map(Task::getNode).toList();;
+                List<Node> dependentNodes = graph.getDependenciesByNode(node);;
 
                 if(dependentNodes.isEmpty()){
                     freeTaskNodes.add(node);
