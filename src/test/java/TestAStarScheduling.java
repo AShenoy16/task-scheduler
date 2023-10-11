@@ -1,4 +1,4 @@
-import algorithm.astar.AstarParallelisation;
+import algorithm.astar.AstarParallel;
 import algorithm.astar.AstarScheduler;
 import io.IOHandler;
 import model.Graph;
@@ -16,7 +16,7 @@ public class TestAStarScheduling {
     AstarScheduler scheduler;
     Schedule schedule;
 
-    AstarParallelisation parallelSchduler;
+    AstarParallel parallelSchduler;
 
     @Test
     public void TestAStarTwoProcessorsNodes7() {
@@ -47,7 +47,7 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNodes7Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
-        parallelSchduler = new AstarParallelisation();
+        parallelSchduler = new AstarParallel();
         schedule = parallelSchduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
@@ -121,7 +121,7 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNodes10Paralell() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_10_Random.dot");
-        parallelSchduler = new AstarParallelisation();
+        parallelSchduler = new AstarParallel();
         schedule = parallelSchduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
@@ -144,7 +144,7 @@ public class TestAStarScheduling {
     public void TestAStarTwoProcessorsNodes11Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        parallelSchduler = new AstarParallelisation();
+        parallelSchduler = new AstarParallel();
         schedule = parallelSchduler.run(graph, 2);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
@@ -167,7 +167,7 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNode11Paralell() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        parallelSchduler = new AstarParallelisation();
+        parallelSchduler = new AstarParallel();
         schedule = parallelSchduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));

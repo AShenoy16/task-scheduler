@@ -40,9 +40,6 @@ public class AstarScheduler {
 
         }
 
-
-
-
         List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
         if(validEntryNodes.isEmpty()){
             System.out.println("Why are entry nodes empty????");
@@ -180,7 +177,6 @@ public class AstarScheduler {
         return newSchedules;
 
     }
-
 
     public List<Schedule> createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph, ExecutorService executorService){
         int size = validNodes.size();
