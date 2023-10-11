@@ -57,31 +57,6 @@ public class Schedule {
 
 
     /**
-     * This method gets the dependencies for a particular task (node)
-     * @param node
-     * @param graph
-     * @return
-     */
-    private List<Task> getDependencies(Node node, Graph graph){
-        // get the parents of this node
-
-        List<Node> parentNodes = graph.getParentNodes(node);
-        List<Task> dependencies = new ArrayList<>();
-
-
-        for(Task task: tasks){
-            // if a task in the schedule is in the parent nodes
-            // it is a dependency
-            if(parentNodes.contains(task.getNode())){
-                dependencies.add(task);
-            }
-        }
-
-        return dependencies;
-
-    }
-
-    /**
      * This gets the free tasks for a specific schedule
      * @param graph
      * @return
@@ -192,7 +167,7 @@ public class Schedule {
         for(Task task: tasks){
             Node node = task.getNode();
 
-            List<Node> dependencies = graph.getDependenciesByNode(node);
+            List<Node> dependencies = graph.getParentsByNode(node);
 
 //            List<Task> dependencies = getDependencies(node, graph);
 

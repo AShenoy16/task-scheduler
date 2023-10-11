@@ -106,10 +106,8 @@ public class AstarParallel {
             Schedule partialSchedule = open2.poll();
 
             if (partialSchedule.isCompleteSchedule(graph)) {
-                if (partialSchedule.isValidScheduleNoOverlap() && partialSchedule.isValidScheduleSatisfyDependencies(graph)) {
-                    open2.clear();
-                    return partialSchedule;
-                }
+                open2.clear();
+                return partialSchedule;
             }
 
             List<Schedule> newSchedules = createPartialSchedules(

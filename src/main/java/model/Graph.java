@@ -109,6 +109,10 @@ public class Graph {
         return dependencies.get(node);
     }
 
+    public List<Node> getParentsByNode(Node node) {
+        return parentNodes.get(node);
+    }
+
     // create method to get all dependencies and put them into a hashamp
 
 
