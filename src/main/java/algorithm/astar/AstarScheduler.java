@@ -13,6 +13,8 @@ public class AstarScheduler {
     private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
     private HashSet<Integer> closed = new HashSet<>();
 
+    private HashSet<Integer> openHash = new HashSet<>();
+
     //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
 
@@ -75,6 +77,10 @@ public class AstarScheduler {
 //            newSchedules = createPartialSchedulesThreads(partialSchedule.getFreeNodes(graph), numProcessors, 4, partialSchedule, graph, executorService);
 
             open.addAll(newSchedules);
+            // adds hashes
+
+            //TODO if messes up parallelization, just do normal for each
+            newSchedules.parallelStream().forEach(schedule -> openHash.add(schedule.hashCode()));
         }
         
         //TODO add proper fail state?
@@ -178,10 +184,13 @@ public class AstarScheduler {
                 //if present in either closed or open list, discard the state
                 // Prune 2: removes any duplicates
 
+                int hash = newlyMadeSchedule.hashCode();
+
                 //TODO find faster way to check if it's in open
-                if(closed.contains(newlyMadeSchedule.hashCode())){
+                if(closed.contains(hash) || openHash.contains(hash)){
                     continue;
                 }
+
 
                 // not present in closed or open and valid -> add to newSchedules(open)
 
