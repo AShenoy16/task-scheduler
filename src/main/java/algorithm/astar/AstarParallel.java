@@ -13,6 +13,8 @@ public class AstarParallel {
 
     private CalculateCostFunction calculateCostFunction;
     private int globalCost = Integer.MAX_VALUE;
+    HashSet<Integer> closed = new HashSet<>();
+    HashSet<Integer> openHash = new HashSet<>();
     public Schedule run(Graph graph, int numProcessors) {
         calculateCostFunction = new CalculateCostFunction(graph);
         for (Node entryNode : graph.getStartNodes()) {
@@ -30,8 +32,6 @@ public class AstarParallel {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
-        HashSet<Integer> closed = new HashSet<>();
-        HashSet<Integer> openHash = new HashSet<>();
         List<Callable<Schedule>> tasks = new ArrayList<>();
 
         if(initialSchedules.size() > 4){
@@ -41,7 +41,7 @@ public class AstarParallel {
         } else {
             List<Schedule> secondInitialSchedules = new ArrayList<>();
             for(Schedule schedule1 : initialSchedules){
-                secondInitialSchedules.addAll(createPartialSchedules(schedule1.getFreeNodes(graph), numProcessors, schedule1, graph, closed, openHash));
+                secondInitialSchedules.addAll(createPartialSchedules(schedule1.getFreeNodes(graph), numProcessors, schedule1, graph));
             }
             for(Schedule schedule2 : secondInitialSchedules){
                 tasks.add(() -> new MyCallable(numProcessors, schedule2, graph).call());
@@ -54,6 +54,8 @@ public class AstarParallel {
             for (Future<Schedule> future : futures) {
                 if(future.get() != null && future.get().getCost() == globalCost){
                     executorService.shutdown();
+                    openHash.clear();
+                    closed.clear();
                     return future.get();
                 }
             }
@@ -99,8 +101,7 @@ public class AstarParallel {
 
     public Schedule createPartialSchedulesParallel2(Schedule schedule, int numProcessors, Graph graph) {
         PriorityQueue<Schedule> open2 = new PriorityQueue<>(new CostFunctionComparator());
-        HashSet<Integer> closed = new HashSet<>();
-        HashSet<Integer> openHash = new HashSet<>();
+
         open2.add(schedule);
         while (open2.size() != 0) {
             Schedule partialSchedule = open2.poll();
@@ -117,7 +118,7 @@ public class AstarParallel {
                     .stream()
                     .sorted(Comparator.comparingInt(node -> calculateCostFunction.bottomLevelofNode(node)))
                     .toList();
-            List<Schedule> newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph, closed, openHash);
+            List<Schedule> newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph);
 
             open2.addAll(newSchedules);
             newSchedules.parallelStream().forEach(s -> openHash.add(s.hashCode()));
@@ -142,18 +143,18 @@ public class AstarParallel {
             return createPartialSchedulesParallel2(schedule, numOfProcessors, graph);
         }
     }
-    public List<Schedule> createPartialSchedulesParallel(
-            List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph) {
+//    public List<Schedule> createPartialSchedulesParallel(
+//            List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph) {
+//
+//        // concurrently handle valid node partial schedule creation
+//        // map each validNode to a list of partial schedules created by createPartialSchedules
+//        // return the list
+//        return validNodes.parallelStream()
+//                .flatMap(validNode -> createPartialSchedules(validNode, numOfProcessors, schedule, graph).stream())
+//                .collect(Collectors.toList());
+//    }
 
-        // concurrently handle valid node partial schedule creation
-        // map each validNode to a list of partial schedules created by createPartialSchedules
-        // return the list
-        return validNodes.parallelStream()
-                .flatMap(validNode -> createPartialSchedules(validNode, numOfProcessors, schedule, graph).stream())
-                .collect(Collectors.toList());
-    }
-
-    public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph, HashSet<Integer> closed, HashSet<Integer> openHash){
+    public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph){
         // create empty list of schedules, parent nodes and new tasks to add
         List<Schedule> newSchedules = new ArrayList<>();
         List<Node> parentNodes;
@@ -242,64 +243,64 @@ public class AstarParallel {
         return newSchedules;
 
     }
-    public List<Schedule> createPartialSchedules(Node validNode, int numOfProcessors, Schedule schedule, Graph graph) {
-
-        List<Schedule> newSchedules = new ArrayList<>();
-        List<Node> parentNodes = graph.getDependenciesByNode(validNode);
-        List<Task> newTasks;
-
-        int earliestStartTimeForProcessor;
-        int latestParentStartTime;
-        int earliestTimeTaskCanStart;
-
-        // Add Task for each processor
-        for(int processorID = 1 ; processorID <= numOfProcessors; processorID++){
-            earliestStartTimeForProcessor = 0;
-            latestParentStartTime = 0;
-
-            // Get all existing task in schedule to get latest starting time
-            for(Task task : schedule.getTasks()){
-                // This will get the latest finish time of any task for a particular processor (processorID)
-                if(task.getProcessor() == processorID && task.getFinishTime() > earliestStartTimeForProcessor){
-                    earliestStartTimeForProcessor = task.getFinishTime();
-                }
-
-                // This checks if the task is a parent task
-                if(parentNodes.contains(task.getNode())){
-                    int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
-
-                    // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-                    if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
-                        latestParentStartTime = task.getFinishTime();
-                    } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
-                        latestParentStartTime = task.getFinishTime() + edgeWeight;
-                    }
-                }
-            }
-
-            // Set latest starting time
-            earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
-
-            // Add task
-            Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
-            newTasks = new ArrayList<>(schedule.getTasks());
-            newTasks.add(task);
-            Schedule newlyMadeSchedule = new Schedule(newTasks);
-
-            // Set cost
-            calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-
-            if(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph)){
-                // Add potential schedule
-                newSchedules.add(newlyMadeSchedule);
-            }
-
-            //check if visited an equivalent schedule already using hashes
-
-
-        }
-        return newSchedules;
-    }
+//    public List<Schedule> createPartialSchedules(Node validNode, int numOfProcessors, Schedule schedule, Graph graph) {
+//
+//        List<Schedule> newSchedules = new ArrayList<>();
+//        List<Node> parentNodes = graph.getDependenciesByNode(validNode);
+//        List<Task> newTasks;
+//
+//        int earliestStartTimeForProcessor;
+//        int latestParentStartTime;
+//        int earliestTimeTaskCanStart;
+//
+//        // Add Task for each processor
+//        for(int processorID = 1 ; processorID <= numOfProcessors; processorID++){
+//            earliestStartTimeForProcessor = 0;
+//            latestParentStartTime = 0;
+//
+//            // Get all existing task in schedule to get latest starting time
+//            for(Task task : schedule.getTasks()){
+//                // This will get the latest finish time of any task for a particular processor (processorID)
+//                if(task.getProcessor() == processorID && task.getFinishTime() > earliestStartTimeForProcessor){
+//                    earliestStartTimeForProcessor = task.getFinishTime();
+//                }
+//
+//                // This checks if the task is a parent task
+//                if(parentNodes.contains(task.getNode())){
+//                    int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
+//
+//                    // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
+//                    if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
+//                        latestParentStartTime = task.getFinishTime();
+//                    } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
+//                        latestParentStartTime = task.getFinishTime() + edgeWeight;
+//                    }
+//                }
+//            }
+//
+//            // Set latest starting time
+//            earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
+//
+//            // Add task
+//            Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
+//            newTasks = new ArrayList<>(schedule.getTasks());
+//            newTasks.add(task);
+//            Schedule newlyMadeSchedule = new Schedule(newTasks);
+//
+//            // Set cost
+//            calculateCostFunction.setScheduleCost(newlyMadeSchedule);
+//
+//            if(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph)){
+//                // Add potential schedule
+//                newSchedules.add(newlyMadeSchedule);
+//            }
+//
+//            //check if visited an equivalent schedule already using hashes
+//
+//
+//        }
+//        return newSchedules;
+//    }
 
 
 }
