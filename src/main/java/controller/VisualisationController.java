@@ -31,6 +31,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +49,9 @@ public class VisualisationController {
     private Canvas memoryWheel;
     @FXML
     private StackedBarChart<String, Number> scheduleBarChart;
-
+    @FXML CategoryAxis scheduleXAxis;
+    @FXML
+    private Label timerLabel;
     @FXML
     private Label cpuText;
 
@@ -66,6 +70,7 @@ public class VisualisationController {
     private ScheduledExecutorService scheduledExecutorService;
     private boolean isFinished = false;
     private BranchAndBound bnb;
+    private int timerCounter;
 
 
     public void initialize() {
@@ -89,8 +94,7 @@ public class VisualisationController {
             processorNames[i] = "P" + i;
         }
         // set processor names as x axis labels
-        CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(processorNames)));
+        scheduleXAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(processorNames)));
 
         // create a single thread schedule executor that periodically updates the schedule stacked bar chart
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -135,6 +139,9 @@ public class VisualisationController {
                     }
                 });
             });
+            if (bnb.getIsFinished()) {
+                scheduledExecutorService.shutdown();
+            }
         }, 0, 500, TimeUnit.MILLISECONDS);
     }
 
@@ -196,6 +203,33 @@ public class VisualisationController {
 
     }
 
+    private void startTimer() {
+        timerCounter = 0;
+        Timer myTimer = new Timer();
+        myTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                timerCounter++;
+
+                long minutes = timerCounter / (60*100);
+                long seconds = (timerCounter - (minutes*60*100))/100;
+                long milliseconds = timerCounter - (minutes*60*100) - (seconds*100);
+
+                String minuteDigit = (minutes < 10) ? "0" : "";
+                String secondDigit = (seconds < 10) ? "0" : "";
+                String milliSecondDigit = (milliseconds < 10) ? "0" : "";
+
+                String timeText = minuteDigit + minutes + ":" + secondDigit + seconds + ":" + milliSecondDigit + milliseconds;
+                Platform.runLater(() -> {
+                    timerLabel.setText(timeText);
+                });
+                if (bnb.getIsFinished()) {
+                    myTimer.cancel();
+                }
+            }
+        }, 0, 10);
+    }
+
     public void startScheduler() {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
@@ -212,6 +246,7 @@ public class VisualisationController {
         schedulerThread.start();
 
         initializeBarChart();
+        startTimer();
     }
 
     public void setBestText(int currentShortestPath) {

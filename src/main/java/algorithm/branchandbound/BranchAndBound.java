@@ -20,6 +20,7 @@ public class BranchAndBound {
 
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
+    private boolean isFinished = false;
 
 
     /**
@@ -49,6 +50,7 @@ public class BranchAndBound {
             partialSolution.getChildrenQueue().putAll(childrenQueue);
             dfs(partialSolution); // start recursive dfs branch and bound
         }
+        isFinished = true;
 
         // returns a schedule of the shortest path found
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -202,6 +204,10 @@ public class BranchAndBound {
 
     public ScheduledTask getCurrentDFSTask() {
         return currentDFSTask;
+    }
+
+    public boolean getIsFinished() {
+        return isFinished;
     }
 
 }

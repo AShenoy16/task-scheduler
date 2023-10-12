@@ -14,3 +14,7 @@
     -fx-border-color: black;
     -fx-border-width: 2px;
 }
+
+#background{
+    -fx-padding: 10;
+}
