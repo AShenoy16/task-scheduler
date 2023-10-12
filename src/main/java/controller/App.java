@@ -24,7 +24,6 @@ public class App extends Application {
         stage.show();
         Platform.runLater(() -> {
             visualisationController.initialize();
-            visualisationController.startScheduler();
         });
     }
 
