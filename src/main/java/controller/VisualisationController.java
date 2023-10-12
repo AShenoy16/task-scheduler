@@ -3,8 +3,6 @@ package controller;
 import algorithm.branchandbound.BranchAndBound;
 import algorithm.branchandbound.Schedule;
 import algorithm.branchandbound.ScheduledTask;
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.swing.mxGraphComponent;
 import com.sun.management.OperatingSystemMXBean;
 import io.IOHandler;
 import javafx.animation.Animation;
@@ -12,7 +10,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -20,7 +17,6 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
@@ -28,14 +24,10 @@ import javafx.util.Duration;
 import model.Graph;
 import model.Node;
 import model.VisualiseGraph;
+import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
-import org.jgrapht.ext.JGraphXAdapter;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 
-import javax.swing.*;
-import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
@@ -45,8 +37,6 @@ import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.graphstream.graph.implementations.MultiGraph;
 
 
 public class VisualisationController {
@@ -96,7 +86,6 @@ public class VisualisationController {
         scheduler.setController(this);
 
         createGraphstream(graph);
-//        createJGraphT(graph);
 
         bestCurrentText.setText("inf");
 
@@ -138,61 +127,6 @@ public class VisualisationController {
 
         FxViewPanel viewPanel = (FxViewPanel) viewer.addDefaultView(false);
         graphContainer.setCenter(viewPanel);
-//
-//        // Add the SwingNode to the JavaFX layout
-//        graphContainer.getChildren().add(graphNode);
-    }
-
-    private void createJGraphT(Graph graph){
-        // Create the JGraphXAdapter
-        SwingUtilities.invokeLater(() -> {
-            org.jgrapht.Graph graphT = convertToJGraphT(graph);
-            JGraphXAdapter<Node,DefaultEdge> graphAdapter = new JGraphXAdapter<>(graphT);
-            mxGraphComponent graphComponent = new mxGraphComponent(graphAdapter);
-
-            mxHierarchicalLayout layout = new mxHierarchicalLayout(graphAdapter);
-
-            layout.execute(graphAdapter.getDefaultParent());
-
-            graphComponent.setPreferredSize(new Dimension(300,300));
-            graphComponent.setMaximumSize(new Dimension(300,300));
-            graphComponent.setMinimumSize(new Dimension(250,250));
-            graphComponent.zoomTo(1.5, false);
-//            graphNode.setContent(graphComponent);
-
-
-//            org.jgrapht.Graph graphT = convertToJGraphT(graph);
-//
-//            JGraphModelAdapter<Node,DefaultEdge> graphAdapter = new JGraphModelAdapter<>(graphT);
-//
-//            JGraph graphComponent = new JGraph(graphAdapter);
-//            graphContainer.setContent(graphComponent);
-//
-//            JGraphLayout layout = new JGraphHierarchicalLayout();
-//            JGraphFacade facade = new JGraphFacade(graphComponent);
-//            layout.run(facade);
-//            Map nested = facade.createNestedMap(false, false);
-//            graphComponent.getGraphLayoutCache().edit(nested);
-        });
-    }
-
-    private org.jgrapht.Graph convertToJGraphT(Graph graph) {
-        org.jgrapht.Graph jGraphTGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
-
-        // Add nodes and edges from your custom graph to JGraphT
-        Node[] nodes = graph.getNodes();
-        for(Integer i = 0; i < nodes.length; i++){
-            jGraphTGraph.addVertex(nodes[i].getId());
-        }
-        int[][] edges = graph.getAdjacencyMatrix();
-        for (Integer i = 0; i < edges.length; i++) {
-            for (Integer j = 0; j < edges.length; j++){
-                if (edges[i][j] != 0) {
-                    jGraphTGraph.addEdge(i, j);
-                }
-            }
-        }
-        return jGraphTGraph;
     }
 
     public void initializeBarChart() {
