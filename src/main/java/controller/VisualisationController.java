@@ -92,9 +92,11 @@ public class VisualisationController {
     public void initialize() {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
-        Graph graph = io.readDot(directory + "Nodes_7_OutTree.dot");
+        Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         BranchAndBound scheduler = new BranchAndBound();
         scheduler.setController(this);
+        bnb = scheduler;
+        numProcessors = 4;
 
 //        createGraphstream(graph);
         createJGraphT(graph);
@@ -113,12 +115,12 @@ public class VisualisationController {
 
         // Start the scheduler in a separate thread
         Thread schedulerThread = new Thread(() -> {
-            Schedule schedule = scheduler.run(graph, 4);
+            Schedule schedule = scheduler.run(graph, numProcessors);
         });
         schedulerThread.start();
 
-
-
+        initializeBarChart();
+        startTimer();
     }
     private void createGraphstream(Graph graph) {
         org.graphstream.graph.Graph graphS = new MultiGraph("bnb");
