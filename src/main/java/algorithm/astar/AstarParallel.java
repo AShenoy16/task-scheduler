@@ -5,9 +5,7 @@ import model.Node;
 import model.Schedule;
 import model.Task;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -32,7 +30,8 @@ public class AstarParallel {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
-        List<Schedule> finalSchedules = new ArrayList<>();
+        HashSet<Integer> closed = new HashSet<>();
+        HashSet<Integer> openHash = new HashSet<>();
         List<Callable<Schedule>> tasks = new ArrayList<>();
 
         if(initialSchedules.size() > 4){
@@ -42,7 +41,7 @@ public class AstarParallel {
         } else {
             List<Schedule> secondInitialSchedules = new ArrayList<>();
             for(Schedule schedule1 : initialSchedules){
-                secondInitialSchedules.addAll(createPartialSchedules(schedule1.getFreeNodes(graph), numProcessors, schedule1, graph));
+                secondInitialSchedules.addAll(createPartialSchedules(schedule1.getFreeNodes(graph), numProcessors, schedule1, graph, closed, openHash));
             }
             for(Schedule schedule2 : secondInitialSchedules){
                 tasks.add(() -> new MyCallable(numProcessors, schedule2, graph).call());
@@ -100,6 +99,8 @@ public class AstarParallel {
 
     public Schedule createPartialSchedulesParallel2(Schedule schedule, int numProcessors, Graph graph) {
         PriorityQueue<Schedule> open2 = new PriorityQueue<>(new CostFunctionComparator());
+        HashSet<Integer> closed = new HashSet<>();
+        HashSet<Integer> openHash = new HashSet<>();
         open2.add(schedule);
         while (open2.size() != 0) {
             Schedule partialSchedule = open2.poll();
@@ -112,11 +113,14 @@ public class AstarParallel {
                 globalCost = partialSchedule.getCost();
                 return partialSchedule;
             }
-
-            List<Schedule> newSchedules = createPartialSchedules(
-                    partialSchedule.getFreeNodes(graph), numProcessors, partialSchedule, graph);
+            List<Node> sortedNodes = partialSchedule.getFreeNodes(graph)
+                    .stream()
+                    .sorted(Comparator.comparingInt(node -> calculateCostFunction.bottomLevelofNode(node)))
+                    .toList();
+            List<Schedule> newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph, closed, openHash);
 
             open2.addAll(newSchedules);
+            newSchedules.parallelStream().forEach(s -> openHash.add(s.hashCode()));
         }
 
         return null;
@@ -149,11 +153,13 @@ public class AstarParallel {
                 .collect(Collectors.toList());
     }
 
-    public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph){
+    public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph, HashSet<Integer> closed, HashSet<Integer> openHash){
         // create empty list of schedules, parent nodes and new tasks to add
         List<Schedule> newSchedules = new ArrayList<>();
         List<Node> parentNodes;
         List<Task> newTasks;
+
+        // maybe instead of creating free tasks everytime we make a queue or something
 
         //TODO optimise
         for(Node validNode : validNodes){
@@ -200,16 +206,38 @@ public class AstarParallel {
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
 
-                if(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph)){
-                    // Add potential schedule
-                    newSchedules.add(newlyMadeSchedule);
+                // if not valid skip
+
+                // if both of them are true valid schedule and add to new schedules
+                // if one of them isn't true, predicate is true and go to next iteration
+
+                // Prune 2: remove any invalid schedules
+                if(!(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph))){
+                    continue;
+
                 }
 
-                //check if visited an equivalent schedule already using hashes
+                //if present in either closed or open list, discard the state
+                // Prune 2: removes any duplicates
+
+                int hash = newlyMadeSchedule.hashCode();
+
+                //TODO find faster way to check if it's in open
+                if(closed.contains(hash) || openHash.contains(hash)){
+                    continue;
+                }
+
+
+                // not present in closed or open and valid -> add to newSchedules(open)
+
+                newSchedules.add(newlyMadeSchedule);
 
 
             }
         }
+
+        // add schedule to closed
+        closed.add(schedule.hashCode());
 
         return newSchedules;
 
