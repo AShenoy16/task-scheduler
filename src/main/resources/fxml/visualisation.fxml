@@ -15,11 +15,16 @@
 <?import javafx.scene.chart.NumberAxis?>
 <VBox id="stage" fx:id="stage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="770.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
-      <Text id="titleText" fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="771.644287109375">
-         <font>
-            <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
-         </font>
-      </Text>
+      <AnchorPane prefHeight="41.0" prefWidth="709.0">
+         <children>
+            <Text id="titleText" fx:id="titleText" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="740.0">
+               <font>
+                  <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
+               </font>
+            </Text>
+            <Label fx:id="timerLabel" layoutX="705.0" layoutY="15.0" text="00:00:00" />
+         </children>
+      </AnchorPane>
       <HBox id="iconsSection" prefHeight="150.0" prefWidth="784.0" stylesheets="@../css/visualisation.css">
          <children>
             <VBox id="bestCurrentSection" prefHeight="195.0" prefWidth="211.0" stylesheets="@../css/visualisation.css">
@@ -80,13 +85,13 @@
             </VBox>
          </children>
       </HBox>
-      <HBox prefHeight="397.0" prefWidth="770.0">
+      <HBox prefHeight="378.0" prefWidth="770.0" stylesheets="@../css/visualisation.css">
          <children>
             <Pane prefHeight="355.0" prefWidth="390.0">
                <children>
                   <StackedBarChart fx:id="scheduleBarChart" animated="false" layoutX="31.0" layoutY="66.0" legendVisible="false" prefHeight="262.0" prefWidth="304.0">
                     <xAxis>
-                      <CategoryAxis side="BOTTOM" />
+                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" />
                     </xAxis>
                     <yAxis>
                       <NumberAxis side="LEFT" />
