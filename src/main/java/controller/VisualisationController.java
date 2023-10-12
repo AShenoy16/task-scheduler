@@ -21,11 +21,14 @@ import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.util.Duration;
 import model.Graph;
 import model.Node;
+import model.VisualiseGraph;
+import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -42,9 +45,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.graphstream.graph.implementations.MultiGraph;
-import org.graphstream.ui.swingViewer.ViewPanel;
-import org.graphstream.ui.view.Viewer;
-import org.graphstream.ui.view.ViewerPipe;
+
 
 public class VisualisationController {
     @FXML
@@ -65,10 +66,8 @@ public class VisualisationController {
 
 
     @FXML
-    private AnchorPane graphContainer;
+    private BorderPane graphContainer;
 
-    @FXML
-    private SwingNode graphNode;
 
     private GraphicsContext cpuGC;
     private GraphicsContext memoryGC;
@@ -91,8 +90,8 @@ public class VisualisationController {
         BranchAndBound scheduler = new BranchAndBound();
         scheduler.setController(this);
 
-//        createGraphstream(graph);
-        createJGraphT(graph);
+        createGraphstream(graph);
+//        createJGraphT(graph);
 
         bestCurrentText.setText("inf");
 
@@ -117,39 +116,26 @@ public class VisualisationController {
     }
     private void createGraphstream(Graph graph) {
         org.graphstream.graph.Graph graphS = new MultiGraph("bnb");
-
-        // Configure GraphStream's viewer
-        Viewer viewer = new FxViewer(graphS, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        Node[] nodes = graph.getNodes();
+        for(Integer i = 0; i < nodes.length; i++){
+            graphS.addNode(String.valueOf(nodes[i].getId()));
+        }
+        int[][] edges = graph.getAdjacencyMatrix();
+        for (Integer i = 0; i < edges.length; i++) {
+            for (Integer j = 0; j < edges.length; j++){
+                if (edges[i][j] != 0) {
+                    graphS.addEdge(i +","+j, i, j);
+                }
+            }
+        }
+        VisualiseGraph viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
 
-        // Create a Swing-based view panel for the graph
-        ViewPanel viewPanel = viewer.addDefaultView(false);
-
-        // Create a SwingNode to embed the view panel in JavaFX
-        SwingNode swingNode = new SwingNode();
-        swingNode.setContent(viewPanel);
-
-        // Add the SwingNode to the JavaFX layout
-        graphContainer.getChildren().add(swingNode);
-
-        // Initialize the GraphStream viewer pipe
-        ViewerPipe viewerPipe = viewer.newViewerPipe();
-
-        // Start a thread to listen for events from GraphStream viewer
-        Thread thread = new Thread(() -> {
-            viewerPipe.addSink(graphS);
-            while (true) {
-                viewerPipe.pump();
-            }
-        });
-        thread.start();
-
-
-        // You can add nodes and edges to your GraphStream graph as needed
-        // For example:
-        // graph.addNode("Node1");
-        // graph.addNode("Node2");
-        // graph.addEdge("Edge1", "Node1", "Node2");
+        FxViewPanel viewPanel = (FxViewPanel) viewer.addDefaultView(false);
+        graphContainer.setCenter(viewPanel);
+//
+//        // Add the SwingNode to the JavaFX layout
+//        graphContainer.getChildren().add(graphNode);
     }
 
     private void createJGraphT(Graph graph){
@@ -167,7 +153,7 @@ public class VisualisationController {
             graphComponent.setMaximumSize(new Dimension(300,300));
             graphComponent.setMinimumSize(new Dimension(250,250));
             graphComponent.zoomTo(1.5, false);
-            graphNode.setContent(graphComponent);
+//            graphNode.setContent(graphComponent);
 
 
 //            org.jgrapht.Graph graphT = convertToJGraphT(graph);
