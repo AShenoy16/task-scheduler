@@ -1,112 +1,221 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.embed.swing.SwingNode?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.StackedBarChart?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<?import javafx.scene.chart.StackedBarChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
-<VBox id="stage" fx:id="stage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="770.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
-      <AnchorPane prefHeight="41.0" prefWidth="709.0">
+      <AnchorPane prefHeight="42.0" prefWidth="780.0" stylesheets="@../css/visualisation.css">
          <children>
-            <Text id="titleText" fx:id="titleText" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="740.0">
+            <Text id="titleText" fx:id="titleText" fill="WHITE" layoutX="215.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="750.0">
                <font>
                   <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
                </font>
             </Text>
-            <Label fx:id="timerLabel" layoutX="705.0" layoutY="15.0" text="00:00:00" />
          </children>
+         <padding>
+            <Insets bottom="10.0" />
+         </padding>
       </AnchorPane>
-      <HBox id="iconsSection" prefHeight="150.0" prefWidth="784.0" stylesheets="@../css/visualisation.css">
+      <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
          <children>
-            <VBox id="bestCurrentSection" prefHeight="195.0" prefWidth="211.0" stylesheets="@../css/visualisation.css">
+            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section" stylesheets="@../css/visualisation.css">
                <children>
-                  <Text id="bestCurrentTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Best" textAlignment="CENTER" wrappingWidth="256.1432647705078">
-                     <font>
-                        <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
-                     </font>
-                  </Text>
-                  <StackPane id="bestCurrentPane" prefHeight="112.0" prefWidth="200.0" stylesheets="@../css/visualisation.css">
+                  <VBox alignment="CENTER" prefWidth="85.0">
                      <children>
-                        <Label id="bestCurrentText" fx:id="bestCurrentText" prefHeight="86.0" prefWidth="140.0" style="-fx-alignment: center;" stylesheets="@../css/visualisation.css" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS">
+                        <Label fx:id="timerLabel" alignment="TOP_LEFT" prefHeight="71.0" prefWidth="190.0" styleClass="sectionValue" text="99:99:99" />
+                        <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Running Time" wrappingWidth="145.68972778320312">
+                           <font>
+                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <HBox.margin>
+                        <Insets right="40.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <StackPane alignment="CENTER_RIGHT">
+                     <children>
+                        <ImageView fx:id="bestIcon1" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/timeIcon.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </StackPane>
+               </children>
+               <effect>
+                  <DropShadow>
+                     <color>
+                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </HBox>
+            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="252.5" styleClass="section" stylesheets="@../css/visualisation.css">
+               <children>
+                  <VBox alignment="CENTER" prefWidth="85.0">
+                     <children>
+                        <Label id="bestCurrentText" fx:id="bestCurrentText" alignment="TOP_LEFT" prefHeight="86.0" prefWidth="159.0" styleClass="sectionValue" stylesheets="@../css/visualisation.css" text="100" textOverrun="CENTER_WORD_ELLIPSIS">
                            <font>
                               <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
                            </font>
                         </Label>
-                     </children>
-                  </StackPane>
-               </children>
-            </VBox>
-            <VBox id="cpuSection" maxHeight="-Infinity" prefHeight="195.0" prefWidth="235.0" stylesheets="@../css/visualisation.css">
-               <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CPU" textAlignment="CENTER" wrappingWidth="257.410400390625">
-                     <font>
-                        <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
-                     </font>
-                  </Text>
-                  <StackPane id="cpuPane" prefHeight="150.0" prefWidth="258.0" stylesheets="@../css/visualisation.css">
-                     <children>
-                        <Canvas id="cpuIcon" fx:id="cpuWheel" height="100.0" width="100.0" />
-                        <Label id="cpuText" fx:id="cpuText" stylesheets="@../css/visualisation.css">
+                        <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Current Best" wrappingWidth="87.4615478515625">
                            <font>
-                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
                            </font>
-                        </Label>
+                        </Text>
                      </children>
-                  </StackPane>
-               </children>
-            </VBox>
-            <VBox id="memorySection" prefHeight="195.0" prefWidth="201.0" stylesheets="@../css/visualisation.css">
-               <children>
-                  <Text id="memoryTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="Memory" textAlignment="CENTER" wrappingWidth="243.08135986328125">
-                     <font>
-                        <Font size="26.0" />
-                     </font>
-                  </Text>
-                  <StackPane id="memoryPane" prefHeight="100.0" prefWidth="222.0" stylesheets="@../css/visualisation.css">
+                     <HBox.margin>
+                        <Insets right="50.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <StackPane alignment="CENTER_RIGHT">
                      <children>
-                        <Canvas id="memoryIcon" fx:id="memoryWheel" height="100.0" width="100.0" />
-                        <Label id="memoryText" fx:id="memoryText" stylesheets="@../css/visualisation.css">
-                           <font>
-                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
-                           </font>
-                        </Label>
+                        <ImageView fx:id="bestIcon" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/bestIcon.png" />
+                           </image>
+                        </ImageView>
                      </children>
                   </StackPane>
                </children>
-            </VBox>
+               <effect>
+                  <DropShadow>
+                     <color>
+                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </HBox>
+            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
+               <children>
+                  <VBox id="cpuSection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="235.0" stylesheets="@../css/visualisation.css">
+                     <children>
+                        <StackPane id="cpuPane" prefHeight="150.0" prefWidth="256.0" stylesheets="@../css/visualisation.css">
+                           <children>
+                              <Canvas id="cpuIcon" fx:id="cpuWheel" height="86.0" width="86.0" />
+                              <Label id="cpuText" fx:id="cpuText" styleClass="sectionOSValues" stylesheets="@../css/visualisation.css" text="99.99%">
+                                 <font>
+                                    <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                     </children>
+                     <HBox.margin>
+                        <Insets right="50.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                     <children>
+                        <StackPane alignment="CENTER_RIGHT">
+                           <children>
+                              <ImageView fx:id="bestIcon2" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../images/cpuIcon.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </StackPane>
+                     </children>
+                  </VBox>
+               </children>
+               <effect>
+                  <DropShadow>
+                     <color>
+                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </HBox>
+            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
+               <children>
+                  <VBox id="memorySection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="201.0" stylesheets="@../css/visualisation.css">
+                     <children>
+                        <StackPane id="memoryPane" prefHeight="100.0" prefWidth="222.0" stylesheets="@../css/visualisation.css">
+                           <children>
+                              <Canvas id="memoryIcon" fx:id="memoryWheel" height="86.0" width="86.0" />
+                              <Label id="memoryText" fx:id="memoryText" styleClass="sectionOSValues" stylesheets="@../css/visualisation.css" text="99.99%">
+                                 <font>
+                                    <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                     </children>
+                     <HBox.margin>
+                        <Insets right="50.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <ImageView fx:id="bestIcon3" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../images/memoryIcon.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </StackPane>
+                     </children>
+                  </VBox>
+               </children>
+               <effect>
+                  <DropShadow>
+                     <color>
+                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </HBox>
          </children>
       </HBox>
-      <HBox prefHeight="378.0" prefWidth="770.0" stylesheets="@../css/visualisation.css">
+      <HBox id="stage" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="1160.0" stylesheets="@../css/visualisation.css">
          <children>
-            <Pane prefHeight="355.0" prefWidth="390.0">
+            <VBox prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
                <children>
-                  <StackedBarChart fx:id="scheduleBarChart" animated="false" layoutX="31.0" layoutY="66.0" legendVisible="false" prefHeight="262.0" prefWidth="304.0">
+                  <Label alignment="CENTER" prefHeight="28.0" prefWidth="383.0" styleClass="chartTitle" text="Schedules" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets left="37.0" top="15.0" />
+                     </VBox.margin>
+                  </Label>
+                  <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0">
                     <xAxis>
-                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" />
+                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" tickLabelFill="#dadada" />
                     </xAxis>
                     <yAxis>
-                      <NumberAxis side="LEFT" />
+                      <NumberAxis side="LEFT" tickLabelFill="#dadada" tickLabelGap="7.0" />
                     </yAxis>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
                   </StackedBarChart>
                </children>
-               <children>
-                  <Canvas height="200.0" width="200.0" />
-               </children>
-            </Pane>
-            <AnchorPane fx:id="graphContainer" prefHeight="397.0" prefWidth="377.0">
-               <children>
-                  <SwingNode fx:id="graphNode" />
-               </children></AnchorPane>
+               <effect>
+                  <DropShadow height="30.0" radius="14.5" width="30.0">
+                     <color>
+                        <Color red="1.0" green="1.0" blue="1.0" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </VBox>
          </children>
       </HBox>
    </children>

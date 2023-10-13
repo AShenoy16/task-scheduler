@@ -1,20 +1,54 @@
-#bestCurrentSection{
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-}
-#bestCurrentText{
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-}
-#cpuSection{
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-}
-#memorySection{
-    -fx-border-color: black;
-    -fx-border-width: 2px;
+#stage {
+    -fx-padding: 10px;
+    -fx-background-color: #121212;
 }
 
-#background{
-    -fx-padding: 10;
+#scheduleBarChart .chart-content .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #dadada;
+    -fx-opacity: 0.25;
+    -fx-stroke-width: 1px;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.section {
+    -fx-background-color: #282828;
+    -fx-padding: 30;
+    -fx-background-radius: 15;
+}
+
+.sectionCharts {
+    -fx-background-color: #282828;
+    -fx-background-radius: 15;
+}
+
+.brandBGColour {
+    -fx-background-color: #03DAC6;
+}
+
+.sectionValue {
+    -fx-text-fill: #dadada;
+    -fx-font-size: 35;
+    -fx-alignment: left;
+
+}
+
+.sectionTitle {
+    -fx-font-size: 16;
+    -fx-fill: #dadada;
+    -fx-alignment: left;
+}
+
+.sectionOSValues {
+    -fx-text-fill: #dadada;
+    -fx-font-size: 16;
+}
+
+.chartTitle {
+    -fx-text-fill: #dadada;
+    -fx-font-size: 22;
+    -fx-font-weight: 800;
 }
