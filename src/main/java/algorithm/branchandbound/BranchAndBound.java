@@ -15,6 +15,8 @@ public class BranchAndBound {
     private int currentShortestPath;
     private ScheduledTask currentShortestTask;
 
+    private CalculateCostFunction calculateCostFunction;
+
     private HashMap<Node, Integer> bottomLevels;
 
     private final HashSet<Integer> visitedSchedules = new HashSet<>();
@@ -32,10 +34,12 @@ public class BranchAndBound {
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
 
-        CalculateCostFunction calculateCostFunction = new CalculateCostFunction(graph);
 
-        for(Node node: graph.getStartNodes()){
-            calculateCostFunction.setBottomLevelMap(node);
+        calculateCostFunction = CalculateCostFunction.getInstance(graph);
+
+        for(Node entryNode: graph.getStartNodes()){
+            calculateCostFunction.setBottomLevelMap(entryNode);
+            graph.createDependencies(entryNode);
         }
 
         bottomLevels = calculateCostFunction.getBottomLevelMap();
@@ -50,9 +54,13 @@ public class BranchAndBound {
                     childrenQueue.put(m, new ArrayList<>());
                 }
             }
+
+            // cost will be bottom level of the entry node
             ScheduledTask task = new ScheduledTask(0,0, n,null);
-            PartialSolution partialSolution = new PartialSolution(task, numProcesses);
+            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(n));
             partialSolution.getChildrenQueue().putAll(childrenQueue);
+
+
             dfs(partialSolution); // start recursive dfs branch and bound
         }
 
@@ -93,6 +101,7 @@ public class BranchAndBound {
 
         visitedSchedules.add(partialSolution.hashCode());
 
+
         // add children of current node to queue of partial solution
         int[] outgoingEdgeWeights = graph.getAdjacencyMatrix()[currentTask.getNode().getId()];
         for (int i = 0; i < outgoingEdgeWeights.length; i++) {// 'i' represents the outgoing edge node
@@ -118,7 +127,7 @@ public class BranchAndBound {
             currentShortestTask = currentTask;
             int hashCode = partialSolution.getScheduledTask().hashCode();
 
-            // print path on console
+//             print path on console
             printCurrentPath(currentTask);
 
         }
@@ -164,17 +173,23 @@ public class BranchAndBound {
                 ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
 
 
-
-                // check if newPartial Solution is valid
-                // if startTime + task bottom level can't beat current fast time -> skip
+                // if cost can't beat best time just skip
 
 
-
-
-
-                PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask);
+                PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask, graph);
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
 
+//                // Set cost
+                calculateCostFunction.setPartialSolutionCost(newPartialSolution);
+
+                if(newPartialSolution.getCost() >= currentShortestPath){
+                    continue;
+                }
+
+                // check if newPartial Solution is valid
+                if(!newPartialSolution.isValid(graph)){
+                    continue;
+                }
 
                 dfs(newPartialSolution);
             }
