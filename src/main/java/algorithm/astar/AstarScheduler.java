@@ -56,13 +56,10 @@ public class AstarScheduler {
             Schedule partialSchedule = open.poll();
 
             if(partialSchedule.isCompleteSchedule(graph)){
-                if(partialSchedule.isValidScheduleNoOverlap() && partialSchedule.isValidScheduleSatisfyDependencies(graph)){
-                    finishTimeNano = System.nanoTime();
-                    System.out.println("Elapsed Time (Nanoseconds): " + (finishTimeNano - startTimeNano) + " ns");
-                    open.clear();
-                    return partialSchedule;
-                }
-
+                finishTimeNano = System.nanoTime();
+                System.out.println("Elapsed Time (Nanoseconds): " + (finishTimeNano - startTimeNano) + " ns");
+                open.clear();
+                return partialSchedule;
             }
 
             // sort the freeNodes by bottomLevel
@@ -165,11 +162,14 @@ public class AstarScheduler {
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
-                Schedule newlyMadeSchedule = new Schedule(newTasks);
+//                Collections.sort(newTasks,  Comparator.comparing(Task::getProcessor));
+                Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-
+                if(task.getNode().getId() == 13 && newlyMadeSchedule.getCost() == 145){
+                    System.out.println("Yuh");
+                }
                 // if not valid skip
 
                 // if both of them are true valid schedule and add to new schedules

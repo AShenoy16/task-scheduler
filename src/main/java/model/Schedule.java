@@ -10,15 +10,16 @@ import java.util.stream.Collectors;
 public class Schedule {
     private List<Task> tasks;
     private int cost;
+    private int numProcessors;
 
     /**
      * This creates a new schedule given a list of tasks
      *
      * @param tasks A list of tasks to add to a schedule
      */
-    public Schedule(List<Task> tasks) {
+    public Schedule(List<Task> tasks, int numProcessors) {
         this.tasks = tasks;
-        Collections.sort(this.tasks, Comparator.comparingInt(Task::getProcessor));
+        this.numProcessors = numProcessors;
     }
 
     /**
@@ -136,37 +137,23 @@ public class Schedule {
 
     public boolean isValidScheduleNoOverlap(){
 
-//        for( int i = 1; i <= this.numProcessors; i++){
-//            // loop through all the processors
-//            // get all the tasks on that processor
-//            List<Task> sortedTasks = getTaskByProcessor(i);
-//
-//            for(int j = 0; j < sortedTasks.size() - 1; j++){
-//                Task currentTask = sortedTasks.get(j);
-//                Task nextTask = sortedTasks.get(j + 1);
-//
-//                //make sure there's no overlap
-//                if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
-//                        currentTask.getFinishTime() <= nextTask.getStartTime() &&
-//                        nextTask.getStartTime() < nextTask.getFinishTime())) {
-//                    return false;
-//                }
-//            }
-//
-//        }
-        for(int j = 0; j < this.tasks.size() - 1; j++){
-            Task currentTask = this.tasks.get(j);
-            Task nextTask = this.tasks.get(j + 1);
-            if(currentTask.getProcessor() != nextTask.getProcessor()){
-                continue;
+        for( int i = 1; i <= this.numProcessors; i++){
+            // loop through all the processors
+            // get all the tasks on that processor
+            List<Task> sortedTasks = getTaskByProcessor(i);
+
+            for(int j = 0; j < sortedTasks.size() - 1; j++){
+                Task currentTask = sortedTasks.get(j);
+                Task nextTask = sortedTasks.get(j + 1);
+
+                //make sure there's no overlap
+                if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
+                        currentTask.getFinishTime() <= nextTask.getStartTime() &&
+                        nextTask.getStartTime() < nextTask.getFinishTime())) {
+                    return false;
+                }
             }
 
-            //make sure there's no overlap
-            if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
-                    currentTask.getFinishTime() <= nextTask.getStartTime() &&
-                    nextTask.getStartTime() < nextTask.getFinishTime())) {
-                return false;
-            }
         }
 
         return true;

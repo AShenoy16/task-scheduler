@@ -202,7 +202,7 @@ public class AstarParallel {
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
                 newTasks.add(task);
-                Schedule newlyMadeSchedule = new Schedule(newTasks);
+                Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
