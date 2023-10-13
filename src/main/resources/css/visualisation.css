@@ -32,14 +32,14 @@
 .sectionValue {
     -fx-text-fill: #dadada;
     -fx-font-size: 35;
-    -fx-alignment: left;
+    -fx-alignment: center-left;
 
 }
 
 .sectionTitle {
     -fx-font-size: 16;
     -fx-fill: #dadada;
-    -fx-alignment: left;
+    -fx-alignment: center-left;
 }
 
 .sectionOSValues {

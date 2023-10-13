@@ -1,4 +1,4 @@
-package model;
+package visualisation;
 
 import org.graphstream.ui.fx_viewer.FxViewer;
 import org.graphstream.ui.view.Viewer;
