@@ -19,20 +19,21 @@ public class PartialSolution {
 
     private List<Task> allTasks;
 
-
+    private CalculateCostFunction calculateCostFunction;
 
     /**
      * Partial solution for the first root level node
      * @param scheduledTask the scheduled task of this partial solution
      * @param numProcessors number of processors that can perform this task
      */
-    public PartialSolution(ScheduledTask scheduledTask, int numProcessors, int cost){
+    public PartialSolution(ScheduledTask scheduledTask, int numProcessors, int cost, CalculateCostFunction calculateCostFunction){
         this.visitedNodes = new ArrayList<>();
         this.childrenQueue = new HashMap<>();
         this.scheduledTask = scheduledTask;
         this.processorTimes = new int[numProcessors];
         this.allTasks = new ArrayList<>();
         this.cost = cost;
+        this.calculateCostFunction = calculateCostFunction;
 
         // updates root node
         processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
@@ -60,10 +61,11 @@ public class PartialSolution {
      * @param parentPartialSolution the parent of this partial solution
      * @param task the task added to the queue
      */
-    public PartialSolution(PartialSolution parentPartialSolution, ScheduledTask task, Graph graph) {
+    public PartialSolution(PartialSolution parentPartialSolution, ScheduledTask task, CalculateCostFunction calculateCostFunction) {
         this.childrenQueue = new HashMap<>();
         this.visitedNodes = new ArrayList<>();
         this.visitedNodes.addAll(parentPartialSolution.visitedNodes);
+        this.calculateCostFunction = calculateCostFunction;
 
         parentPartialSolution.childrenQueue.forEach((node, dependencyList) -> {
             childrenQueue.put(node, new ArrayList<>(dependencyList));
@@ -80,7 +82,7 @@ public class PartialSolution {
         this.allTasks = new ArrayList<>(parentPartialSolution.allTasks);
         this.allTasks.add(task.toTask());
 
-        int bottomLevelOfTask = CalculateCostFunction.getInstance(graph).bottomLevelofNode(scheduledTask.getNode());
+        int bottomLevelOfTask = calculateCostFunction.bottomLevelofNode(scheduledTask.getNode());
         this.cost = parentPartialSolution.getCost() + bottomLevelOfTask;
 
 

@@ -35,7 +35,7 @@ public class BranchAndBound {
         this.currentShortestTask = null;
 
 
-        calculateCostFunction = CalculateCostFunction.getInstance(graph);
+        calculateCostFunction = new CalculateCostFunction(graph);
 
         for(Node entryNode: graph.getStartNodes()){
             calculateCostFunction.setBottomLevelMap(entryNode);
@@ -57,7 +57,7 @@ public class BranchAndBound {
 
             // cost will be bottom level of the entry node
             ScheduledTask task = new ScheduledTask(0,0, n,null);
-            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(n));
+            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(n), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
 
@@ -176,7 +176,7 @@ public class BranchAndBound {
                 // if cost can't beat best time just skip
 
 
-                PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask, graph);
+                PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask, calculateCostFunction);
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
 
 //                // Set cost
