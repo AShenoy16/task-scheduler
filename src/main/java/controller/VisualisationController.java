@@ -18,8 +18,11 @@ import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import model.Graph;
 import model.Node;
@@ -40,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class VisualisationController {
+    private final String[] colours = new String[]{"03DAC6", "4895EF", "4361EE", "3F37C9", "3A0CA3", "480CA8", "560BAD",
+        "7209B7", "B5179E", "F72585"};
     @FXML
     private Label bestCurrentText;
 
@@ -107,7 +112,7 @@ public class VisualisationController {
         });
         schedulerThread.start();
 
-        initializeBarChart();
+        initializeCharts();
         startTimer();
     }
     private void createGraphstream(Graph graph) {
@@ -131,7 +136,7 @@ public class VisualisationController {
         graphContainer.setCenter(viewPanel);
     }
 
-    public void initializeBarChart() {
+    public void initializeCharts() {
         processorNames = new String[numProcessors];
         processorStartTimes = new int[numProcessors];
         // initialises array of processor names
@@ -171,6 +176,7 @@ public class VisualisationController {
 
                     // creates series of this task
                     series.getData().add(new XYChart.Data<>(processorName, taskTime));
+                    series.setName(String.valueOf(scheduledTask.getNode().getId()));
                     scheduleBarChart.getData().addAll(series);
                     processorStartTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + taskTime;
                 }
@@ -180,6 +186,17 @@ public class VisualisationController {
                     if (t.getName() != null && t.getName().equals("none")) {
                         t.getData().forEach((j) -> {
                             j.getNode().setStyle("-fx-background-color: transparent");
+                        });
+                    } else {
+                        t.getData().forEach((j) -> {
+                            String colourCSS = colours[Integer.parseInt(t.getName())%colours.length];
+                            j.getNode().getStyleClass().add("dataSeries");
+                            j.getNode().setStyle("-fx-background-color: #" +  colourCSS);
+
+                            StackPane bar = (StackPane) j.getNode();
+                            Text dataText = new Text(t.getName());
+                            dataText.getStyleClass().add("dataValue");
+                            bar.getChildren().add(dataText);
                         });
                     }
                 });
@@ -290,7 +307,7 @@ public class VisualisationController {
         });
         schedulerThread.start();
 
-        initializeBarChart();
+        initializeCharts();
         startTimer();
     }
 

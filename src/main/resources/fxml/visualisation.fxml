@@ -9,7 +9,6 @@
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -19,20 +18,8 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="664.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
-      <AnchorPane prefHeight="42.0" prefWidth="780.0" stylesheets="@../css/visualisation.css">
-         <children>
-            <Text id="titleText" fx:id="titleText" fill="WHITE" layoutX="215.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling Algorithm Visualisation" textAlignment="CENTER" wrappingWidth="750.0">
-               <font>
-                  <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
-               </font>
-            </Text>
-         </children>
-         <padding>
-            <Insets bottom="10.0" />
-         </padding>
-      </AnchorPane>
       <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
          <children>
             <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section" stylesheets="@../css/visualisation.css">
@@ -74,7 +61,7 @@
                      <children>
                         <Label id="bestCurrentText" fx:id="bestCurrentText" alignment="TOP_LEFT" prefHeight="86.0" prefWidth="159.0" styleClass="sectionValue" stylesheets="@../css/visualisation.css" text="100" textOverrun="CENTER_WORD_ELLIPSIS">
                            <font>
-                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="24.0" />
+                              <Font size="24.0" />
                            </font>
                         </Label>
                         <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Current Best" wrappingWidth="87.4615478515625">
@@ -191,19 +178,19 @@
       </HBox>
       <HBox id="stage" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css">
          <children>
-            <VBox prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
+            <VBox alignment="CENTER_LEFT" prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
                <children>
-                  <Label alignment="CENTER" prefHeight="28.0" prefWidth="383.0" styleClass="chartTitle" text="Schedules" textAlignment="CENTER">
+                  <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
                      <VBox.margin>
-                        <Insets left="37.0" top="15.0" />
+                        <Insets top="15.0" />
                      </VBox.margin>
                   </Label>
-                  <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0">
+                  <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
                     <xAxis>
-                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" tickLabelFill="#dadada" />
+                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
                     </xAxis>
                     <yAxis>
-                      <NumberAxis side="LEFT" tickLabelFill="#dadada" tickLabelGap="7.0" />
+                      <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
                     </yAxis>
                      <padding>
                         <Insets right="10.0" />
