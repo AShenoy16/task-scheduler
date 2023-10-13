@@ -1,5 +1,6 @@
 package algorithm.branchandbound;
 
+import algorithm.astar.CalculateCostFunction;
 import model.Graph;
 import model.Node;
 
@@ -11,8 +12,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.stream.Collectors;
 
-import static java.util.concurrent.ForkJoinTask.invokeAll;
-
 /**
  * The branch and bound class is needed to run the dfs branch and bound algorithm.
  */
@@ -21,6 +20,8 @@ public class BranchAndBoundParallel {
     private Graph graph;
     private int currentShortestPath;
     private ScheduledTask currentShortestTask;
+    private CalculateCostFunction calculateCostFunction;
+    private HashMap<Node, Integer> bottomLevels;
     private static ForkJoinPool pool;
 
     /**
@@ -37,13 +38,22 @@ public class BranchAndBoundParallel {
         this.currentShortestTask = null;
         pool = new ForkJoinPool(numCores);
 
+        calculateCostFunction = new CalculateCostFunction(graph);
+
+        for(Node entryNode: graph.getStartNodes()){
+            calculateCostFunction.setBottomLevelMap(entryNode);
+            graph.createDependencies(entryNode);
+        }
+
+        bottomLevels = calculateCostFunction.getBottomLevelMap();
+
         graph.getStartNodes().forEach(startNode -> {
             Map<Node, List<ScheduledTask>> childrenQueue = graph.getStartNodes().stream()
                     .filter(node -> !node.equals(startNode))
                     .collect(Collectors.toMap(node -> node, node -> new ArrayList<>()));
 
             ScheduledTask task = new ScheduledTask(0, 0, startNode, null);
-            PartialSolution partialSolution = new PartialSolution(task, numProcesses);
+            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
             pool.invoke(new dfs(partialSolution));
@@ -93,7 +103,7 @@ public class BranchAndBoundParallel {
                 // 'i' represents the outgoing edge node
                 if (outgoingEdgeWeights[i] != 0 && !partialSolution.getVisitedNodes().contains(graph.getNodes()[i])) {
                     // adds current task as dependency of dest node
-                    partialSolution.getChildrenQueue().computeIfAbsent(graph.getNodes()[i], k -> new ArrayList<>()).add(currentTask);;
+                    partialSolution.getChildrenQueue().computeIfAbsent(graph.getNodes()[i], k -> new ArrayList<>()).add(currentTask);
                 }
             }
 
@@ -134,10 +144,24 @@ public class BranchAndBoundParallel {
                     // check if processor is free after earliestStartTime
                     int possibleStartTime = Math.max(earliestStartTime, partialSolution.getProcessorTimes()[i]);
 
+                    if(earliestStartTime + bottomLevels.get(destNode) >= currentShortestPath){
+                        continue;
+                    }
                     // create new partial solution with new task for this child and add it to dfs branch and bound recursion
                     ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
-                    PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask);
+                    PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask, calculateCostFunction);
                     newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
+
+                    calculateCostFunction.setPartialSolutionCost(newPartialSolution);
+
+                    if(newPartialSolution.getCost() >= currentShortestPath){
+                        continue;
+                    }
+
+                    // check if newPartial Solution is valid
+                    if(!newPartialSolution.isValid(graph)){
+                        continue;
+                    }
 
                     taskList.add(new dfs(newPartialSolution));
                 }
