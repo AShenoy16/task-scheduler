@@ -1,6 +1,7 @@
 package controller;
 
 import algorithm.branchandbound.BranchAndBound;
+import algorithm.branchandbound.PartialSolution;
 import algorithm.branchandbound.Schedule;
 import algorithm.branchandbound.ScheduledTask;
 import com.sun.management.OperatingSystemMXBean;
@@ -26,7 +27,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import model.Graph;
 import model.Node;
-import model.VisualiseGraph;
+import visualisation.VisualiseGraph;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
@@ -34,9 +35,7 @@ import org.graphstream.ui.fx_viewer.FxViewer;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -78,9 +77,12 @@ public class VisualisationController {
     private String[] processorNames;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService scheduledExecutorServiceGraph;
+
     private boolean isFinished = false;
     private BranchAndBound bnb;
     private int timerCounter;
+    private org.graphstream.graph.Graph graphS;
 
     @FXML
     public void initialize() {
@@ -91,8 +93,6 @@ public class VisualisationController {
         scheduler.setController(this);
         bnb = scheduler;
         numProcessors = 4;
-
-        createGraphstream(graph);
 
         bestCurrentText.setText("inf");
 
@@ -108,15 +108,17 @@ public class VisualisationController {
 
         // Start the scheduler in a separate thread
         Thread schedulerThread = new Thread(() -> {
-            Schedule schedule = scheduler.run(graph, numProcessors);
+            scheduler.run(graph, numProcessors);
         });
         schedulerThread.start();
 
+        initGraph(graph);
         initializeCharts();
         startTimer();
     }
-    private void createGraphstream(Graph graph) {
-        org.graphstream.graph.Graph graphS = new MultiGraph("bnb");
+
+    private void initGraph(Graph graph){
+        graphS = new MultiGraph("bnb");
         Node[] nodes = graph.getNodes();
         for(Integer i = 0; i < nodes.length; i++){
             graphS.addNode(String.valueOf(nodes[i].getId()));
@@ -129,11 +131,34 @@ public class VisualisationController {
                 }
             }
         }
+        graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
         VisualiseGraph viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
 
         FxViewPanel viewPanel = (FxViewPanel) viewer.addDefaultView(false);
         graphContainer.setCenter(viewPanel);
+
+        scheduledExecutorServiceGraph = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorServiceGraph.scheduleAtFixedRate(() -> {
+            updateGraph(bnb.getCurrentPS());
+        }, 0, 500, TimeUnit.MILLISECONDS);
+    }
+    public void updateGraph(PartialSolution partialSolution) {
+        List<Node> visitedNodes = partialSolution.getVisitedNodes();
+        List<Integer> visitedNodesID = new ArrayList<>();
+        for (Node node : visitedNodes) {
+            visitedNodesID.add(node.getId());
+        }
+        System.out.println("----------------------"+graphS.getNodeCount());
+        for(int i = 0; i < graphS.getNodeCount(); i++){
+            org.graphstream.graph.Node node = graphS.getNode(String.valueOf(visitedNodes.get(i).getId()));
+            if (visitedNodesID.contains(i)) {
+                node.setAttribute("ui.stylesheet", "fill-color: red;");
+            } else {
+                node.setAttribute("ui.stylesheet", "fill-color: white;");
+            }
+
+        }
     }
 
     public void initializeCharts() {
@@ -155,6 +180,8 @@ public class VisualisationController {
                 scheduledTasks[i] = currentScheduledTask;
                 currentScheduledTask = currentScheduledTask.getParent();
             }
+//            updateGraph(bnb.getCurrentPS());
+
             Platform.runLater(() -> {
                 Arrays.fill(processorStartTimes, 0); // reset processor times
                 scheduleBarChart.getData().clear(); // reset stacked bar chart
@@ -200,6 +227,7 @@ public class VisualisationController {
                         });
                     }
                 });
+                bestCurrentText.setText(String.valueOf(bnb.getShortestPathText()));
             });
             if (bnb.getIsFinished()) {
                 scheduledExecutorService.shutdown();
@@ -309,14 +337,5 @@ public class VisualisationController {
 
         initializeCharts();
         startTimer();
-    }
-
-    public void setBestText(int currentShortestPath) {
-        Platform.runLater(() -> {
-            bestCurrentText.setText(String.valueOf(currentShortestPath));
-        });
-    }
-
-    public void setControllerGraph() {
     }
 }

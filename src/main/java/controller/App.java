@@ -34,10 +34,6 @@ public class App extends Application {
         });
     }
 
-    public void setControllerGraph(){
-        visualisationController.setControllerGraph();
-    }
-
     public static void main(String[] args) {
         launch();
     }

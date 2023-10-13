@@ -32,14 +32,14 @@
 .sectionValue {
     -fx-text-fill: #dadada;
     -fx-font-size: 31;
-    -fx-alignment: left;
+    -fx-alignment: center-left;
     -fx-font-family: "SHUTTLE-X";
 }
 
 .sectionTitle {
     -fx-font-size: 12;
     -fx-fill: #dadada;
-    -fx-alignment: left;
+    -fx-alignment: center-left;
     -fx-font-family: "SHUTTLE-X";
 }
 

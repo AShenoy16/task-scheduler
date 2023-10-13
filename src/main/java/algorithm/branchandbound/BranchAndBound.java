@@ -16,10 +16,13 @@ public class BranchAndBound {
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
+
+    private int shortestPathText;
     private ScheduledTask currentShortestTask;
 
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
+    private PartialSolution currentPS;
     private boolean isFinished = false;
 
 
@@ -49,6 +52,7 @@ public class BranchAndBound {
             PartialSolution partialSolution = new PartialSolution(task, numProcesses);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
             dfs(partialSolution); // start recursive dfs branch and bound
+
         }
         isFinished = true;
 
@@ -72,6 +76,7 @@ public class BranchAndBound {
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
         currentDFSTask = currentTask;
+        this.currentPS = partialSolution;
         int pathTime = getCurrentLatestTaskTime(currentTask);
 
         // bound the search of this node
@@ -104,7 +109,7 @@ public class BranchAndBound {
             currentShortestTask = currentTask;
 
             // update visualisation
-            controller.setBestText(currentShortestPath);
+            setShortestPathText(currentShortestPath);
 
             // print path on console
             printCurrentPath(currentTask);
@@ -145,6 +150,7 @@ public class BranchAndBound {
             }
         });
     }
+
 
     /**
      * This helper function will return the latest task time from the partial solution of this current task, as current
@@ -208,6 +214,18 @@ public class BranchAndBound {
 
     public boolean getIsFinished() {
         return isFinished;
+    }
+
+    public PartialSolution getCurrentPS() {
+        return currentPS;
+    }
+
+    public void setShortestPathText(int currentShortestPath) {
+        this.shortestPathText = currentShortestPath;
+    }
+
+    public int getShortestPathText(){
+        return shortestPathText;
     }
 
 }
