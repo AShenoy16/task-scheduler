@@ -187,8 +187,8 @@ public class AstarParallel {
                         int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-                        if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
-                            latestParentStartTime = task.getFinishTime();
+                        if(task.getProcessor() == processorID){
+                            latestParentStartTime = Math.max(latestParentStartTime, task.getFinishTime());
                         } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
                             latestParentStartTime = task.getFinishTime() + edgeWeight;
                         }

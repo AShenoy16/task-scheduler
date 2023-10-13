@@ -20,7 +20,12 @@ public class Schedule {
     public Schedule(List<Task> tasks, int numProcessors) {
         this.tasks = tasks;
         this.numProcessors = numProcessors;
+        this.tasks.sort(Comparator
+                .comparingInt(Task::getProcessor)
+                .thenComparingInt(Task::getStartTime)
+        );
     }
+
 
     /**
      * This creates a new initial schedule with only one task (entry node)
@@ -50,9 +55,37 @@ public class Schedule {
             }
 
         }
-
+        
         return processorTask;
     }
+
+
+    private List<Task> getTaskByProcessorID(int processorId) {
+        return tasks
+                .stream()
+                .filter(task -> task.getProcessor() == processorId) // Filter by processorId
+                .sorted(Comparator.comparing(Task::getStartTime)) // Sort by startTime
+                .collect(Collectors.toList()); // Collect the result into a List
+    }
+
+    public boolean isValidScheduleNoOverlap2() {
+        for (int i = 1; i <= this.numProcessors; i++) {
+            List<Task> sortedTasks = getTaskByProcessorID(i);
+
+            for (int j = 0; j < sortedTasks.size() - 1; j++) {
+                Task currentTask = sortedTasks.get(j);
+                Task nextTask = sortedTasks.get(j + 1);
+
+                // Make sure there's no overlap
+                if (currentTask.getFinishTime() > nextTask.getStartTime()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
 
 
     /**
@@ -231,6 +264,10 @@ public class Schedule {
      */
     public boolean isCompleteSchedule(Graph graph){
         return(tasks.size() == graph.getAdjacencyMatrix().length);
+    }
+
+    public boolean isValid(Graph graph){
+        return (isValidScheduleNoOverlap() && isValidScheduleSatisfyDependencies(graph));
     }
 
 

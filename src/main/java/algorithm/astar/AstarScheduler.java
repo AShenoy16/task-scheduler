@@ -126,6 +126,10 @@ public class AstarScheduler {
         for(Node validNode : validNodes){
             parentNodes = graph.getParentNodes(validNode);
 
+//            if(validNode.getId() == 11){
+//                System.out.println("HERE");
+//            }
+
             int earliestStartTimeForProcessor;
             int latestParentStartTime;
             int earliestTimeTaskCanStart;
@@ -147,8 +151,11 @@ public class AstarScheduler {
                         int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-                        if(task.getProcessor() == processorID && task.getFinishTime() > latestParentStartTime){
-                            latestParentStartTime = task.getFinishTime();
+                        // failing here
+
+                        // since
+                        if(task.getProcessor() == processorID){
+                            latestParentStartTime = Math.max(latestParentStartTime, task.getFinishTime());
                         } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
                             latestParentStartTime = task.getFinishTime() + edgeWeight;
                         }
@@ -167,29 +174,84 @@ public class AstarScheduler {
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-                if(task.getNode().getId() == 13 && newlyMadeSchedule.getCost() == 145){
+//                if(task.getNode().getId() == 13 && newlyMadeSchedule.getCost() == 145){
+//                    System.out.println("Yuh");
+//                }
+//
+//                // works here
+//                if(task.getNode().getId() == 2 && newlyMadeSchedule.getTasks().size() == 2){
+//                    System.out.println("Yuh");
+//                }
+//
+//                //3rd node
+//                //works here just 0 -> 3 -> 2
+//                if(task.getNode().getId() == 3 && newlyMadeSchedule.getTasks().size() == 3){
+//                    System.out.println("Yuh");
+//                }
+//
+//                //works here just different order
+//                if(task.getNode().getId() == 1 && newlyMadeSchedule.getTasks().size() == 4){
+//                    System.out.println("Yuh");
+//                }
+//
+//
+//                //works here just different order
+//                if(task.getNode().getId() == 4 && newlyMadeSchedule.getTasks().size() == 5 && earliestStartTimeForProcessor == 57){
+//                    System.out.println("Yuh");
+//                }
+//
+//                // fine different order
+//                if(task.getNode().getId() == 6 && newlyMadeSchedule.getTasks().size() == 6 && earliestStartTimeForProcessor == 97){
+//                    System.out.println("Yuh");
+//                }
+//
+//                //works here different order
+//                if(task.getNode().getId() == 8 && newlyMadeSchedule.getTasks().size() == 7 && earliestStartTimeForProcessor == 107){
+//                    System.out.println("Yuh");
+//                }
+//
+//                //works different order
+//                if(task.getNode().getId() == 9 && newlyMadeSchedule.getTasks().size() == 8 && earliestStartTimeForProcessor == 120){
+//                    System.out.println("Yuh");
+//                }
+
+
+
+                if(task.getNode().getId() == 11 && newlyMadeSchedule.getTasks().size() == 9 && earliestStartTimeForProcessor == 45){
                     System.out.println("Yuh");
                 }
+
+
+
+//                if(task.getNode().getId() == 1 && newlyMadeSchedule.getCost() == 57 && newlyMadeSchedule.getTasks().size() == 4){
+//                    System.out.println("Yuh");
+//                }
+
                 // if not valid skip
 
                 // if both of them are true valid schedule and add to new schedules
                 // if one of them isn't true, predicate is true and go to next iteration
+//
+//                 Prune 2: remove any invalid schedules
+//                if(!(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph))){
+//                    continue;
+//
+//                }
 
-                // Prune 2: remove any invalid schedules
-                if(!(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph))){
+                if(!newlyMadeSchedule.isValid(graph)){
                     continue;
-
                 }
 
-                //if present in either closed or open list, discard the state
-                // Prune 2: removes any duplicates
+//                if present in either closed or open list, discard the state
+//                 Prune 2: removes any duplicates
 
                 int hash = newlyMadeSchedule.hashCode();
-
-                //TODO find faster way to check if it's in open
+////
+////                //TODO find faster way to check if it's in open
                 if(closed.contains(hash) || openHash.contains(hash)){
                     continue;
                 }
+
 
 
                 // not present in closed or open and valid -> add to newSchedules(open)
