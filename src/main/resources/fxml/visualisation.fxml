@@ -10,7 +10,9 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
@@ -187,7 +189,7 @@
             </HBox>
          </children>
       </HBox>
-      <HBox id="stage" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="1160.0" stylesheets="@../css/visualisation.css">
+      <HBox id="stage" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css">
          <children>
             <VBox prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
                <children>
@@ -216,6 +218,18 @@
                   </DropShadow>
                </effect>
             </VBox>
+            <Pane prefHeight="451.0" prefWidth="719.0" styleClass="section">
+               <children>
+                        <BorderPane fx:id="graphContainer" layoutX="10.0" layoutY="11.0" prefHeight="428.0" prefWidth="677.0" />
+               </children>
+               <effect>
+                  <DropShadow height="30.0" radius="14.5" width="30.0">
+                     <color>
+                        <Color red="1.0" green="1.0" blue="1.0" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </Pane>
          </children>
       </HBox>
    </children>
