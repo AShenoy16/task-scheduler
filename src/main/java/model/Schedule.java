@@ -2,34 +2,38 @@ package model;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Schedule {
     private List<Task> tasks;
-    private int numProcessors;
     private int cost;
+    private int numProcessors;
 
     /**
      * This creates a new schedule given a list of tasks
      *
      * @param tasks A list of tasks to add to a schedule
-     * @param numProcessors The number of processors
      */
     public Schedule(List<Task> tasks, int numProcessors) {
-        this.numProcessors = numProcessors;
         this.tasks = tasks;
+        this.numProcessors = numProcessors;
+        this.tasks.sort(Comparator
+                .comparingInt(Task::getProcessor)
+                .thenComparingInt(Task::getStartTime)
+        );
     }
+
 
     /**
      * This creates a new initial schedule with only one task (entry node)
      *
      * @param intialTask The initial task to add
-     * @param numProcessors The number of processors
      */
-    public Schedule(Task intialTask, int numProcessors){
+    public Schedule(Task intialTask){
         this.tasks = new ArrayList<>(List.of(intialTask));
-        this.numProcessors = numProcessors;
     }
 
     public List<Task> getTasks() {
@@ -51,36 +55,38 @@ public class Schedule {
             }
 
         }
-
+        
         return processorTask;
     }
 
 
-    /**
-     * This method gets the dependencies for a particular task (node)
-     * @param node
-     * @param graph
-     * @return
-     */
-    private List<Task> getDependencies(Node node, Graph graph){
-        // get the parents of this node
+    private List<Task> getTaskByProcessorID(int processorId) {
+        return tasks
+                .stream()
+                .filter(task -> task.getProcessor() == processorId) // Filter by processorId
+                .sorted(Comparator.comparing(Task::getStartTime)) // Sort by startTime
+                .collect(Collectors.toList()); // Collect the result into a List
+    }
 
-        ArrayList<Node> parentNodes = graph.getParentNodes(node);
+    public boolean isValidScheduleNoOverlap2() {
+        for (int i = 1; i <= this.numProcessors; i++) {
+            List<Task> sortedTasks = getTaskByProcessorID(i);
 
-        ArrayList<Task> dependencies = new ArrayList<>();
+            for (int j = 0; j < sortedTasks.size() - 1; j++) {
+                Task currentTask = sortedTasks.get(j);
+                Task nextTask = sortedTasks.get(j + 1);
 
-
-        for(Task task: tasks){
-            // if a task in the schedule is in the parent nodes
-            // it is a dependency
-            if(parentNodes.contains(task.getNode())){
-                dependencies.add(task);
+                // Make sure there's no overlap
+                if (currentTask.getFinishTime() > nextTask.getStartTime()) {
+                    return false;
+                }
             }
         }
 
-        return dependencies;
-
+        return true;
     }
+
+
 
     /**
      * This gets the free tasks for a specific schedule
@@ -95,7 +101,7 @@ public class Schedule {
         for (Node node : graph.getNodes()) {
             // Check if the node is not in the current schedule
             if (!allScheduleNodes.contains(node)) {
-                List<Node> dependentNodes = getDependencies(node, graph).stream().map(Task::getNode).toList();;
+                List<Node> dependentNodes = graph.getDependenciesByNode(node);;
 
                 if(dependentNodes.isEmpty()){
                     freeTaskNodes.add(node);
@@ -193,7 +199,7 @@ public class Schedule {
         for(Task task: tasks){
             Node node = task.getNode();
 
-            List<Node> dependencies = graph.getDependenciesByNode(node);
+            List<Node> dependencies = graph.getParentsByNode(node);
 
 //            List<Task> dependencies = getDependencies(node, graph);
 
@@ -260,6 +266,13 @@ public class Schedule {
         return(tasks.size() == graph.getAdjacencyMatrix().length);
     }
 
+    public boolean isValid(Graph graph){
+        return (isValidScheduleNoOverlap() && isValidScheduleSatisfyDependencies(graph));
+    }
 
 
+    @Override
+    public int hashCode() {
+        return tasks.hashCode();
+    }
 }

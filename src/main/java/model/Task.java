@@ -37,9 +37,10 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return startTime == task.startTime && processor == task.processor && Objects.equals(node, task.node);
+        return startTime == task.startTime && processor == task.processor && Objects.equals(node.getId(), task.node.getId());
     }
 
+    //
     @Override
     public int hashCode() {
         return Objects.hash(node.getId(), startTime, processor);
