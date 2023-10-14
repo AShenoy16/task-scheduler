@@ -27,6 +27,8 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import model.Graph;
 import model.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.Viewer;
 import visualisation.VisualiseGraph;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
@@ -84,6 +86,8 @@ public class VisualisationController {
     private int timerCounter;
     private org.graphstream.graph.Graph graphS;
 
+    private VisualiseGraph viewer;
+
     @FXML
     public void initialize() {
         final String directory = "src/test/graphs/";
@@ -118,10 +122,11 @@ public class VisualisationController {
     }
 
     private void initGraph(Graph graph){
-        graphS = new MultiGraph("bnb");
+        System.setProperty("org.graphstream.ui", "javafx");
+        graphS = new SingleGraph("bnb");
         Node[] nodes = graph.getNodes();
         for(Integer i = 0; i < nodes.length; i++){
-            graphS.addNode(String.valueOf(nodes[i].getId()));
+            org.graphstream.graph.Node node = graphS.addNode(String.valueOf(nodes[i].getId()));
         }
         int[][] edges = graph.getAdjacencyMatrix();
         for (Integer i = 0; i < edges.length; i++) {
@@ -132,33 +137,31 @@ public class VisualisationController {
             }
         }
         graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
-        VisualiseGraph viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        scheduledExecutorServiceGraph = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorServiceGraph.scheduleAtFixedRate(() -> {
+            updateGraph(graph, bnb.getCurrentPS());
+        }, 0, 500, TimeUnit.MILLISECONDS);
+        viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
 
         FxViewPanel viewPanel = (FxViewPanel) viewer.addDefaultView(false);
         graphContainer.setCenter(viewPanel);
 
-        scheduledExecutorServiceGraph = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorServiceGraph.scheduleAtFixedRate(() -> {
-            updateGraph(bnb.getCurrentPS());
-        }, 0, 500, TimeUnit.MILLISECONDS);
-    }
-    public void updateGraph(PartialSolution partialSolution) {
-        List<Node> visitedNodes = partialSolution.getVisitedNodes();
-        List<Integer> visitedNodesID = new ArrayList<>();
-        for (Node node : visitedNodes) {
-            visitedNodesID.add(node.getId());
-        }
-        System.out.println("----------------------"+graphS.getNodeCount());
-        for(int i = 0; i < graphS.getNodeCount(); i++){
-            org.graphstream.graph.Node node = graphS.getNode(String.valueOf(visitedNodes.get(i).getId()));
-            if (visitedNodesID.contains(i)) {
-                node.setAttribute("ui.stylesheet", "fill-color: red;");
-            } else {
-                node.setAttribute("ui.stylesheet", "fill-color: white;");
-            }
 
-        }
+
+    }
+    public void updateGraph(Graph graph, PartialSolution partialSolution) {
+        Platform.runLater(() -> {
+            List<Node> visitedNodes = partialSolution.getVisitedNodes();
+            for(Node node : graph.getNodes()){
+                org.graphstream.graph.Node nodeS = graphS.getNode(String.valueOf(node.getId()));
+                if(visitedNodes.contains(node)){
+                    nodeS.setAttribute("ui.style", "fill-color: red;");
+                } else {
+                    nodeS.setAttribute("ui.style", "fill-color: white;");
+                }
+            }
+        });
     }
 
     public void initializeCharts() {
@@ -180,7 +183,6 @@ public class VisualisationController {
                 scheduledTasks[i] = currentScheduledTask;
                 currentScheduledTask = currentScheduledTask.getParent();
             }
-//            updateGraph(bnb.getCurrentPS());
 
             Platform.runLater(() -> {
                 Arrays.fill(processorStartTimes, 0); // reset processor times
