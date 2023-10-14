@@ -1,13 +1,19 @@
 package scheduler;
 import algorithm.astar.AstarScheduler;
+import com.sun.javafx.application.PlatformImpl;
+import controller.App;
+import controller.VisualisationController;
 import io.IOHandler;
 import model.Graph;
+import javafx.stage.Stage;
 import model.Schedule;
 
-import java.io.IOException;
-
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+
+        //visualise();
+
+
         int argsLength = args.length;
         if (args == null || argsLength < 2) {
             throw new RuntimeException("InputFileName or numProcessors arguments not supplied");
@@ -47,6 +53,15 @@ public class Main {
         printMemoryUsage();
     }
 
+    public static void visualise(){
+        PlatformImpl.startup(() -> {
+            App visualisation = new App();
+            try {
+                visualisation.start(new Stage());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }});
+    }
     private static String getOutputFileName(String[] args) {
         for (int i = 2; i < args.length; i++) {
             if (args[i].equals("-o")) {
@@ -59,7 +74,7 @@ public class Main {
                 }
             }
         }
-        return null; // Return an empty string if -o is not found or if it's not followed by a value
+        return null;
     }
 
     private static void printMemoryUsage() {

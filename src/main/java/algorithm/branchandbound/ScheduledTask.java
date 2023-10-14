@@ -13,12 +13,14 @@ public class ScheduledTask {
     private int processorId;
     private Node node;
     private ScheduledTask parent;
+    private int taskLength;
 
-    public ScheduledTask(int startTime, int processorId, Node node, ScheduledTask parent){
+    public ScheduledTask(int startTime, int processorId, Node node,ScheduledTask parent, int taskLength){
         this.startTime = startTime;
         this.processorId = processorId;
         this.node = node;
         this.parent = parent;
+        this.taskLength = taskLength;
     }
 
     public Task toTask(){
@@ -40,6 +42,9 @@ public class ScheduledTask {
         return parent;
     }
 
+    public int getTaskLength() {
+        return taskLength;
+    }
     // if two schduledTasks have same startTime, processorId and node Id they're equivalent
     @Override
     public boolean equals(Object o) {

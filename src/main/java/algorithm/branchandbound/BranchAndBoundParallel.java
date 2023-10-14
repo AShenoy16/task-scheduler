@@ -52,7 +52,7 @@ public class BranchAndBoundParallel {
                     .filter(node -> !node.equals(startNode))
                     .collect(Collectors.toMap(node -> node, node -> new ArrayList<>()));
 
-            ScheduledTask task = new ScheduledTask(0, 0, startNode, null);
+            ScheduledTask task = new ScheduledTask(0, 0, startNode, null, 1);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
@@ -148,7 +148,7 @@ public class BranchAndBoundParallel {
                         continue;
                     }
                     // create new partial solution with new task for this child and add it to dfs branch and bound recursion
-                    ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
+                    ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask(), partialSolution.getScheduledTask().getTaskLength()+1);
                     PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask, calculateCostFunction);
                     newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
 

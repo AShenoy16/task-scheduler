@@ -1,5 +1,6 @@
 package algorithm.branchandbound;
 
+import controller.VisualisationController;
 import algorithm.astar.CalculateCostFunction;
 import model.Graph;
 import model.Node;
@@ -13,7 +14,14 @@ public class BranchAndBound {
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
+
+    private int shortestPathText;
     private ScheduledTask currentShortestTask;
+
+    private VisualisationController controller;
+    private ScheduledTask currentDFSTask;
+    private PartialSolution currentPS;
+    private boolean isFinished = false;
 
     private CalculateCostFunction calculateCostFunction;
 
@@ -54,15 +62,16 @@ public class BranchAndBound {
                     childrenQueue.put(m, new ArrayList<>());
                 }
             }
-
             // cost will be bottom level of the entry node
-            ScheduledTask task = new ScheduledTask(0,0, n,null);
+            ScheduledTask task = new ScheduledTask(0,0, n,null, 1);
             PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(n), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
 
             dfs(partialSolution); // start recursive dfs branch and bound
+
         }
+        isFinished = true;
 
         // returns a schedule of the shortest path found
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -77,13 +86,14 @@ public class BranchAndBound {
         return schedule;
     }
 
-
     /**
      * recursive dfs branch and bound algorithm, that will recursively iterate for each new partial solution
      * @param partialSolution the partial solution of this dfs iteration
      */
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
+        currentDFSTask = currentTask;
+        this.currentPS = partialSolution;
         int pathTime = getCurrentLatestTaskTime(currentTask);
 
         // bound the search of this node
@@ -127,7 +137,9 @@ public class BranchAndBound {
             currentShortestTask = currentTask;
             int hashCode = partialSolution.getScheduledTask().hashCode();
 
-//             print path on console
+            // update visualisation
+            setShortestPathText(currentShortestPath);
+            controller.queuePartialSolution(partialSolution);
             printCurrentPath(currentTask);
 
         }
@@ -170,11 +182,9 @@ public class BranchAndBound {
                 }
 
                 // create new partial solution with new task for this child and add it to dfs branch and bound recursion
-                ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask());
-
+                ScheduledTask newTask = new ScheduledTask(possibleStartTime, i, destNode, partialSolution.getScheduledTask(), partialSolution.getScheduledTask().getTaskLength() + 1);
 
                 // if cost can't beat best time just skip
-
 
                 PartialSolution newPartialSolution = new PartialSolution(partialSolution, newTask, calculateCostFunction);
                 newPartialSolution.getProcessorTimes()[i] = possibleStartTime + graph.getNodes()[destNode.getId()].getVal();
@@ -195,6 +205,7 @@ public class BranchAndBound {
             }
         });
     }
+
 
     /**
      * This helper function will return the latest task time from the partial solution of this current task, as current
@@ -246,6 +257,30 @@ public class BranchAndBound {
             }
         }
         return true;
+    }
+
+    public void setController(VisualisationController controller){
+        this.controller = controller;
+    }
+
+    public ScheduledTask getCurrentDFSTask() {
+        return currentDFSTask;
+    }
+
+    public boolean getIsFinished() {
+        return isFinished;
+    }
+
+    public PartialSolution getCurrentPS() {
+        return currentPS;
+    }
+
+    public void setShortestPathText(int currentShortestPath) {
+        this.shortestPathText = currentShortestPath;
+    }
+
+    public int getShortestPathText(){
+        return shortestPathText;
     }
 
 }
