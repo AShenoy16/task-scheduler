@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * The branch and bound class is needed to run the dfs branch and bound algorithm.
  */
-public class BranchAndBound {
+public class BranchAndBound extends BranchAndBoundAlgorithm{
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
@@ -261,6 +261,11 @@ public class BranchAndBound {
 
     public void setController(VisualisationController controller){
         this.controller = controller;
+    }
+
+    @Override
+    public Schedule run(Graph graph, int numProcessors, int i) {
+        return null;
     }
 
     public ScheduledTask getCurrentDFSTask() {

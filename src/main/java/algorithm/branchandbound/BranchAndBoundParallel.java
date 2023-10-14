@@ -1,6 +1,7 @@
 package algorithm.branchandbound;
 
 import algorithm.astar.CalculateCostFunction;
+import controller.VisualisationController;
 import model.Graph;
 import model.Node;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * The branch and bound class is needed to run the dfs branch and bound algorithm.
  */
-public class BranchAndBoundParallel {
+public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
@@ -23,6 +24,11 @@ public class BranchAndBoundParallel {
     private CalculateCostFunction calculateCostFunction;
     private HashMap<Node, Integer> bottomLevels;
     private static ForkJoinPool pool;
+    private VisualisationController controller;
+    private ScheduledTask currentDFSTask;
+    private boolean isFinished = false;
+    private dfs currentDFS;
+
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -56,7 +62,9 @@ public class BranchAndBoundParallel {
             PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
-            pool.invoke(new dfs(partialSolution));
+            dfs dfs = new dfs(partialSolution);
+            dfs.bnb = this;
+            pool.invoke(dfs);
         });
 
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -69,7 +77,13 @@ public class BranchAndBoundParallel {
 
         Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
         schedule.setShortestPath(currentShortestPath);
+        isFinished = true;
         return schedule;
+    }
+
+    @Override
+    public Schedule run(Graph graph, int numProcessors) {
+        return null;
     }
 
 
@@ -78,7 +92,9 @@ public class BranchAndBoundParallel {
      */
     private class dfs extends RecursiveAction {
 
-        private PartialSolution partialSolution;
+        public PartialSolution partialSolution;
+        private BranchAndBoundParallel bnb;
+
         dfs(PartialSolution partialSolution) {
             this.partialSolution = partialSolution;
         }
@@ -89,6 +105,7 @@ public class BranchAndBoundParallel {
         @Override
         protected void compute() {
             ScheduledTask currentTask = partialSolution.getScheduledTask();
+            currentDFSTask = currentTask;
             int pathTime = getCurrentLatestTaskTime(currentTask);
 
             // bound the search of this node
@@ -224,6 +241,29 @@ public class BranchAndBoundParallel {
             }
         }
         return true;
+    }
+
+    public void setController(VisualisationController controller) {
+        this.controller = controller;
+    }
+
+    public ScheduledTask getCurrentDFSTask() {
+        return currentDFSTask;
+    }
+
+    @Override
+    public PartialSolution getCurrentPS() {
+        return currentDFS.partialSolution;
+    }
+
+    @Override
+    public int getShortestPathText() {
+        return currentShortestPath;
+    }
+
+    @Override
+    public boolean getIsFinished() {
+        return isFinished;
     }
 
 }
