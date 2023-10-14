@@ -17,9 +17,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -36,7 +34,6 @@ import visualisation.VisualiseGraph;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -88,8 +85,11 @@ public class VisualisationController {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
         Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
+        initGraphVisualisation(graph);
+
         BranchAndBound scheduler = new BranchAndBound();
         scheduler.setController(this);
+
         bnb = scheduler;
         numProcessors = 2;
 
@@ -109,8 +109,8 @@ public class VisualisationController {
         Thread schedulerThread = new Thread(() -> scheduler.run(graph, numProcessors));
         schedulerThread.start();
 
-        initGraph(graph);
-//        initializeCharts();
+        visualiseSchedules();
+        initializeCharts();
         startTimer();
     }
 
@@ -134,7 +134,7 @@ public class VisualisationController {
         event.consume();
     }
 
-    private void initGraph(Graph graph){
+    private void initGraphVisualisation(Graph graph){
         System.setProperty("org.graphstream.ui", "javafx");
         graphS = new SingleGraph("bnb");
         Node[] nodes = graph.getNodes();
@@ -150,7 +150,6 @@ public class VisualisationController {
             }
         }
         graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
-        visualiseSchedules();
         viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
 
@@ -171,7 +170,7 @@ public class VisualisationController {
             }
 
             viewer.visualizeQueuedSchedule();
-        }, 1000, 400, TimeUnit.MILLISECONDS);
+        }, 2000, 400, TimeUnit.MILLISECONDS);
     }
 
     /**

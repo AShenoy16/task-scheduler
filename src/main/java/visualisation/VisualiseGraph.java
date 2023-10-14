@@ -1,8 +1,6 @@
 package visualisation;
 
 import algorithm.branchandbound.PartialSolution;
-import javafx.application.Platform;
-import model.Graph;
 import model.Node;
 import org.graphstream.ui.fx_viewer.FxViewer;
 import org.graphstream.ui.view.Viewer;
@@ -12,9 +10,9 @@ import java.util.List;
 import java.util.Queue;
 
 public class VisualiseGraph extends FxViewer {
-    private org.graphstream.graph.Graph graph;
+    private final org.graphstream.graph.Graph graph;
     private final Queue<PartialSolution> partialSolutionQueue = new LinkedList<>();
-    private int n;
+    private final int n;
     private int nodeIndex;
     private List<Node> nodes;
 
@@ -49,8 +47,14 @@ public class VisualiseGraph extends FxViewer {
         }
 
         if (nodeIndex < n) {
-            org.graphstream.graph.Node nodeS = graph.getNode(String.valueOf(nodes.get(nodeIndex).getId()));
-            nodeS.setAttribute("ui.style", "fill-color: red;");
+            org.graphstream.graph.Node node = graph.getNode(String.valueOf(nodes.get(nodeIndex).getId()));
+            node.setAttribute("ui.style", "fill-color: #4895EF;");
+        }
+
+        if (nodeIndex == n-1) {
+            for (org.graphstream.graph.Node node : graph) {
+                node.setAttribute("ui.style", "stroke-color:#B4F89E;");
+            }
         }
 
         nodeIndex++;
@@ -61,7 +65,7 @@ public class VisualiseGraph extends FxViewer {
      */
     public void resetNodeColours() {
         for (org.graphstream.graph.Node node : graph) {
-            node.setAttribute("ui.style", "fill-color: white;");
+            node.setAttribute("ui.style", "fill-color: white; stroke-color:grey;");
         }
     }
 
