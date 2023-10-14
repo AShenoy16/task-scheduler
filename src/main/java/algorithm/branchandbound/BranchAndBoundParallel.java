@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +24,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     private ScheduledTask currentShortestTask;
     private CalculateCostFunction calculateCostFunction;
     private HashMap<Node, Integer> bottomLevels;
+    private int[] parallelThreadTimes;
     private static ForkJoinPool pool;
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
@@ -42,6 +44,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
         this.numProcessors = numProcesses;
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
+        this.parallelThreadTimes = new int[graph.getStartNodes().size()];
         pool = new ForkJoinPool(numCores);
 
         calculateCostFunction = new CalculateCostFunction(graph);
@@ -53,6 +56,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
 
         bottomLevels = calculateCostFunction.getBottomLevelMap();
 
+        AtomicInteger i = new AtomicInteger();
         graph.getStartNodes().forEach(startNode -> {
             Map<Node, List<ScheduledTask>> childrenQueue = graph.getStartNodes().stream()
                     .filter(node -> !node.equals(startNode))
@@ -62,9 +66,9 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
             PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
-            dfs dfs = new dfs(partialSolution);
-            dfs.bnb = this;
+            dfs dfs = new dfs(partialSolution, i);
             pool.invoke(dfs);
+            i.getAndIncrement();
         });
 
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -75,9 +79,13 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
             shortestPathTask = shortestPathTask.getParent();
         }
 
+        // finalise visualiser with best shortest task
+        currentDFSTask = currentShortestTask;
+        isFinished = true;
+
         Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
         schedule.setShortestPath(currentShortestPath);
-        isFinished = true;
+
         return schedule;
     }
 
@@ -92,11 +100,12 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
      */
     private class dfs extends RecursiveAction {
 
+        private AtomicInteger id;
         public PartialSolution partialSolution;
-        private BranchAndBoundParallel bnb;
 
-        dfs(PartialSolution partialSolution) {
+        dfs(PartialSolution partialSolution, AtomicInteger id) {
             this.partialSolution = partialSolution;
+            this.id = id;
         }
 
         /**
@@ -132,6 +141,8 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                 // print path on console
                 printCurrentPath(currentTask);
 
+//                // update thread times
+//                parallelThreadTimes[this.id.get()] = currentShortestPath;
             }
 
             // branch and bound algorithm for queued children
@@ -180,7 +191,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                         continue;
                     }
 
-                    taskList.add(new dfs(newPartialSolution));
+                    taskList.add(new dfs(newPartialSolution, this.id));
                 }
 
                 // Fork subtasks (execute in parallel). InvokeAll will return will all tasks are completed.
@@ -264,6 +275,10 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     @Override
     public boolean getIsFinished() {
         return isFinished;
+    }
+
+    public int[] getParallelThreadTimes() {
+        return parallelThreadTimes;
     }
 
 }

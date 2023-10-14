@@ -11,9 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.StackedBarChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
@@ -48,8 +46,9 @@ public class VisualisationController {
     @FXML
     private HBox sequentialContainer;
     @FXML
+    private BarChart<Number, String> parallelBarChart;
+    @FXML
     private Label bestCurrentText;
-
     @FXML
     private Canvas cpuWheel;
     @FXML
@@ -58,13 +57,13 @@ public class VisualisationController {
     private StackedBarChart<String, Number> scheduleBarChart;
     @FXML
     private StackedBarChart<String, Number> scheduleBarChartPara;
+    @FXML CategoryAxis parallelXAxis;
     @FXML CategoryAxis scheduleXAxis;
     @FXML CategoryAxis scheduleXAxisPara;
     @FXML
     private Label timerLabel;
     @FXML
     private Label cpuText;
-
     @FXML
     private Label memoryText;
     @FXML
@@ -87,6 +86,7 @@ public class VisualisationController {
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private ScheduledExecutorService scheduledExecutorServiceGraph;
+    private ScheduledExecutorService scheduledExecutorServiceParallel;
 
     private boolean isFinished = false;
     private BranchAndBoundAlgorithm bnb;
@@ -208,7 +208,6 @@ public class VisualisationController {
                 scheduledTasks[i] = currentScheduledTask;
                 currentScheduledTask = currentScheduledTask.getParent();
             }
-//            updateGraph(bnb.getCurrentPS());
 
             Platform.runLater(() -> {
                 Arrays.fill(processorStartTimes, 0); // reset processor times
@@ -256,11 +255,33 @@ public class VisualisationController {
                     }
                 });
                 bestCurrentText.setText(String.valueOf(bnb.getShortestPathText()));
+                if (bnb.getIsFinished()) {
+                    scheduledExecutorService.shutdown();
+                }
             });
-            if (bnb.getIsFinished()) {
-                scheduledExecutorService.shutdown();
-            }
-        }, 0, 750, TimeUnit.MILLISECONDS);
+        }, 0, 500, TimeUnit.MILLISECONDS);
+
+//        if (isParallel) {
+//            List<XYChart.Series<Number, String>> seriesParallelList = new ArrayList<>();
+//
+//            scheduledExecutorServiceParallel = Executors.newSingleThreadScheduledExecutor();
+//            scheduledExecutorServiceParallel.scheduleAtFixedRate(() -> {
+//                BranchAndBoundParallel bnbParallel = (BranchAndBoundParallel) bnb;
+//                int[] threadTimes = bnbParallel.getParallelThreadTimes();
+//
+//                // initialises array of processor names
+//                for (int i = 0; i < threadTimes.length; i++) {
+//                    System.out.println(threadTimes[i]);
+//
+//                    XYChart.Series<Number, String> series = new XYChart.Series<>();
+//                    series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
+//                    Platform.runLater(() -> {
+//                        parallelBarChart.getData().clear();
+//                        parallelBarChart.getData().addAll(series);
+//                    });
+//                }
+//            }, 0, 500, TimeUnit.MILLISECONDS);
+//        }
     }
 
     private void updateWheels() {

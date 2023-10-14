@@ -180,7 +180,7 @@
       </HBox>
       <Group>
          <children>
-            <HBox id="stage" fx:id="sequentialContainer" layoutX="4.0" layoutY="4.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="412.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css" visible="false">
+            <HBox id="stage" fx:id="sequentialContainer" layoutX="4.0" layoutY="4.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="412.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css">
                <children>
                   <VBox alignment="CENTER_LEFT" prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
                      <children>
@@ -269,10 +269,10 @@
                         </Label>
                         <BarChart fx:id="parallelBarChart" animated="false" legendVisible="false" styleClass="mainFont" verticalGridLinesVisible="false">
                           <xAxis>
-                            <CategoryAxis side="BOTTOM" tickLabelFill="#dadada" />
+                             <NumberAxis tickLabelFill="#dadada" />
                           </xAxis>
                           <yAxis>
-                            <NumberAxis side="LEFT" tickLabelFill="#dadada" />
+                             <CategoryAxis fx:id="parallelXAxis" side="LEFT" tickLabelFill="#dadada" />
                           </yAxis>
                            <padding>
                               <Insets right="10.0" />
