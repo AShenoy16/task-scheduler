@@ -79,7 +79,13 @@ public class CalculateCostFunction {
             cost = Math.max(cost, startTime + bottomLevelMap.get(task.getNode()));
 
         }
-        currentSchedule.setCost(cost);
+        int sum = 0;
+        int idleTimeHeuristic = 0;
+        for (int i = 0; i < graph.getNodeWeightings().length; i++) {
+            sum += graph.getNodeWeightings()[i];
+        }
+        idleTimeHeuristic = (currentSchedule.getIdleTime() + sum)/currentSchedule.getNumProcessors();
+        currentSchedule.setCost(Math.max(cost, idleTimeHeuristic));
     }
 
     public void setPartialSolutionCost(PartialSolution partialSolution){

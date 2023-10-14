@@ -31,7 +31,7 @@ public class AstarParallel {
         //TODO Add dynamic number of threads, set to 4 threads for now
         ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 
-        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
+        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         List<Callable<Schedule>> tasks = new ArrayList<>();
 
         if(initialSchedules.size() > numThreads){
@@ -88,11 +88,11 @@ public class AstarParallel {
         return lowestCostSchedule;
     }
 
-    public List<Schedule> createInitialSchedules(List<Node> entryNodes) {
+    public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numProcessors) {
         List<Schedule> newSchedules = new ArrayList<>();
         for (Node entryNode : entryNodes) {
             Task task = new Task(entryNode, 0, entryNode.getVal(), 1);
-            Schedule newlyMadeSchedule = new Schedule(task);
+            Schedule newlyMadeSchedule = new Schedule(task, numProcessors);
             calculateCostFunction.setScheduleCost(newlyMadeSchedule);
             newSchedules.add(newlyMadeSchedule);
         }
@@ -201,8 +201,19 @@ public class AstarParallel {
                 // Add task
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
+                int gapStartTime = 0;
+
+                for(Task task1 : newTasks){
+                    if(task1.getProcessor() == processorID){
+                        gapStartTime = Math.max(gapStartTime, task1.getFinishTime());
+                    }
+                }
+                int gapTime = earliestTimeTaskCanStart - gapStartTime;
+
                 newTasks.add(task);
+//                Collections.sort(newTasks,  Comparator.comparing(Task::getProcessor));
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+                newlyMadeSchedule.setIdleTime(schedule.getIdleTime() + gapTime);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);

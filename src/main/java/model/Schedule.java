@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 public class Schedule {
     private List<Task> tasks;
     private int cost;
+    private int idleTime;
+    private int finishTime;
     private int numProcessors;
 
     /**
@@ -32,8 +34,26 @@ public class Schedule {
      *
      * @param intialTask The initial task to add
      */
-    public Schedule(Task intialTask){
+    public Schedule(Task intialTask, int numProcessors) {
         this.tasks = new ArrayList<>(List.of(intialTask));
+        this.numProcessors = numProcessors;
+    }
+
+    public int getFinishTime(){
+        Task maxtask = Collections.max(this.tasks, (obj1, obj2) -> Integer.compare(obj1.getFinishTime(), obj2.getFinishTime()));
+        return maxtask.getFinishTime();
+    }
+
+    public int getNumProcessors() {
+        return numProcessors;
+    }
+
+    public int getIdleTime() {
+        return idleTime;
+    }
+
+    public void setIdleTime(int idleTime) {
+        this.idleTime = idleTime;
     }
 
     public List<Task> getTasks() {
