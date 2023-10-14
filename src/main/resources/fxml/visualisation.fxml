@@ -207,7 +207,7 @@
             </VBox>
             <Pane prefHeight="451.0" prefWidth="719.0" styleClass="section">
                <children>
-                        <BorderPane fx:id="graphContainer" layoutX="10.0" layoutY="11.0" prefHeight="428.0" prefWidth="677.0" style="-fx-background-color: #282828;" />
+                        <BorderPane fx:id="graphContainer" onScroll="#handleZoom" layoutX="10.0" layoutY="11.0" prefHeight="428.0" prefWidth="677.0" style="-fx-background-color: #282828; "/>
                </children>
                <effect>
                   <DropShadow height="30.0" radius="14.5" width="30.0">
