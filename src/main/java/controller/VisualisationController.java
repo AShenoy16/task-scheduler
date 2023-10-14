@@ -2,7 +2,6 @@ package controller;
 
 import algorithm.branchandbound.BranchAndBound;
 import algorithm.branchandbound.PartialSolution;
-import algorithm.branchandbound.Schedule;
 import algorithm.branchandbound.ScheduledTask;
 import com.sun.management.OperatingSystemMXBean;
 import io.IOHandler;
@@ -22,17 +21,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import model.Graph;
 import model.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.Viewer;
-import visualisation.VisualiseGraph;
-import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
+import visualisation.VisualiseGraph;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -42,13 +38,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 public class VisualisationController {
     private final String[] colours = new String[]{"03DAC6", "4895EF", "4361EE", "3F37C9", "3A0CA3", "480CA8", "560BAD",
         "7209B7", "B5179E", "F72585"};
     @FXML
     private Label bestCurrentText;
-
     @FXML
     private Canvas cpuWheel;
     @FXML
@@ -60,15 +54,10 @@ public class VisualisationController {
     private Label timerLabel;
     @FXML
     private Label cpuText;
-
     @FXML
     private Label memoryText;
-
-
     @FXML
     private BorderPane graphContainer;
-
-
     private GraphicsContext cpuGC;
     private GraphicsContext memoryGC;
     private OperatingSystemMXBean osBean;
@@ -76,17 +65,16 @@ public class VisualisationController {
     private double cpuUsage;
     private double memoryUsage;
     private int numProcessors;
-    private String[] processorNames;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
-    private ScheduledExecutorService scheduledExecutorServiceGraph;
-
-    private boolean isFinished = false;
+    private VisualiseGraph viewer;
+    private final Queue<PartialSolution> partialSolutionQueue = new LinkedList<>();
+    private int n = 11;
+    private int nodeIndex = 0;
+    private List<Node> nodes;
     private BranchAndBound bnb;
     private int timerCounter;
     private org.graphstream.graph.Graph graphS;
-
-    private VisualiseGraph viewer;
 
     @FXML
     public void initialize() {
@@ -111,9 +99,7 @@ public class VisualisationController {
         timeline.play();
 
         // Start the scheduler in a separate thread
-        Thread schedulerThread = new Thread(() -> {
-            scheduler.run(graph, numProcessors);
-        });
+        Thread schedulerThread = new Thread(() -> scheduler.run(graph, numProcessors));
         schedulerThread.start();
 
         initGraph(graph);
@@ -125,47 +111,53 @@ public class VisualisationController {
         System.setProperty("org.graphstream.ui", "javafx");
         graphS = new SingleGraph("bnb");
         Node[] nodes = graph.getNodes();
-        for(Integer i = 0; i < nodes.length; i++){
-            org.graphstream.graph.Node node = graphS.addNode(String.valueOf(nodes[i].getId()));
+        for (Node value : nodes) {
+            org.graphstream.graph.Node node = graphS.addNode(String.valueOf(value.getId()));
         }
         int[][] edges = graph.getAdjacencyMatrix();
-        for (Integer i = 0; i < edges.length; i++) {
-            for (Integer j = 0; j < edges.length; j++){
+        for (int i = 0; i < edges.length; i++) {
+            for (int j = 0; j < edges.length; j++){
                 if (edges[i][j] != 0) {
                     graphS.addEdge(i +","+j, i, j);
                 }
             }
         }
         graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
-        scheduledExecutorServiceGraph = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorServiceGraph.scheduleAtFixedRate(() -> {
-            updateGraph(graph, bnb.getCurrentPS());
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        visualiseSchedules();
         viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
 
         FxViewPanel viewPanel = (FxViewPanel) viewer.addDefaultView(false);
         graphContainer.setCenter(viewPanel);
-
-
-
     }
-    public void updateGraph(Graph graph, PartialSolution partialSolution) {
-        Platform.runLater(() -> {
-            List<Node> visitedNodes = partialSolution.getVisitedNodes();
-            for(Node node : graph.getNodes()){
-                org.graphstream.graph.Node nodeS = graphS.getNode(String.valueOf(node.getId()));
-                if(visitedNodes.contains(node)){
-                    nodeS.setAttribute("ui.style", "fill-color: red;");
-                } else {
-                    nodeS.setAttribute("ui.style", "fill-color: white;");
-                }
+
+    /**
+     * Visualise all schedules that were once the best schedule.
+     *
+     */
+    private void visualiseSchedules() {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(() ->  {
+            if (viewer.getPartialSolutionQueue().isEmpty()) {
+                executorService.shutdownNow();
+                return;
             }
-        });
+
+            viewer.visualizeQueuedSchedule();
+        }, 1000, 400, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Add newly found best partial solution to queue to be visualized.
+     *
+     * @param partialSolution Partial solution to add to queue
+     */
+    public void queuePartialSolution(PartialSolution partialSolution) {
+        viewer.getPartialSolutionQueue().offer(partialSolution);
     }
 
     public void initializeCharts() {
-        processorNames = new String[numProcessors];
+        String[] processorNames = new String[numProcessors];
         processorStartTimes = new int[numProcessors];
         // initialises array of processor names
         for (int i = 0; i < numProcessors; i++) {
@@ -213,9 +205,7 @@ public class VisualisationController {
                 // styles the previous mentioned series with time delay as transparent
                 scheduleBarChart.getData().forEach((t) -> {
                     if (t.getName() != null && t.getName().equals("none")) {
-                        t.getData().forEach((j) -> {
-                            j.getNode().setStyle("-fx-background-color: transparent");
-                        });
+                        t.getData().forEach((j) -> j.getNode().setStyle("-fx-background-color: transparent"));
                     } else {
                         t.getData().forEach((j) -> {
                             String colourCSS = colours[Integer.parseInt(t.getName())%colours.length];
@@ -248,7 +238,7 @@ public class VisualisationController {
         memoryUsage = (double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax();
 
         cpuText.setText(String.format("%.2f", cpuUsage*100) + "%");
-        memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");;
+        memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");
 
         updateCPU();
         updateMemory();
@@ -312,32 +302,11 @@ public class VisualisationController {
                 String milliSecondDigit = (milliseconds < 10) ? "0" : "";
 
                 String timeText = minuteDigit + minutes + ":" + secondDigit + seconds + ":" + milliSecondDigit + milliseconds;
-                Platform.runLater(() -> {
-                    timerLabel.setText(timeText);
-                });
+                Platform.runLater(() -> timerLabel.setText(timeText));
                 if (bnb.getIsFinished()) {
                     myTimer.cancel();
                 }
             }
         }, 0, 10);
-    }
-
-    public void startScheduler() {
-        final String directory = "src/test/graphs/";
-        IOHandler io = new IOHandler();
-        Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        BranchAndBound scheduler = new BranchAndBound();
-        scheduler.setController(this);
-        bnb = scheduler;
-        numProcessors = 4;
-
-        // Start the scheduler in a separate thread
-        Thread schedulerThread = new Thread(() -> {
-            Schedule schedule = scheduler.run(graph, numProcessors);
-        });
-        schedulerThread.start();
-
-        initializeCharts();
-        startTimer();
     }
 }

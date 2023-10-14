@@ -1,14 +1,27 @@
 package visualisation;
 
+import algorithm.branchandbound.PartialSolution;
+import model.Graph;
+import model.Node;
 import org.graphstream.ui.fx_viewer.FxViewer;
 import org.graphstream.ui.view.Viewer;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 public class VisualiseGraph extends FxViewer {
     private org.graphstream.graph.Graph graph;
+    private final Queue<PartialSolution> partialSolutionQueue = new LinkedList<>();
+    private int n;
+    private int nodeIndex;
+    private List<Node> nodes;
 
     public VisualiseGraph(org.graphstream.graph.Graph graph, Viewer.ThreadingModel threadingModel) {
         super(graph, threadingModel);
         this.graph = graph;
+        n = graph.getNodeCount();
+        nodeIndex = n + 3;
         initialiseLabels();
     }
 
@@ -21,5 +34,38 @@ public class VisualiseGraph extends FxViewer {
                     + "\tsize: 30px, 30px;\n"
                     + "\ttext-size: 15px; text-color: black; text-style: bold;\n");
         }
+    }
+
+    /**
+     * Visualize traversal of a schedule
+     */
+    public void visualizeQueuedSchedule() {
+        if (nodeIndex > n + 2) {
+            nodeIndex = 0;
+            nodes = partialSolutionQueue.poll().getVisitedNodes();
+            resetNodeColours();
+            return;
+        }
+
+        if (nodeIndex < n) {
+            System.out.println(nodeIndex);
+            org.graphstream.graph.Node nodeS = graph.getNode(String.valueOf(nodes.get(nodeIndex).getId()));
+            nodeS.setAttribute("ui.style", "fill-color: red;");
+        }
+
+        nodeIndex++;
+    }
+
+    /**
+     *  Reset all GraphStream graph nodes to white
+     */
+    public void resetNodeColours() {
+        for (org.graphstream.graph.Node node : graph) {
+            node.setAttribute("ui.style", "fill-color: white;");
+        }
+    }
+
+    public Queue<PartialSolution> getPartialSolutionQueue() {
+        return partialSolutionQueue;
     }
 }
