@@ -15,7 +15,7 @@ public class AstarParallel {
     private int globalCost = Integer.MAX_VALUE;
     HashSet<Integer> closed = new HashSet<>();
     HashSet<Integer> openHash = new HashSet<>();
-    public Schedule run(Graph graph, int numProcessors) {
+    public Schedule run(Graph graph, int numProcessors, int numThreads) {
         calculateCostFunction = new CalculateCostFunction(graph);
         for (Node entryNode : graph.getStartNodes()) {
             calculateCostFunction.setBottomLevelMap(entryNode);
@@ -29,12 +29,12 @@ public class AstarParallel {
         }
 
         //TODO Add dynamic number of threads, set to 4 threads for now
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
         List<Callable<Schedule>> tasks = new ArrayList<>();
 
-        if(initialSchedules.size() > 4){
+        if(initialSchedules.size() > numThreads){
             for(Schedule schedule : initialSchedules){
                 tasks.add(() -> new MyCallable(numProcessors, schedule, graph).call());
             }
