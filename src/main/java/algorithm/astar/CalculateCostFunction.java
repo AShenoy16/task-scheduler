@@ -85,17 +85,21 @@ public class CalculateCostFunction {
         for (int i = 0; i < graph.getNodeWeightings().length; i++) {
             sumOfNodeWeights += graph.getNodeWeightings()[i];
         }
-        for (int i = 1; i < currentSchedule.getNumProcessors(); i++) {
+        for (int i = 1; i <= currentSchedule.getNumProcessors(); i++) {
             int maxFinishTime = 0;
             for(Task task : currentSchedule.getTasks()){
                 if(task.getProcessor() != i){
                     continue;
                 }
+                // get the maximum finish time for a processor
                 maxFinishTime = Math.max(task.getFinishTime(), maxFinishTime);
             }
+            // ending trailtimes for a specific processor
+            // will be zero for the processor with the latest scheduled task
             trailTimes += currentSchedule.getFinishTime() - maxFinishTime;
         }
 
+        // idle time from equation
         idleTimeHeuristic = (currentSchedule.getGapTimes() + trailTimes + sumOfNodeWeights)/currentSchedule.getNumProcessors();
         currentSchedule.setCost(Math.max(cost, idleTimeHeuristic));
     }
