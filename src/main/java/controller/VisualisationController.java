@@ -17,6 +17,9 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -33,6 +36,7 @@ import visualisation.VisualiseGraph;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -68,6 +72,13 @@ public class VisualisationController {
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
+    private ScheduledExecutorService scheduledExecutorServiceGraph;
+
+    private double currentScale = 1.0;
+    private double minScale = 0.65;
+    private double maxScale = 1.025;
+
+    private boolean isFinished = false;
     private BranchAndBound bnb;
     private int timerCounter;
     private org.graphstream.graph.Graph graphS;
@@ -99,8 +110,28 @@ public class VisualisationController {
         schedulerThread.start();
 
         initGraph(graph);
-        initializeCharts();
+//        initializeCharts();
         startTimer();
+    }
+
+
+    @FXML
+    public void handleZoom(ScrollEvent event) {
+
+        // if scroll > 0 zoomfactor = 1.05
+        // otherwise scroll factors 0.95
+        double zoomFactor = event.getDeltaY() > 0 ? 1.05 : 0.95; // Adjust zoom factor as needed
+
+        double newScale = currentScale * zoomFactor;
+
+        // Ensure the new scale is within the defined range
+        if (newScale >= minScale && newScale <= maxScale) {
+            graphContainer.setScaleX(newScale);
+            graphContainer.setScaleY(newScale);
+            currentScale = newScale;
+        }
+
+        event.consume();
     }
 
     private void initGraph(Graph graph){
