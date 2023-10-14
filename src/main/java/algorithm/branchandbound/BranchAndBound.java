@@ -139,7 +139,7 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
 
             // update visualisation
             setShortestPathText(currentShortestPath);
-
+            controller.queuePartialSolution(partialSolution);
             printCurrentPath(currentTask);
 
         }

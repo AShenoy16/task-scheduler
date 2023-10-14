@@ -1,6 +1,9 @@
 package controller;
 
 import algorithm.branchandbound.*;
+import algorithm.branchandbound.BranchAndBound;
+import algorithm.branchandbound.PartialSolution;
+import algorithm.branchandbound.ScheduledTask;
 import com.sun.management.OperatingSystemMXBean;
 import io.IOHandler;
 import javafx.animation.Animation;
@@ -14,20 +17,20 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Border;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import model.Graph;
 import model.Node;
-import visualisation.VisualiseGraph;
-import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
+import visualisation.VisualiseGraph;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -36,7 +39,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 
 public class VisualisationController {
     private final String[] colours = new String[]{"03DAC6", "4895EF", "4361EE", "3F37C9", "3A0CA3", "480CA8", "560BAD",
@@ -85,8 +87,13 @@ public class VisualisationController {
     private String[] processorNames;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
+    private VisualiseGraph viewer;
     private ScheduledExecutorService scheduledExecutorServiceGraph;
     private ScheduledExecutorService scheduledExecutorServiceParallel;
+
+    private double currentScale = 1.0;
+    private double minScale = 0.65;
+    private double maxScale = 1.025;
 
     private boolean isFinished = false;
     private BranchAndBoundAlgorithm bnb;
@@ -98,9 +105,12 @@ public class VisualisationController {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
         Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
+
+        initGraphVisualisation(graph);
+
         numProcessors = 2;
         numCores = 4;
-        isParallel = true;
+        isParallel = false;
 
         if (isParallel) {
             bnb = new BranchAndBoundParallel();
@@ -140,57 +150,82 @@ public class VisualisationController {
         });
         schedulerThread.start();
 
-        initGraph(graph);
+        visualiseSchedules();
         initializeCharts();
         startTimer();
     }
 
-    private void initGraph(Graph graph){
-        graphS = new MultiGraph("bnb");
+
+    @FXML
+    public void handleZoom(ScrollEvent event) {
+
+        // if scroll > 0 zoomfactor = 1.05
+        // otherwise scroll factors 0.95
+        double zoomFactor = event.getDeltaY() > 0 ? 1.05 : 0.95; // Adjust zoom factor as needed
+
+        double newScale = currentScale * zoomFactor;
+
+        // Ensure the new scale is within the defined range
+        if (newScale >= minScale && newScale <= maxScale) {
+            graphContainer.setScaleX(newScale);
+            graphContainer.setScaleY(newScale);
+            currentScale = newScale;
+        }
+
+        event.consume();
+    }
+
+    private void initGraphVisualisation(Graph graph){
+        System.setProperty("org.graphstream.ui", "javafx");
+        graphS = new SingleGraph("bnb");
         Node[] nodes = graph.getNodes();
-        for(Integer i = 0; i < nodes.length; i++){
-            graphS.addNode(String.valueOf(nodes[i].getId()));
+        for (Node value : nodes) {
+            org.graphstream.graph.Node node = graphS.addNode(String.valueOf(value.getId()));
         }
         int[][] edges = graph.getAdjacencyMatrix();
-        for (Integer i = 0; i < edges.length; i++) {
-            for (Integer j = 0; j < edges.length; j++){
+        for (int i = 0; i < edges.length; i++) {
+            for (int j = 0; j < edges.length; j++){
                 if (edges[i][j] != 0) {
                     graphS.addEdge(i +","+j, i, j);
                 }
             }
         }
         graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
-        VisualiseGraph viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
 
         FxViewPanel viewPanel = (FxViewPanel) viewer.addDefaultView(false);
-        currentGraphContainer.setCenter(viewPanel);
 
-        scheduledExecutorServiceGraph = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorServiceGraph.scheduleAtFixedRate(() -> {
-            updateGraph(bnb.getCurrentPS());
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        graphContainer.setCenter(viewPanel);
     }
-    public void updateGraph(PartialSolution partialSolution) {
-        List<Node> visitedNodes = partialSolution.getVisitedNodes();
-        List<Integer> visitedNodesID = new ArrayList<>();
-        for (Node node : visitedNodes) {
-            visitedNodesID.add(node.getId());
-        }
-        System.out.println("----------------------"+graphS.getNodeCount());
-        for(int i = 0; i < graphS.getNodeCount(); i++){
-            org.graphstream.graph.Node node = graphS.getNode(String.valueOf(visitedNodes.get(i).getId()));
-            if (visitedNodesID.contains(i)) {
-                node.setAttribute("ui.stylesheet", "fill-color: red;");
-            } else {
-                node.setAttribute("ui.stylesheet", "fill-color: white;");
+
+    /**
+     * Visualise all schedules that were once the best schedule.
+     *
+     */
+    private void visualiseSchedules() {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(() ->  {
+            if (viewer.getPartialSolutionQueue().isEmpty()) {
+                executorService.shutdownNow();
+                return;
             }
 
-        }
+            viewer.visualizeQueuedSchedule();
+        }, 2000, 400, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Add newly found best partial solution to queue to be visualized.
+     *
+     * @param partialSolution Partial solution to add to queue
+     */
+    public void queuePartialSolution(PartialSolution partialSolution) {
+        viewer.getPartialSolutionQueue().offer(partialSolution);
     }
 
     public void initializeCharts() {
-        processorNames = new String[numProcessors];
+        String[] processorNames = new String[numProcessors];
         processorStartTimes = new int[numProcessors];
         // initialises array of processor names
         for (int i = 0; i < numProcessors; i++) {
@@ -238,9 +273,7 @@ public class VisualisationController {
                 // styles the previous mentioned series with time delay as transparent
                 currentScheduleBarChart.getData().forEach((t) -> {
                     if (t.getName() != null && t.getName().equals("none")) {
-                        t.getData().forEach((j) -> {
-                            j.getNode().setStyle("-fx-background-color: transparent");
-                        });
+                        t.getData().forEach((j) -> j.getNode().setStyle("-fx-background-color: transparent"));
                     } else {
                         t.getData().forEach((j) -> {
                             String colourCSS = colours[Integer.parseInt(t.getName())%colours.length];
@@ -295,7 +328,7 @@ public class VisualisationController {
         memoryUsage = (double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax();
 
         cpuText.setText(String.format("%.2f", cpuUsage*100) + "%");
-        memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");;
+        memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");
 
         updateCPU();
         updateMemory();
@@ -359,32 +392,11 @@ public class VisualisationController {
                 String milliSecondDigit = (milliseconds < 10) ? "0" : "";
 
                 String timeText = minuteDigit + minutes + ":" + secondDigit + seconds + ":" + milliSecondDigit + milliseconds;
-                Platform.runLater(() -> {
-                    timerLabel.setText(timeText);
-                });
+                Platform.runLater(() -> timerLabel.setText(timeText));
                 if (bnb.getIsFinished()) {
                     myTimer.cancel();
                 }
             }
         }, 0, 10);
-    }
-
-    public void startScheduler() {
-        final String directory = "src/test/graphs/";
-        IOHandler io = new IOHandler();
-        Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        BranchAndBound scheduler = new BranchAndBound();
-        scheduler.setController(this);
-        bnb = scheduler;
-        numProcessors = 4;
-
-        // Start the scheduler in a separate thread
-        Thread schedulerThread = new Thread(() -> {
-            Schedule schedule = scheduler.run(graph, numProcessors);
-        });
-        schedulerThread.start();
-
-        initializeCharts();
-        startTimer();
     }
 }
