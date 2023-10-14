@@ -82,9 +82,9 @@ public class CalculateCostFunction {
         int sumOfNodeWeights = 0;
         int trailTimes = 0;
         int idleTimeHeuristic = 0;
-        for (int i = 0; i < graph.getNodeWeightings().length; i++) {
-            sumOfNodeWeights += graph.getNodeWeightings()[i];
-        }
+//        for (int i = 0; i < graph.getNodeWeightings().length; i++) {
+//            sumOfNodeWeights += graph.getNodeWeightings()[i];
+//        }
         for (int i = 1; i <= currentSchedule.getNumProcessors(); i++) {
             int maxFinishTime = 0;
             for(Task task : currentSchedule.getTasks()){
@@ -93,6 +93,7 @@ public class CalculateCostFunction {
                 }
                 // get the maximum finish time for a processor
                 maxFinishTime = Math.max(task.getFinishTime(), maxFinishTime);
+                sumOfNodeWeights += task.getNode().getVal();
             }
             // ending trailtimes for a specific processor
             // will be zero for the processor with the latest scheduled task
