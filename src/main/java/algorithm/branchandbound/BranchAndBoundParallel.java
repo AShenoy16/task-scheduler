@@ -29,8 +29,6 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
     private boolean isFinished = false;
-    private dfs currentDFS;
-
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -88,12 +86,6 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
 
         return schedule;
     }
-
-    @Override
-    public Schedule run(Graph graph, int numProcessors) {
-        return null;
-    }
-
 
     /**
      * Represents a unit of work to be processed in parallel. Take partial solution as workload to execute.
@@ -263,8 +255,8 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     }
 
     @Override
-    public PartialSolution getCurrentPS() {
-        return currentDFS.partialSolution;
+    public Schedule run(Graph graph, int numProcessors) {
+        return null;
     }
 
     @Override

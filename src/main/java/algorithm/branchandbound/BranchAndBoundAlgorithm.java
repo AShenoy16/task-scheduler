@@ -13,8 +13,6 @@ public abstract class BranchAndBoundAlgorithm {
 
     public abstract ScheduledTask getCurrentDFSTask();
 
-    public abstract PartialSolution getCurrentPS();
-
     public abstract int getShortestPathText();
 
     public abstract boolean getIsFinished();

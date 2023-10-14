@@ -112,7 +112,7 @@ public class VisualisationController {
 
         numProcessors = 2;
         numCores = 4;
-        isParallel = false;
+        isParallel = true;
 
         if (isParallel) {
             bnb = new BranchAndBoundParallel();
@@ -308,7 +308,7 @@ public class VisualisationController {
                     scheduledExecutorService.shutdown();
                 }
             });
-        }, 100, 500, TimeUnit.MILLISECONDS);
+        }, 50, 500, TimeUnit.MILLISECONDS);
 
         if (isParallel) {
 
@@ -327,7 +327,10 @@ public class VisualisationController {
                         parallelBarChart.getData().addAll(series);
                     });
                 }
-            }, 100, 500, TimeUnit.MILLISECONDS);
+                if (bnb.getIsFinished()) {
+                    scheduledExecutorServiceParallel.shutdown();
+                }
+            }, 0, 100, TimeUnit.MILLISECONDS);
         }
     }
 

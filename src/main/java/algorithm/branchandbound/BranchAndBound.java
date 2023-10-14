@@ -20,7 +20,6 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
 
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
-    private PartialSolution currentPS;
     private boolean isFinished = false;
 
     private CalculateCostFunction calculateCostFunction;
@@ -96,7 +95,6 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
         currentDFSTask = currentTask;
-        this.currentPS = partialSolution;
         int pathTime = getCurrentLatestTaskTime(currentTask);
 
         // bound the search of this node
@@ -277,10 +275,6 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
 
     public boolean getIsFinished() {
         return isFinished;
-    }
-
-    public PartialSolution getCurrentPS() {
-        return currentPS;
     }
 
     public void setShortestPathText(int currentShortestPath) {
