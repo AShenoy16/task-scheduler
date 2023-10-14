@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.RecursiveAction;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,6 @@ public class BranchAndBoundParallel {
     private ScheduledTask currentShortestTask;
     private CalculateCostFunction calculateCostFunction;
     private HashMap<Node, Integer> bottomLevels;
-    private static ForkJoinPool pool;
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -36,7 +36,22 @@ public class BranchAndBoundParallel {
         this.numProcessors = numProcesses;
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
-        pool = new ForkJoinPool(numCores);
+
+        final ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
+            @Override
+            public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
+                final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+                return worker;
+            }
+        };
+
+        ForkJoinPool pool = new ForkJoinPool(numCores, factory, null, true);
+
+        List<ForkJoinWorkerThread> workers = new ArrayList<ForkJoinWorkerThread>();
+        for (int i = 0; i < numProcessors; i++) {
+            var worker = factory.newThread(pool);
+            workers.add(worker);
+        }
 
         calculateCostFunction = new CalculateCostFunction(graph);
 

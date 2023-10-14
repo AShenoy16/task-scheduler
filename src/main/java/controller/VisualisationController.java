@@ -164,12 +164,11 @@ public class VisualisationController {
     private void visualiseSchedules() {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(() ->  {
+            viewer.visualizeQueuedSchedule();
             if (viewer.getPartialSolutionQueue().isEmpty()) {
                 executorService.shutdownNow();
                 return;
             }
-
-            viewer.visualizeQueuedSchedule();
         }, 2000, 400, TimeUnit.MILLISECONDS);
     }
 
