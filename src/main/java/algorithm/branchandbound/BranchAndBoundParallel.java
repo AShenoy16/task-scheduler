@@ -141,8 +141,8 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                 // print path on console
                 printCurrentPath(currentTask);
 
-//                // update thread times
-//                parallelThreadTimes[this.id.get()] = currentShortestPath;
+                // update thread times
+                parallelThreadTimes[this.id.get()] = currentShortestPath;
             }
 
             // branch and bound algorithm for queued children

@@ -71,7 +71,6 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
             dfs(partialSolution); // start recursive dfs branch and bound
 
         }
-        isFinished = true;
 
         // returns a schedule of the shortest path found
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -81,6 +80,10 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
             scheduledTasksList.add(shortestPathTask);
             shortestPathTask = shortestPathTask.getParent();
         }
+
+        isFinished = true;
+        currentDFSTask = currentShortestTask;
+
         Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
         schedule.setShortestPath(currentShortestPath);
         return schedule;
