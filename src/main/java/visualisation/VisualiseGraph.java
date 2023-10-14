@@ -1,6 +1,7 @@
 package visualisation;
 
 import algorithm.branchandbound.PartialSolution;
+import javafx.application.Platform;
 import model.Graph;
 import model.Node;
 import org.graphstream.ui.fx_viewer.FxViewer;
@@ -48,7 +49,6 @@ public class VisualiseGraph extends FxViewer {
         }
 
         if (nodeIndex < n) {
-            System.out.println(nodeIndex);
             org.graphstream.graph.Node nodeS = graph.getNode(String.valueOf(nodes.get(nodeIndex).getId()));
             nodeS.setAttribute("ui.style", "fill-color: red;");
         }

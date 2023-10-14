@@ -68,10 +68,6 @@ public class VisualisationController {
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
-    private final Queue<PartialSolution> partialSolutionQueue = new LinkedList<>();
-    private int n = 11;
-    private int nodeIndex = 0;
-    private List<Node> nodes;
     private BranchAndBound bnb;
     private int timerCounter;
     private org.graphstream.graph.Graph graphS;
