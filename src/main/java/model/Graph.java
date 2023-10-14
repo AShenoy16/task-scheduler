@@ -16,6 +16,7 @@ public class Graph {
     private HashMap<Node, List<Node>> dependencies = new HashMap<>();
     private HashMap<Node, List<Node>> parentNodes = new HashMap<>();
 
+
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
         adjacencyMatrix = new int[n][n];
