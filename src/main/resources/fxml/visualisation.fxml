@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.StackedBarChart?>
@@ -18,7 +20,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="664.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="595.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
       <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
          <children>
@@ -48,7 +50,7 @@
                   </StackPane>
                </children>
                <effect>
-                  <DropShadow>
+                  <DropShadow height="30.0" radius="14.5" width="30.0">
                      <color>
                         <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
                      </color>
@@ -85,7 +87,7 @@
                   </StackPane>
                </children>
                <effect>
-                  <DropShadow>
+                  <DropShadow height="30.0" radius="14.5" width="30.0">
                      <color>
                         <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
                      </color>
@@ -126,7 +128,7 @@
                   </VBox>
                </children>
                <effect>
-                  <DropShadow>
+                  <DropShadow height="30.0" radius="14.5" width="30.0">
                      <color>
                         <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
                      </color>
@@ -167,7 +169,7 @@
                   </VBox>
                </children>
                <effect>
-                  <DropShadow>
+                  <DropShadow height="30.0" radius="14.5" width="30.0">
                      <color>
                         <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
                      </color>
@@ -176,48 +178,128 @@
             </HBox>
          </children>
       </HBox>
-      <HBox id="stage" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css">
+      <Group>
          <children>
-            <VBox alignment="CENTER_LEFT" prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
+            <HBox id="stage" fx:id="sequentialContainer" layoutX="4.0" layoutY="4.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="412.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css" visible="false">
                <children>
-                  <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
-                     <VBox.margin>
-                        <Insets top="15.0" />
-                     </VBox.margin>
-                  </Label>
-                  <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
-                    <xAxis>
-                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
-                    </yAxis>
-                     <padding>
-                        <Insets right="10.0" />
-                     </padding>
-                  </StackedBarChart>
+                  <VBox alignment="CENTER_LEFT" prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
+                           <VBox.margin>
+                              <Insets top="15.0" />
+                           </VBox.margin>
+                        </Label>
+                        <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
+                          <xAxis>
+                            <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
+                          </yAxis>
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </StackedBarChart>
+                     </children>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </VBox>
+                  <Pane prefHeight="451.0" prefWidth="719.0" styleClass="section">
+                     <children>
+                              <BorderPane fx:id="graphContainer" layoutX="10.0" layoutY="43.0" prefHeight="337.0" prefWidth="677.0" style="-fx-background-color: #282828;" />
+                        <Label alignment="CENTER" layoutY="16.0" prefHeight="23.0" prefWidth="697.0" styleClass="chartTitle" text="NODE GRAPH" textAlignment="CENTER" />
+                     </children>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </Pane>
                </children>
-               <effect>
-                  <DropShadow height="30.0" radius="14.5" width="30.0">
-                     <color>
-                        <Color red="1.0" green="1.0" blue="1.0" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </VBox>
-            <Pane prefHeight="451.0" prefWidth="719.0" styleClass="section">
+            </HBox>
+            <HBox id="stage" fx:id="parallelContainer" layoutX="14.0" layoutY="14.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="1161.0" spacing="20.0" stylesheets="@../css/visualisation.css">
                <children>
-                        <BorderPane fx:id="graphContainer" layoutX="10.0" layoutY="11.0" prefHeight="428.0" prefWidth="677.0" style="-fx-background-color: #282828;" />
+                  <VBox alignment="CENTER_LEFT" prefHeight="378.0" prefWidth="396.0" spacing="5.0" styleClass="sectionCharts">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
+                           <VBox.margin>
+                              <Insets top="15.0" />
+                           </VBox.margin>
+                        </Label>
+                        <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChartPara" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
+                           <xAxis>
+                              <CategoryAxis fx:id="scheduleXAxisPara" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
+                           </xAxis>
+                           <yAxis>
+                              <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
+                           </yAxis>
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </StackedBarChart>
+                     </children>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </VBox>
+                  <VBox prefHeight="378.0" prefWidth="476.0" styleClass="sectionCharts">
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                     <children>
+                        <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="PARALLEL THREADS" textAlignment="CENTER">
+                           <VBox.margin>
+                              <Insets top="15.0" />
+                           </VBox.margin>
+                        </Label>
+                        <BarChart fx:id="parallelBarChart" animated="false" legendVisible="false" styleClass="mainFont" verticalGridLinesVisible="false">
+                          <xAxis>
+                            <CategoryAxis side="BOTTOM" tickLabelFill="#dadada" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" tickLabelFill="#dadada" />
+                          </yAxis>
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </BarChart>
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER_LEFT" prefHeight="378.0" prefWidth="481.0" spacing="5.0" styleClass="sectionCharts">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="23.0" prefWidth="697.0" styleClass="chartTitle" text="NODE GRAPH" textAlignment="CENTER">
+                           <VBox.margin>
+                              <Insets top="15.0" />
+                           </VBox.margin>
+                        </Label>
+                        <BorderPane fx:id="graphContainerPara" prefHeight="345.0" prefWidth="684.0" style="-fx-background-color: #282828; -fx-background-radius: 15;" />
+                     </children>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </VBox>
                </children>
-               <effect>
-                  <DropShadow height="30.0" radius="14.5" width="30.0">
-                     <color>
-                        <Color red="1.0" green="1.0" blue="1.0" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Pane>
+            </HBox>
          </children>
-      </HBox>
+      </Group>
    </children>
 </VBox>

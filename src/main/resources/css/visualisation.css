@@ -7,6 +7,10 @@
     -fx-background-color: transparent;
 }
 
+#parallelBarChart .chart-content .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
 .chart-horizontal-grid-lines {
     -fx-stroke: #dadada;
     -fx-opacity: 0.25;
