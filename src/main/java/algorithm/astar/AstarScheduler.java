@@ -179,7 +179,7 @@ public class AstarScheduler {
                 newTasks.add(task);
 //                Collections.sort(newTasks,  Comparator.comparing(Task::getProcessor));
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
-                newlyMadeSchedule.setIdleTime(schedule.getIdleTime() + gapTime);
+                newlyMadeSchedule.setGapTimes(schedule.getGapTimes() + gapTime);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);

@@ -79,12 +79,24 @@ public class CalculateCostFunction {
             cost = Math.max(cost, startTime + bottomLevelMap.get(task.getNode()));
 
         }
-        int sum = 0;
+        int sumOfNodeWeights = 0;
+        int trailTimes = 0;
         int idleTimeHeuristic = 0;
         for (int i = 0; i < graph.getNodeWeightings().length; i++) {
-            sum += graph.getNodeWeightings()[i];
+            sumOfNodeWeights += graph.getNodeWeightings()[i];
         }
-        idleTimeHeuristic = (currentSchedule.getIdleTime() + sum)/currentSchedule.getNumProcessors();
+        for (int i = 1; i < currentSchedule.getNumProcessors(); i++) {
+            int maxFinishTime = 0;
+            for(Task task : currentSchedule.getTasks()){
+                if(task.getProcessor() != i){
+                    continue;
+                }
+                maxFinishTime = Math.max(task.getFinishTime(), maxFinishTime);
+            }
+            trailTimes += currentSchedule.getFinishTime() - maxFinishTime;
+        }
+
+        idleTimeHeuristic = (currentSchedule.getGapTimes() + trailTimes + sumOfNodeWeights)/currentSchedule.getNumProcessors();
         currentSchedule.setCost(Math.max(cost, idleTimeHeuristic));
     }
 

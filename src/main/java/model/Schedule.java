@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Schedule {
     private List<Task> tasks;
     private int cost;
-    private int idleTime;
+    private int gapTimes;
     private int finishTime;
     private int numProcessors;
 
@@ -48,12 +48,12 @@ public class Schedule {
         return numProcessors;
     }
 
-    public int getIdleTime() {
-        return idleTime;
+    public int getGapTimes() {
+        return gapTimes;
     }
 
-    public void setIdleTime(int idleTime) {
-        this.idleTime = idleTime;
+    public void setGapTimes(int gapTimes) {
+        this.gapTimes = gapTimes;
     }
 
     public List<Task> getTasks() {
