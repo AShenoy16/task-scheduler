@@ -96,7 +96,7 @@ public class VisualisationController {
         BranchAndBound scheduler = new BranchAndBound();
         scheduler.setController(this);
         bnb = scheduler;
-        numProcessors = 4;
+        numProcessors = 2;
 
         bestCurrentText.setText("inf");
 

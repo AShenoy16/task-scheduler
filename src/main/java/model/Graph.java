@@ -3,6 +3,7 @@ package model;
 import algorithm.astar.CalculateCostFunction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Graph {
@@ -12,6 +13,9 @@ public class Graph {
     private ArrayList<Node> startNodes = new ArrayList<>();
     private ArrayList<Node> endNodes = new ArrayList<>();
     private Node[] nodes;
+
+    private HashMap<Node, List<Node>> dependencies = new HashMap<>();
+
 
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.n = nodes.size();
@@ -68,6 +72,44 @@ public class Graph {
             adjacencyMatrix[e.getSrcId()][e.getDestId()] = e.getWeight();
         }
     }
+
+    public void createDependencies(Node node){
+
+        // need to get all it's parents
+
+        List<Node> childrenNodes = getChildrenNodes(node);
+
+        for(Node childrenNode: childrenNodes){
+            createDependencies(childrenNode);
+        }
+
+        //TODO further optimisation
+//        if(dependencies.containsKey(node)){
+//            return;
+//        }
+
+        // check if getParent nodes works on entry node
+        List<Node> parentNodes = getParentNodes(node);
+
+        // add parents of specific node
+        dependencies.put(node, parentNodes);
+
+        // go through all children of that node and add it's ancestors
+        for(Node child: childrenNodes){
+            dependencies.get(child).addAll(parentNodes);
+        }
+
+    }
+
+    public HashMap<Node, List<Node>> getDependencies() {
+        return dependencies;
+    }
+
+    public List<Node> getDependenciesByNode(Node node) {
+        return dependencies.get(node);
+    }
+
+    // create method to get all dependencies and put them into a hashamp
 
 
     /**

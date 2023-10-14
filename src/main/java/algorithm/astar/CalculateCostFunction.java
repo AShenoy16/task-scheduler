@@ -1,5 +1,6 @@
 package algorithm.astar;
 
+import algorithm.branchandbound.PartialSolution;
 import model.Graph;
 import model.Node;
 import model.Schedule;
@@ -23,6 +24,15 @@ public class CalculateCostFunction {
 
     public CalculateCostFunction(Graph graph) {
         this.graph = graph;
+    }
+
+    private static CalculateCostFunction instance;
+
+    public static CalculateCostFunction getInstance(Graph graph) {
+        if (instance == null) {
+            instance = new CalculateCostFunction(graph);
+        }
+        return instance;
     }
 
     /**
@@ -70,6 +80,20 @@ public class CalculateCostFunction {
 
         }
         currentSchedule.setCost(cost);
+    }
+
+    public void setPartialSolutionCost(PartialSolution partialSolution){
+        int cost = 0;
+        List<Task> tasks = partialSolution.getAllTasks();
+
+        for (Task task: tasks){
+            int startTime = task.getStartTime();
+            // calculate lower bound
+            // heuristic = max(start time of scheduled tasks plus their bottom level)
+            cost = Math.max(cost, startTime + bottomLevelMap.get(task.getNode()));
+
+        }
+        partialSolution.setCost(cost);
     }
 
     /**
