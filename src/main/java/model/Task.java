@@ -2,6 +2,9 @@ package model;
 
 import java.util.Objects;
 
+/**
+ * Class represents a Task object
+ */
 public class Task {
 
     private Node node;
@@ -9,6 +12,13 @@ public class Task {
     private int finishTime;
     private int processor;
 
+    /**
+     * Creates a task instance
+     * @param node
+     * @param startTime
+     * @param finishTime
+     * @param processor
+     */
     public Task(Node node, int startTime, int finishTime, int processor){
         this.node = node;
         this.startTime = startTime;
@@ -32,6 +42,12 @@ public class Task {
         return node;
     }
 
+    /**
+     * Two nodes are equal if they have the same start time
+     * processor and Node id
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -40,7 +56,10 @@ public class Task {
         return startTime == task.startTime && processor == task.processor && Objects.equals(node.getId(), task.node.getId());
     }
 
-    //
+    /**
+     * Hashcode of the tasks
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(node.getId(), startTime, processor);
