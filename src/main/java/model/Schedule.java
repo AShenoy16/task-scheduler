@@ -7,6 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class creates a schedule instance
+ */
 public class Schedule {
     private List<Task> tasks;
     private int cost;
@@ -15,9 +18,9 @@ public class Schedule {
     private int numProcessors;
 
     /**
-     * This creates a new schedule given a list of tasks
-     *
-     * @param tasks A list of tasks to add to a schedule
+     * This creates a new schedule with a list of tasks
+     * @param tasks list of tasks to add
+     * @param numProcessors number of processors
      */
     public Schedule(List<Task> tasks, int numProcessors) {
         this.tasks = tasks;
@@ -80,32 +83,6 @@ public class Schedule {
     }
 
 
-    private List<Task> getTaskByProcessorID(int processorId) {
-        return tasks
-                .stream()
-                .filter(task -> task.getProcessor() == processorId) // Filter by processorId
-                .sorted(Comparator.comparing(Task::getStartTime)) // Sort by startTime
-                .collect(Collectors.toList()); // Collect the result into a List
-    }
-
-//    public boolean isValidScheduleNoOverlap2() {
-//        for (int i = 1; i <= this.numProcessors; i++) {
-//            List<Task> sortedTasks = getTaskByProcessorID(i);
-//
-//            for (int j = 0; j < sortedTasks.size() - 1; j++) {
-//                Task currentTask = sortedTasks.get(j);
-//                Task nextTask = sortedTasks.get(j + 1);
-//
-//                // Make sure there's no overlap
-//                if (currentTask.getFinishTime() > nextTask.getStartTime()) {
-//                    return false;
-//                }
-//            }
-//        }
-//
-//        return true;
-//    }
-
 
 
     /**
@@ -141,32 +118,6 @@ public class Schedule {
         return freeTaskNodes;
     }
 
-//    public int getEarliestStartTimeForProcessor(int processor) {
-//        int earliestStartTime = 0;
-//        for (Task task : tasks) {
-//            if (task.getProcessor() == processor && task.getFinishTime() > earliestStartTime) {
-//                earliestStartTime = task.getFinishTime();
-//            }
-//        }
-//        return earliestStartTime;
-//    }
-//
-//    public int getLatestParentStartTime(Node node, Graph graph) {
-//        int latestParentStartTime = 0;
-//        List<Node> parentNodes = graph.getParentNodes(node);
-//
-//        for (Task task : tasks) {
-//            if (parentNodes.contains(task.getNode())) {
-//                int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][node.getId()];
-//                if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
-//                    latestParentStartTime = task.getFinishTime() + edgeWeight;
-//                }
-//            }
-//        }
-//
-//        return latestParentStartTime;
-//    }
-
 
 
     public void setCost(int cost) {
@@ -188,6 +139,10 @@ public class Schedule {
     }
 
 
+    /**
+     * Method to check if a schedule has any overlapping tasks
+     * @return
+     */
     public boolean isValidScheduleNoOverlap(){
 
         for( int i = 1; i <= this.numProcessors; i++){
@@ -213,19 +168,22 @@ public class Schedule {
 
     }
 
+    /**
+     * Checks if schedule satifisies all dependencies in the graph
+     * @param graph
+     * @return
+     */
 
     public boolean isValidScheduleSatisfyDependencies(Graph graph){
 
         for(Task task: tasks){
             Node node = task.getNode();
 
-            List<Node> dependencies = graph.getParentsByNode(node);
+            List<Node> dependencies = graph.getDependenciesByNode(node);
 
-//            List<Task> dependencies = getDependencies(node, graph);
 
             for(Node dependency: dependencies){
                 // if parent on the same processor as child
-                // make sure dependency finish time > task start time
                 // no communication cost
 
                 Task task1 = getTaskByNode(dependency);
@@ -242,13 +200,12 @@ public class Schedule {
                     }
 
                 }else{
-                    // Parent, child on different processors, need to account for
-                    // communication cost
+                    // Parent, child on different processors, account for communication cost
 
-                    //get the edge weight from parent to child from the graph
 
                     int edgeWeight = graph.getAdjacencyMatrix()[task1.getNode().getId()][task.getNode().getId()];
 
+                    // overlap occurs
                     if(task.getStartTime() < task1.getFinishTime() + edgeWeight){
                         return false;
                     }
@@ -257,10 +214,16 @@ public class Schedule {
 
         }
 
+        // no overlap occurs
         return true;
 
     }
 
+    /**
+     * This method gets the Task of a schedule by its Node
+     * @param node
+     * @return
+     */
     private Task getTaskByNode(Node node){
         for(Task task: tasks){
             if(task.getNode().getId() == node.getId()){
@@ -286,6 +249,11 @@ public class Schedule {
         return(tasks.size() == graph.getAdjacencyMatrix().length);
     }
 
+    /**
+     * Checks if a solution is valid
+     * @param graph
+     * @return
+     */
     public boolean isValid(Graph graph){
         return (isValidScheduleNoOverlap() && isValidScheduleSatisfyDependencies(graph));
     }

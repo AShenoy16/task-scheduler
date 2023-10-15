@@ -2,6 +2,9 @@ package model;
 
 import java.util.Objects;
 
+/**
+ * This class represents a Node object
+ */
 public class Node {
     private int id;
     private int val;
