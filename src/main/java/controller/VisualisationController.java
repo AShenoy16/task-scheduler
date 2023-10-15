@@ -1,9 +1,6 @@
 package controller;
 
 import algorithm.branchandbound.*;
-import algorithm.branchandbound.BranchAndBound;
-import algorithm.branchandbound.PartialSolution;
-import algorithm.branchandbound.ScheduledTask;
 import com.sun.management.OperatingSystemMXBean;
 import io.IOHandler;
 import io.SchedulingOptions;
@@ -12,21 +9,20 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.chart.*;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.*;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -40,7 +36,9 @@ import visualisation.VisualiseGraph;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -110,13 +108,9 @@ public class VisualisationController {
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
     private ScheduledExecutorService scheduledExecutorServiceParallel;
-
-    private double currentScale = 1.0;
-    private double minScale = 0.65;
-    private double maxScale = 1.025;
     private BranchAndBoundAlgorithm bnb;
     private int timerCounter;
-    private org.graphstream.graph.Graph graphS;
+    private boolean isStarted = false;
 
     @FXML
     public void initialize(SchedulingOptions options) {
@@ -142,21 +136,18 @@ public class VisualisationController {
             currentGraphContainer = graphContainer;
         }
 
+        // store this controller in the branch and bound algo
         bnb.setController(this);
-        initGraphVisualisation(graph);
 
-        bestCurrentText.setText("inf");
-
+        // cpu and memory configurations and set up
         cpuGC = cpuWheel.getGraphicsContext2D();
         memoryGC = memoryWheel.getGraphicsContext2D();
-
         osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         memoryBean = ManagementFactory.getMemoryMXBean();
-
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateWheels()));
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        // Start the scheduler in a separate thread
+        // Start the scheduler in a separate thread, and run depending on user's parallel arg
         Thread schedulerThread = new Thread(() -> {
             if (isParallel) {
                 bnb.run(graph, numProcessors, numCores);
@@ -165,21 +156,25 @@ public class VisualisationController {
             }
         });
 
+        // initialise schedule charts and graphs beforehand
+        initGraphVisualisation(graph);
         initializeCharts();
+
+        // start cpu and memory updates
         timeline.play();
 
-        startBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                startPage.setVisible(false);
+        // button to switch from home screen to main screen and start updating charts/graphs
+        startBtn.setOnAction(event -> {
+            startPage.setVisible(false);
+            schedulerThread.start();
 
-                schedulerThread.start();
-                updateScheduleChart();
-                startTimer();
-                visualiseSchedules();
+            if (isParallel) {
+                updateParallelChart();
             }
+            updateScheduleChart();
+            startTimer();
+            visualiseSchedules();
         });
-
     }
 
     private void updateHomeScreen(String inputFileName, int numProcessors, int numCores, boolean isParallel) {
@@ -193,45 +188,31 @@ public class VisualisationController {
         homeGraphLabel.setText("GRAPH - " + inputFileName);
     }
 
-    public void configureOptions(SchedulingOptions options) {
-
-    }
-
-    @FXML
-    public void handleZoom(ScrollEvent event) {
-
-        // if scroll > 0 zoomfactor = 1.05
-        // otherwise scroll factors 0.95
-        double zoomFactor = event.getDeltaY() > 0 ? 1.05 : 0.95; // Adjust zoom factor as needed
-
-        double newScale = currentScale * zoomFactor;
-
-        // Ensure the new scale is within the defined range
-        if (newScale >= minScale && newScale <= maxScale) {
-            currentGraphContainer.setScaleX(newScale);
-            currentGraphContainer.setScaleY(newScale);
-            currentScale = newScale;
-        }
-
-        event.consume();
-    }
-
+    /**
+     * Initialises the graph visualisations for the input graph, including nodes and edges
+     * @param graph - input graph provided by user
+     */
     private void initGraphVisualisation(Graph graph){
+        // initialise GraphStream graph
         System.setProperty("org.graphstream.ui", "javafx");
-        graphS = new SingleGraph("bnb");
+        org.graphstream.graph.Graph graphS = new SingleGraph("bnb");
+
+        // convert custom graph class, nodes and edges to graphstream graph
         Node[] nodes = graph.getNodes();
         for (Node value : nodes) {
-            org.graphstream.graph.Node node = graphS.addNode(String.valueOf(value.getId()));
+            graphS.addNode(String.valueOf(value.getId()));
         }
         int[][] edges = graph.getAdjacencyMatrix();
         for (int i = 0; i < edges.length; i++) {
             for (int j = 0; j < edges.length; j++){
                 if (edges[i][j] != 0) {
-                    org.graphstream.graph.Edge edge = graphS.addEdge(i + "," + j, i, j);
-                    edge.setAttribute("ui.style", "fill-color: #EFEFEF; size: 8px;");
+                    org.graphstream.graph.Edge edge = graphS.addEdge(i + "," + j, i, j, true);
+                    edge.setAttribute("ui.style", "fill-color: #EFEFEF; size: 2px;");
+                    edge.setAttribute("ui.arrow-shape", "arrow;");
                 }
             }
         }
+        // display graph and set layout in javafx
         graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
         viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
@@ -263,6 +244,9 @@ public class VisualisationController {
         viewer.getPartialSolutionQueue().offer(partialSolution);
     }
 
+    /**
+     * Initialises the schedule bar chart from the initialization of this application but before algo starts
+     */
     private void initializeCharts() {
         String[] processorNames = new String[numProcessors];
         processorStartTimes = new int[numProcessors];
@@ -270,112 +254,134 @@ public class VisualisationController {
         for (int i = 0; i < numProcessors; i++) {
             processorNames[i] = "P" + i;
         }
-        // set processor names as x axis labels
+        // set processor names as x axis labels for schedule bar chart
         currentScheduleAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(processorNames)));
+
+        String[] threadNames = new String[numCores];
+        for (int i = 0; i < numCores; i++) {
+            threadNames[i] = "T" + i;
+        }
+        // set thread names as y-axis labels for parallel bar chart
+        parallelYAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(threadNames)));
     }
 
+    /**
+     * updates the schedule bar chart periodically with the pulled current DFS task.
+     */
     private void updateScheduleChart() {
-
         // create a single thread schedule executor that periodically updates the schedule stacked bar chart
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(() -> {
-            ScheduledTask currentScheduledTask = bnb.getCurrentDFSTask();
-            ScheduledTask[] scheduledTasks = new ScheduledTask[currentScheduledTask.getTaskLength()];
-            for (int i = scheduledTasks.length-1; i >= 0; i--) { // reverse order of task nodes
-                scheduledTasks[i] = currentScheduledTask;
-                currentScheduledTask = currentScheduledTask.getParent();
-            }
-
-            Platform.runLater(() -> {
-                bestCurrentText.setText(String.valueOf(bnb.getShortestPathText()));
-                Arrays.fill(processorStartTimes, 0); // reset processor times
-                currentScheduleBarChart.getData().clear(); // reset stacked bar chart
-                for (ScheduledTask scheduledTask : scheduledTasks) { // create new series for each task
-                    XYChart.Series<String, Number> series = new XYChart.Series<>();
-                    int taskTime = scheduledTask.getNode().getVal();
-                    int startTime = scheduledTask.getStartTime();
-                    int processorID = scheduledTask.getProcessorId();
-                    String processorName = "P" + processorID;
-
-                    // creates a series for when there is a time delay between current task start time and previous
-                    // task finish time. Will be styled as transparent later on
-                    if (scheduledTask.getStartTime() != processorStartTimes[processorID]) {
-                        XYChart.Series<String, Number> seriesNone = new XYChart.Series<>();
-                        seriesNone.getData().add(new XYChart.Data<>(processorName, startTime - processorStartTimes[processorID]));
-                        seriesNone.setName("none");
-                        currentScheduleBarChart.getData().addAll(seriesNone);
-                    }
-
-                    // creates series of this task
-                    series.getData().add(new XYChart.Data<>(processorName, taskTime));
-                    series.setName(String.valueOf(scheduledTask.getNode().getId()));
-                    currentScheduleBarChart.getData().addAll(series);
-                    processorStartTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + taskTime;
+            // only start updating when the algo has started dfs recursion
+            if (isStarted) {
+                ScheduledTask currentScheduledTask = bnb.getCurrentDFSTask();
+                ScheduledTask[] scheduledTasks = new ScheduledTask[currentScheduledTask.getTaskLength()];
+                for (int i = scheduledTasks.length - 1; i >= 0; i--) { // reverse order of task nodes
+                    scheduledTasks[i] = currentScheduledTask;
+                    currentScheduledTask = currentScheduledTask.getParent();
                 }
 
-                // styles the previous mentioned series with time delay as transparent
-                currentScheduleBarChart.getData().forEach((t) -> {
-                    if (t.getName() != null && t.getName().equals("none")) {
-                        t.getData().forEach((j) -> j.getNode().setStyle("-fx-background-color: transparent"));
-                    } else {
+                Platform.runLater(() -> {
+                    bestCurrentText.setText(String.valueOf(bnb.getShortestPathText()));
+                    Arrays.fill(processorStartTimes, 0); // reset processor times
+                    currentScheduleBarChart.getData().clear(); // reset stacked bar chart
+                    for (ScheduledTask scheduledTask : scheduledTasks) { // create new series for each task
+                        XYChart.Series<String, Number> series = new XYChart.Series<>();
+                        int taskTime = scheduledTask.getNode().getVal();
+                        int startTime = scheduledTask.getStartTime();
+                        int processorID = scheduledTask.getProcessorId();
+                        String processorName = "P" + processorID;
+
+                        // creates a series for when there is a time delay between current task start time and previous
+                        // task finish time. Will be styled as transparent later on
+                        if (scheduledTask.getStartTime() != processorStartTimes[processorID]) {
+                            XYChart.Series<String, Number> seriesNone = new XYChart.Series<>();
+                            seriesNone.getData().add(new XYChart.Data<>(processorName, startTime - processorStartTimes[processorID]));
+                            seriesNone.setName("none");
+                            currentScheduleBarChart.getData().addAll(seriesNone);
+                        }
+
+                        // creates series of this task
+                        series.getData().add(new XYChart.Data<>(processorName, taskTime));
+                        series.setName(String.valueOf(scheduledTask.getNode().getId()));
+                        currentScheduleBarChart.getData().addAll(series);
+                        processorStartTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + taskTime;
+                    }
+
+                    currentScheduleBarChart.getData().forEach((t) -> {
+                        if (t.getName() != null && t.getName().equals("none")) {
+                            // styles the previous 'none' series with time delay as transparent
+                            t.getData().forEach((j) -> j.getNode().setStyle("-fx-background-color: transparent"));
+                        } else {
+                            //styles the previous series with colour from predefined colour set and also show task ID
+                            //also check out dataSeries and dataValue css classes in visualisation.css for more styles
+                            t.getData().forEach((j) -> {
+                                String colourCSS = colours[Integer.parseInt(t.getName()) % colours.length];
+                                j.getNode().getStyleClass().add("dataSeries");
+                                j.getNode().setStyle("-fx-background-color: #" + colourCSS);
+
+                                StackPane bar = (StackPane) j.getNode();
+                                Text dataText = new Text(t.getName());
+                                dataText.getStyleClass().add("dataValue");
+                                bar.getChildren().add(dataText);
+                            });
+                        }
+                    });
+                    //shutdown scheduler when algo is finished
+                    if (bnb.getIsFinished()) {
+                        scheduledExecutorService.shutdown();
+
+                    }
+                });
+            }
+        }, 0, 350, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * updates the parallel bar chart periodically with the pulled thread times.
+     */
+    private void updateParallelChart() {
+        scheduledExecutorServiceParallel = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorServiceParallel.scheduleAtFixedRate(() -> {
+            if (isStarted) {
+                Platform.runLater(() -> {
+                    BranchAndBoundParallel bnbParallel = (BranchAndBoundParallel) bnb;
+                    int[] threadTimes = bnbParallel.getParallelThreadTimes();
+                    parallelBarChart.getData().clear(); // clear existing chart data
+                    // add a bar chart for each active thread
+                    for (int i = 0; i < threadTimes.length; i++) {
+                        if (threadTimes[i] != Integer.MAX_VALUE) { //skip inactive threads
+                            XYChart.Series<Number, String> series = new XYChart.Series<>();
+                            series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
+                            series.setName(String.valueOf(i));
+                            parallelBarChart.getData().addAll(series);
+                        }
+                    }
+                    // styles each bar with colour as well as assigning css style class.
+                    parallelBarChart.getData().forEach((t) -> {
                         t.getData().forEach((j) -> {
                             String colourCSS = colours[Integer.parseInt(t.getName())%colours.length];
                             j.getNode().getStyleClass().add("dataSeries");
                             j.getNode().setStyle("-fx-background-color: #" +  colourCSS);
 
                             StackPane bar = (StackPane) j.getNode();
-                            Text dataText = new Text(t.getName());
+                            Text dataText = new Text(j.getXValue().toString());
                             dataText.getStyleClass().add("dataValue");
                             bar.getChildren().add(dataText);
                         });
-                    }
-                });
-                if (bnb.getIsFinished()) {
-                    scheduledExecutorService.shutdown();
-
-                }
-            });
-        }, 70, 500, TimeUnit.MILLISECONDS);
-
-        if (isParallel) {
-
-            scheduledExecutorServiceParallel = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutorServiceParallel.scheduleAtFixedRate(() -> {
-                Platform.runLater(() -> {
-                BranchAndBoundParallel bnbParallel = (BranchAndBoundParallel) bnb;
-                int[] threadTimes = bnbParallel.getParallelThreadTimes();
-                parallelBarChart.getData().clear();
-                    // initialises array of processor names
-                for (int i = 0; i < threadTimes.length; i++) {
-
-                    if (threadTimes[i] != Integer.MAX_VALUE) {
-                        XYChart.Series<Number, String> series = new XYChart.Series<>();
-                        series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
-                        series.setName(String.valueOf(i));
-                        parallelBarChart.getData().addAll(series);
-                    }
-                }
-                // styles the previous mentioned series
-                parallelBarChart.getData().forEach((t) -> {
-                    t.getData().forEach((j) -> {
-                        String colourCSS = colours[Integer.parseInt(t.getName())%colours.length];
-                        j.getNode().getStyleClass().add("dataSeries");
-                        j.getNode().setStyle("-fx-background-color: #" +  colourCSS);
-
-                        StackPane bar = (StackPane) j.getNode();
-                        Text dataText = new Text(j.getXValue().toString());
-                        dataText.getStyleClass().add("dataValue");
-                        bar.getChildren().add(dataText);
                     });
+                    //shutdown scheduler when algo is finished
+                    if (bnb.getIsFinished()) {
+                        scheduledExecutorServiceParallel.shutdown();
+                    }
                 });
-                if (bnb.getIsFinished()) {
-                    scheduledExecutorServiceParallel.shutdown();
-                }
-                });
-            }, 50, 100, TimeUnit.MILLISECONDS);
-        }
+            }
+        }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * updates cpu and memory wheels, and text elements displayed on the GUI
+     */
     private void updateWheels() {
         // Calculate CPU usage (between 0.0 and 1.0)
         cpuUsage = osBean.getProcessCpuLoad();
@@ -386,12 +392,16 @@ public class VisualisationController {
         MemoryUsage heapMemoryUsage = memoryBean.getHeapMemoryUsage();
         memoryUsage = (double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax();
 
+        // update the cpu and memory in UI
         cpuText.setText(String.format("%.2f", cpuUsage*100) + "%");
         memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");
-
         updateCPU();
         updateMemory();
     }
+
+    /**
+     * updates cpu wheel to better visualise its performance
+     */
     private void updateCPU(){
         // Define the dimensions of the ring
         double ringWidth = 10.0; // Width of the ring (adjust as needed)
@@ -412,6 +422,10 @@ public class VisualisationController {
         cpuGC.setLineWidth(ringWidth); // Set the outline width
         cpuGC.strokeArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 90, -360 * cpuUsage, ArcType.OPEN);
     }
+
+    /**
+     *updates memory wheel to better visualise its performance
+     */
     private void updateMemory(){
         // Define the dimensions of the ring
         double ringWidth = 10.0; // Width of the ring (adjust as needed)
@@ -434,17 +448,25 @@ public class VisualisationController {
 
     }
 
+    /**
+     * Starts the running timer when user starts the algorithm
+     */
     private void startTimer() {
         timerCounter = 0;
+        final int runTimesPerSecond = 100;
         Timer myTimer = new Timer();
         myTimer.scheduleAtFixedRate(new TimerTask() {
+            /**
+             * Timer currently configured to run every 10ms, hence will run 100 times for each second
+             */
             @Override
             public void run() {
                 timerCounter++;
 
-                long minutes = timerCounter / (60*100);
-                long seconds = (timerCounter - (minutes*60*100))/100;
-                long milliseconds = timerCounter - (minutes*60*100) - (seconds*100);
+                // runTimesPerSecond is essentially a constant conversion value for calculation
+                long minutes = timerCounter / (60*runTimesPerSecond);
+                long seconds = (timerCounter - (minutes*60*runTimesPerSecond))/runTimesPerSecond;
+                long milliseconds = timerCounter - (minutes*60*runTimesPerSecond) - (seconds*runTimesPerSecond);
 
                 String minuteDigit = (minutes < 10) ? "0" : "";
                 String secondDigit = (seconds < 10) ? "0" : "";
@@ -460,6 +482,9 @@ public class VisualisationController {
         }, 0, 10);
     }
 
+    /**
+     * modifies styles (effect and text fill) when the algo finishes, to inform user"
+     */
     private void updateFinish() {
         DropShadow dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(72, 255, 157));
@@ -474,5 +499,12 @@ public class VisualisationController {
 
         bestCurrentText.setTextFill(Color.rgb(72, 255, 157));
         timerLabel.setTextFill(Color.rgb(72, 255, 157));
+    }
+
+    /**
+     * inform this controller that the bnb algorithm dfs recursion has started
+     */
+    public void setStarted() {
+        isStarted = true;
     }
 }

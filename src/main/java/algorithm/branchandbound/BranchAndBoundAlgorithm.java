@@ -3,6 +3,9 @@ package algorithm.branchandbound;
 import controller.VisualisationController;
 import model.Graph;
 
+/**
+ * This abstract bnb parent class is needed to efficiently run either sequential or parallel as requested by the user
+ */
 public abstract class BranchAndBoundAlgorithm {
 
     public abstract void setController(VisualisationController controller);

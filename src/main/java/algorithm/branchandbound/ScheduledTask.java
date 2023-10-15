@@ -9,11 +9,11 @@ import java.util.Objects;
  * This ScheduleTask class essentially represents a node with more attributes.
  */
 public class ScheduledTask {
-    private int startTime;
-    private int processorId;
-    private Node node;
-    private ScheduledTask parent;
-    private int taskLength;
+    private final int startTime;
+    private final int processorId;
+    private final Node node;
+    private final ScheduledTask parent;
+    private final int taskLength;
 
     public ScheduledTask(int startTime, int processorId, Node node,ScheduledTask parent, int taskLength){
         this.startTime = startTime;
@@ -45,7 +45,13 @@ public class ScheduledTask {
     public int getTaskLength() {
         return taskLength;
     }
-    // if two schduledTasks have same startTime, processorId and node Id they're equivalent
+
+    /**
+     * Two scheduled tasks are equal if they have same
+     * start times, node Id and processor
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,7 +59,7 @@ public class ScheduledTask {
         ScheduledTask that = (ScheduledTask) o;
         return startTime == that.startTime && processorId == that.processorId && Objects.equals(node.getId(), that.node.getId());
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(startTime, processorId, node.getId());

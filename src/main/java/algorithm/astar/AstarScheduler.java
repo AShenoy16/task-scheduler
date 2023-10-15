@@ -15,7 +15,6 @@ public class AstarScheduler {
 
     private HashSet<Integer> openHash = new HashSet<>();
 
-    //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
 
     /**
@@ -26,11 +25,8 @@ public class AstarScheduler {
      * @return A complete schedule
      */
     public Schedule run(Graph graph, int numProcessors){
-        long startTimeNano = System.nanoTime();
-        long finishTimeNano;
 
         List<Schedule> newSchedules;
-        // TODO remove default constructor of CalculateCostFunction if possible (may need to extract methods + graph class is coupled)
         calculateCostFunction = new CalculateCostFunction(graph);
 
         // set bottom level values for every node
@@ -42,45 +38,37 @@ public class AstarScheduler {
         }
 
         List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
-        if(validEntryNodes.isEmpty()){
-            System.out.println("Why are entry nodes empty????");
-            return null;
-        }
 
-        List<Node> sortedList =  calculateCostFunction.getSortedBottomLevel();
+
+        // create initial schedules and add to priority queue
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         while (open.size() != 0){
+            // pop top schedule from queue
             Schedule partialSchedule = open.poll();
 
             if(partialSchedule.isCompleteSchedule(graph)){
-                finishTimeNano = System.nanoTime();
-                System.out.println("Elapsed Time (Nanoseconds): " + (finishTimeNano - startTimeNano) + " ns");
                 open.clear();
                 return partialSchedule;
             }
 
             // sort the freeNodes by bottomLevel
-
             List<Node> sortedNodes = partialSchedule.getFreeNodes(graph)
                     .stream()
                     .sorted(Comparator.comparingInt(node -> calculateCostFunction.bottomLevelofNode(node)))
                     .toList();
 
 
+            // create new schedules
             newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph);
-//            newSchedules = createPartialSchedulesThreads(partialSchedule.getFreeNodes(graph), numProcessors, 4, partialSchedule, graph, executorService);
 
             open.addAll(newSchedules);
-            // adds hashes
 
-            //TODO if messes up parallelization, just do normal for each
-            newSchedules.parallelStream().forEach(schedule -> openHash.add(schedule.hashCode()));
+            // add all hashes to openHash
+            newSchedules.forEach(schedule -> openHash.add(schedule.hashCode()));
         }
-        
-        //TODO add proper fail state?
+
         return null;
     }
 
@@ -112,7 +100,7 @@ public class AstarScheduler {
      * @param numOfProcessors The number of processors
      * @param schedule The existing schedule
      * @param graph The graph
-     * @return A new list of partial schedules with the an additional task added
+     * @return A new list of partial schedules with an additional task added
      */
     public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph){
         // create empty list of schedules, parent nodes and new tasks to add
@@ -120,15 +108,10 @@ public class AstarScheduler {
         List<Node> parentNodes;
         List<Task> newTasks;
 
-        // maybe instead of creating free tasks everytime we make a queue or something
 
-        //TODO optimise
+        // go through each free task and perform expansion
         for(Node validNode : validNodes){
             parentNodes = graph.getParentNodes(validNode);
-
-//            if(validNode.getId() == 11){
-//                System.out.println("HERE");
-//            }
 
             int earliestStartTimeForProcessor;
             int latestParentStartTime;
@@ -151,9 +134,7 @@ public class AstarScheduler {
                         int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-                        // failing here
 
-                        // since
                         if(task.getProcessor() == processorID){
                             latestParentStartTime = Math.max(latestParentStartTime, task.getFinishTime());
                         } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
@@ -168,96 +149,39 @@ public class AstarScheduler {
                 // Add task
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
+
+                // calculate gap times
                 int gapStartTime = 0;
-                for(Task task1 : newTasks){
-                    if(task1.getProcessor() == processorID){
-                        gapStartTime = Math.max(gapStartTime, task1.getFinishTime());
+                for(Task newTask : newTasks){
+                    if(newTask.getProcessor() == processorID){
+                        gapStartTime = Math.max(gapStartTime, newTask.getFinishTime());
                     }
                 }
                 int gapTime = earliestTimeTaskCanStart - gapStartTime;
 
                 newTasks.add(task);
-//                Collections.sort(newTasks,  Comparator.comparing(Task::getProcessor));
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
                 newlyMadeSchedule.setGapTimes(schedule.getGapTimes() + gapTime);
 
-                // Set cost
-                calculateCostFunction.setScheduleCost(newlyMadeSchedule);
-//                if(task.getNode().getId() == 13 && newlyMadeSchedule.getCost() == 145){
-//                    System.out.println("Yuh");
-//                }
-//
-//                // works here
-//                if(task.getNode().getId() == 2 && newlyMadeSchedule.getTasks().size() == 2){
-//                    System.out.println("Yuh");
-//                }
-//
-//                //3rd node
-//                //works here just 0 -> 3 -> 2
-//                if(task.getNode().getId() == 3 && newlyMadeSchedule.getTasks().size() == 3){
-//                    System.out.println("Yuh");
-//                }
-//
-//                //works here just different order
-//                if(task.getNode().getId() == 1 && newlyMadeSchedule.getTasks().size() == 4){
-//                    System.out.println("Yuh");
-//                }
-//
-//
-//                //works here just different order
-//                if(task.getNode().getId() == 4 && newlyMadeSchedule.getTasks().size() == 5 && earliestStartTimeForProcessor == 57){
-//                    System.out.println("Yuh");
-//                }
-//
-//                // fine different order
-//                if(task.getNode().getId() == 6 && newlyMadeSchedule.getTasks().size() == 6 && earliestStartTimeForProcessor == 97){
-//                    System.out.println("Yuh");
-//                }
-//
-//                //works here different order
-//                if(task.getNode().getId() == 8 && newlyMadeSchedule.getTasks().size() == 7 && earliestStartTimeForProcessor == 107){
-//                    System.out.println("Yuh");
-//                }
-//
-//                //works different order
-//                if(task.getNode().getId() == 9 && newlyMadeSchedule.getTasks().size() == 8 && earliestStartTimeForProcessor == 120){
-//                    System.out.println("Yuh");
-//                }
-
-
-
-//                if(task.getNode().getId() == 1 && newlyMadeSchedule.getCost() == 57 && newlyMadeSchedule.getTasks().size() == 4){
-//                    System.out.println("Yuh");
-//                }
-
-                // if not valid skip
-
-                // if both of them are true valid schedule and add to new schedules
-                // if one of them isn't true, predicate is true and go to next iteration
-//
-//                 Prune 2: remove any invalid schedules
-//                if(!(newlyMadeSchedule.isValidScheduleNoOverlap() && newlyMadeSchedule.isValidScheduleSatisfyDependencies(graph))){
-//                    continue;
-//
-//                }
+                // Prune 1:
+                // check if it's a valid schedule
 
                 if(!newlyMadeSchedule.isValid(graph)){
                     continue;
                 }
 
-//                if present in either closed or open list, discard the state
-//                 Prune 2: removes any duplicates
-
                 int hash = newlyMadeSchedule.hashCode();
-////
-////                //TODO find faster way to check if it's in open
+
+                // Prune 2:
+                // remove duplicates
                 if(closed.contains(hash) || openHash.contains(hash)){
                     continue;
                 }
 
 
+                // Set cost
+                calculateCostFunction.setScheduleCost(newlyMadeSchedule);
 
-                // not present in closed or open and valid -> add to newSchedules(open)
 
                 newSchedules.add(newlyMadeSchedule);
 
@@ -271,172 +195,5 @@ public class AstarScheduler {
         return newSchedules;
 
     }
-
-    public List<Schedule> createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph, ExecutorService executorService){
-        int size = validNodes.size();
-        int chunkSize = (int) Math.ceil((double) size / numThreads);
-
-        // Create a list of Callable tasks
-        List<Callable<List<Schedule>>> tasks = new ArrayList<>();
-        List<Schedule> schedules = new ArrayList<>();
-
-        for (int i = 0; i < numThreads; i++) {
-            int startIndex = i * chunkSize;
-            int endIndex = Math.min((i + 1) * chunkSize, size);
-
-            if (startIndex >= endIndex) {
-                break; // No more tasks to create
-            }
-
-//            List<Node> threadNodes = validNodes.subList(startIndex, endIndex);
-            tasks.add(() -> new MyCallable(validNodes.subList(startIndex, endIndex), numOfProcessors, schedule, graph).call());
-        }
-
-        try {
-            // Invoke all tasks and collect results
-            List<Future<List<Schedule>>> futures = executorService.invokeAll(tasks);
-            for (Future<List<Schedule>> future : futures) {
-                schedules.addAll(future.get());
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        return schedules;
-//        List<Schedule> schedules = new ArrayList<>();
-//        List<List<Node>> threadNodes = new ArrayList<>();
-//        int size = validNodes.size();
-//        int chunkSize = (int) Math.ceil((double) size / numThreads);
-//
-//        // Split valid nodes between the threads equally
-//        for (int i = 0; i < size; i += chunkSize) {
-//            int end = Math.min(size, i + chunkSize);
-//            threadNodes.add(validNodes.subList(i, end));
-//        }
-//
-//        // Assign thread the different nodes
-//        try {
-//            List<Callable<List<Schedule>>>tasks = new ArrayList<>();
-////            List<Future<List<Schedule>>> futures;
-//            for (int i = 0; i < numThreads; i++) {
-//                if(i >= threadNodes.size()){
-//                    break;
-//                }
-//                tasks.add(new MyCallable(threadNodes.get(i), numOfProcessors, schedule, graph));
-//            }
-//
-////            futures = executorService.invokeAll(tasks);
-//            // Wait for all threads to run before running main thread
-////            executorService.shutdown();
-////            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-//
-//            for (Future<List<Schedule>> future : executorService.invokeAll(tasks)) {
-//                schedules.addAll(future.get());
-//            }
-//
-//            return schedules;
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
-    }
-
-    class MyCallable implements Callable<List<Schedule>> {
-        private List<Node> validNodes;
-        private int numOfProcessors;
-        private Schedule schedule;
-        private Graph graph;
-
-        public MyCallable(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph) {
-            this.validNodes = validNodes;
-            this.numOfProcessors = numOfProcessors;
-            this.schedule = schedule;
-            this.graph = graph;
-        }
-
-        @Override
-        public List<Schedule> call() {
-            // Perform some computation on the sublist
-            return createPartialSchedules(validNodes, numOfProcessors, schedule, graph);
-        }
-    }
-
-//    public List<Schedule> expansion(int numOfProcessors, Schedule schedule, Graph graph) {
-//        List<Schedule> newSchedules = new ArrayList<>();
-//        List<Node> freeTaskNodes = schedule.getFreeNodes(graph);
-//
-//        for (Node node : freeTaskNodes) {
-//            // Iterate through all available processors
-//            for (int processor = 1; processor <= numOfProcessors; processor++) {
-//                int earliestStartTimeForProcessor = schedule.getEarliestStartTimeForProcessor(processor);
-//                int latestParentStartTime = schedule.getLatestParentStartTime(node, graph);
-//                int earliestTimeTaskCanStart = Math.max(earliestStartTimeForProcessor, latestParentStartTime);
-//
-//                // Create a new task for the free node scheduled on the current processor
-//                Task task = new Task(node, earliestTimeTaskCanStart, earliestTimeTaskCanStart + node.getVal(), processor);
-//
-//                // Clone the existing schedule and add the new task
-//                List<Task> newTasks = new ArrayList<>(schedule.getTasks());
-//                newTasks.add(task);
-//                Schedule newSchedule = new Schedule(newTasks, numOfProcessors);
-//
-//                // Calculate and set the cost for the new schedule
-//                calculateCostFunction.setScheduleCost(newSchedule);
-//
-//                // Add the new schedule to the list
-//                newSchedules.add(newSchedule);
-//            }
-//        }
-//
-//        return newSchedules;
-//    }
-
-//
-//
-//
-//
-//    public void createPartialSchedulesThreads(List<Node> validNodes, int numOfProcessors, int numThreads, Schedule schedule, Graph graph){
-//        List<List<Node>> threadNodes = new ArrayList<>();
-//        int size = validNodes.size();
-//        int chunkSize = (int) Math.ceil((double) size / numThreads);
-//
-//        // Split valid nodes between the threads equally
-//        for (int i = 0; i < size; i += chunkSize) {
-//            int end = Math.min(size, i + chunkSize);
-//            threadNodes.add(validNodes.subList(i, end));
-//        }
-//
-//
-//        // Assign thread the different nodes
-//        try {
-//            var threads = new ArrayList<Thread>();
-//
-//            for (int i = 0; i < numThreads; i++) {
-//                // Can probably optimise this
-//                if(i > threadNodes.size()){
-//                    break;
-//                }
-//                var thread = new Thread(() -> {
-//                    // Not 100% sure if this will work
-//                    createPartialSchedules(threadNodes.get(i), numOfProcessors, schedule, graph);
-//                });
-//
-//                threads.add(thread);
-//                thread.start();
-//            }
-//
-//            // Wait for all threads to run before running main thread
-//            for (var thread : threads) {
-//                thread.join();
-//            }
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
-//    }
 
 }
