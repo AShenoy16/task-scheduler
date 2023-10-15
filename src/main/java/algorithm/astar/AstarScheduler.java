@@ -9,31 +9,26 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class AstarScheduler {
-
     private PriorityQueue<Schedule> open = new PriorityQueue<>(new CostFunctionComparator());
     private HashSet<Integer> closed = new HashSet<>();
-
     private HashSet<Integer> openHash = new HashSet<>();
 
     //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
 
     /**
-     * This runs the Astar algorithm on a input graph and number of processors
+     * This runs the Astar algorithm on an input graph and number of processors
      *
      * @param graph The input graph
      * @param numProcessors The number of processors
      * @return A complete schedule
      */
     public Schedule run(Graph graph, int numProcessors){
-        long startTimeNano = System.nanoTime();
-        long finishTimeNano;
-
         List<Schedule> newSchedules;
         calculateCostFunction = new CalculateCostFunction(graph);
 
-        // set bottom level values for every node
-        // create dependencies for every entry node
+        // Set bottom level values for every node
+        // Create dependencies for every entry node
         for (Node entryNode : graph.getStartNodes()) {
             calculateCostFunction.setBottomLevelMap(entryNode);
             graph.createDependencies(entryNode);
@@ -41,7 +36,6 @@ public class AstarScheduler {
         }
 
         List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
-
 
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
@@ -54,19 +48,19 @@ public class AstarScheduler {
                 return partialSchedule;
             }
 
-            // sort the freeNodes by bottomLevel
+            // Sort the freeNodes by bottomLevel
             List<Node> sortedNodes = partialSchedule.getFreeNodes(graph)
                     .stream()
                     .sorted(Comparator.comparingInt(node -> calculateCostFunction.bottomLevelofNode(node)))
                     .toList();
 
 
-            // create new schedules
+            // Create new schedules
             newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph);
 
             open.addAll(newSchedules);
 
-            // add all hashes to openHash
+            // Add all hashes to openHash
             newSchedules.forEach(schedule -> openHash.add(schedule.hashCode()));
         }
 
@@ -109,8 +103,6 @@ public class AstarScheduler {
         List<Node> parentNodes;
         List<Task> newTasks;
 
-
-        // go through each free task and perform expansion
         for(Node validNode : validNodes){
             parentNodes = graph.getParentNodes(validNode);
 
@@ -135,7 +127,6 @@ public class AstarScheduler {
                         int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][validNode.getId()];
 
                         // if the parent task processor is the same as the current processor we are in, then there will be no edge weight value added
-
                         if(task.getProcessor() == processorID){
                             latestParentStartTime = Math.max(latestParentStartTime, task.getFinishTime());
                         } else if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
@@ -153,40 +144,37 @@ public class AstarScheduler {
 
                 // calculate gap times
                 int gapStartTime = 0;
+
                 for(Task newTask : newTasks){
                     if(newTask.getProcessor() == processorID){
                         gapStartTime = Math.max(gapStartTime, newTask.getFinishTime());
                     }
                 }
-                int gapTime = earliestTimeTaskCanStart - gapStartTime;
 
+                //Get gap time
+                int gapTime = earliestTimeTaskCanStart - gapStartTime;
                 newTasks.add(task);
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+
+                //Add gap time
                 newlyMadeSchedule.setGapTimes(schedule.getGapTimes() + gapTime);
 
                 // Prune 1:
                 // check if it's a valid schedule
-
                 if(!newlyMadeSchedule.isValid(graph)){
                     continue;
                 }
 
+                // Remove any duplicate schedules
                 int hash = newlyMadeSchedule.hashCode();
-
-                // Prune 2:
-                // check if in open or closed
                 if(closed.contains(hash) || openHash.contains(hash)){
                     continue;
                 }
 
-
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
 
-
                 newSchedules.add(newlyMadeSchedule);
-
-
             }
         }
 
@@ -194,7 +182,6 @@ public class AstarScheduler {
         closed.add(schedule.hashCode());
 
         return newSchedules;
-
     }
 
 }
