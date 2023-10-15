@@ -21,6 +21,7 @@ public class PartialSolution {
      * Partial solution for the first root level node
      * @param scheduledTask the scheduled task of this partial solution
      * @param numProcessors number of processors that can perform this task
+     * @param cost cost value of the partial solution
      */
     public PartialSolution(ScheduledTask scheduledTask, int numProcessors, int cost){
         this.visitedNodes = new ArrayList<>();
@@ -92,12 +93,12 @@ public class PartialSolution {
         this.cost = cost;
     }
 
+
     /**
-     * Todo
+     * Method checks if partial solutions satisfies all dependencies
      * @param graph
      * @return
      */
-    // checks if partial solution satisfies dependencies
     public boolean isValidScheduleSatisfyDependencies(Graph graph){
 
         for(Task task: allTasks){
@@ -106,12 +107,11 @@ public class PartialSolution {
             List<Node> dependencies = graph.getDependenciesByNode(node);
 
             for(Node dependency: dependencies){
-                // if parent on the same processor as child
-                // make sure dependency finish time > task start time
-                // no communication cost
+
 
                 Task task1 = getTaskByNode(dependency);
 
+                // no task check
                 if(task1 == null){
                     return false;
                 }
@@ -124,10 +124,7 @@ public class PartialSolution {
                     }
 
                 }else{
-                    // Parent, child on different processors, need to account for
-                    // communication cost
-
-                    //get the edge weight from parent to child from the graph
+                    // Parent, child on different processors account for communication cost
 
                     int edgeWeight = graph.getAdjacencyMatrix()[task1.getNode().getId()][task.getNode().getId()];
 
@@ -143,7 +140,7 @@ public class PartialSolution {
     }
 
     /**
-     * Todo
+     * Method gets the task by it's Node in the partial solution
      * @param node
      * @return
      */
@@ -157,7 +154,7 @@ public class PartialSolution {
     }
 
     /**
-     * Todo
+     * Method gets the task by it's processor
      * @param processorId
      * @return
      */
@@ -176,7 +173,7 @@ public class PartialSolution {
     }
 
     /**
-     * Todo
+     * Method checks if any schedules overlap[
      * @return
      */
     public boolean isValidScheduleNoOverlap(){
@@ -189,7 +186,7 @@ public class PartialSolution {
                 Task currentTask = sortedTasks.get(j);
                 Task nextTask = sortedTasks.get(j + 1);
 
-                //make sure there's no overlap
+                // condition to check no overlap
                 if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
                         currentTask.getFinishTime() <= nextTask.getStartTime() &&
                         nextTask.getStartTime() < nextTask.getFinishTime())) {
@@ -206,8 +203,8 @@ public class PartialSolution {
     }
 
     /**
-     * Todo
-     * @param graph
+     * Method checks if partial solution is valid
+     * @param graph the current graph
      * @return
      */
     public boolean isValid(Graph graph) {
