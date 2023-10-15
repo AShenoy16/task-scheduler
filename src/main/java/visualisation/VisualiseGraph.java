@@ -38,26 +38,27 @@ public class VisualiseGraph extends FxViewer {
     /**
      * Visualize traversal of a schedule
      */
-    public void visualizeQueuedSchedule() {
+    public boolean visualizeQueuedSchedule() {
         if (nodeIndex > n + 2) {
+            if (partialSolutionQueue.isEmpty()) {
+                return false;
+            }
             nodeIndex = 0;
             nodes = partialSolutionQueue.poll().getVisitedNodes();
             resetNodeColours();
-            return;
         }
 
         if (nodeIndex < n) {
             org.graphstream.graph.Node node = graph.getNode(String.valueOf(nodes.get(nodeIndex).getId()));
-            node.setAttribute("ui.style", "fill-color: #4895EF;");
-        }
-
-        if (nodeIndex == n-1) {
-            for (org.graphstream.graph.Node node : graph) {
-                node.setAttribute("ui.style", "stroke-color:#B4F89E;");
+            if (nodeIndex > 0) {
+                org.graphstream.graph.Node prevNode = graph.getNode(String.valueOf(nodes.get(nodeIndex-1).getId()));
+                prevNode.setAttribute("ui.style", "fill-color: #4895EF;");
             }
+            node.setAttribute("ui.style", "fill-color: #03DAC6;");
         }
 
         nodeIndex++;
+        return true;
     }
 
     /**
