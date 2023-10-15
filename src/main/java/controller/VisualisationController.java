@@ -88,11 +88,9 @@ public class VisualisationController {
     private int numProcessors;
     private int numCores;
     private boolean isParallel;
-    private String[] processorNames;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
-    private ScheduledExecutorService scheduledExecutorServiceGraph;
     private ScheduledExecutorService scheduledExecutorServiceParallel;
 
     private double currentScale = 1.0;

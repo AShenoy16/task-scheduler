@@ -130,7 +130,8 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
 
-                // print path on console
+                controller.queuePartialSolution(partialSolution);
+
                 printCurrentPath(currentTask);
 
                 // update thread times
