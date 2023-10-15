@@ -43,6 +43,8 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        stage.setOnCloseRequest(e -> System.exit(0));
+
     }
 
     public void runVisualisation(SchedulingOptions options) {
