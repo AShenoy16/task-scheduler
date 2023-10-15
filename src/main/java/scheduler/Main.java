@@ -14,7 +14,7 @@ import model.Schedule;
 public class Main {
     public static void main(String[] args) {
 
-        var options = CMDArgumentHandler.getSchedulingOptions(args);
+        SchedulingOptions options = CMDArgumentHandler.getSchedulingOptions(args);
         if (options.isVisualised) {
             visualise(options);
             return;
