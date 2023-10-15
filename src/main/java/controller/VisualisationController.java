@@ -6,6 +6,7 @@ import algorithm.branchandbound.PartialSolution;
 import algorithm.branchandbound.ScheduledTask;
 import com.sun.management.OperatingSystemMXBean;
 import io.IOHandler;
+import io.SchedulingOptions;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -104,6 +105,7 @@ public class VisualisationController {
     private int numProcessors;
     private int numCores;
     private boolean isParallel;
+    private Graph graph;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
@@ -112,20 +114,18 @@ public class VisualisationController {
     private double currentScale = 1.0;
     private double minScale = 0.65;
     private double maxScale = 1.025;
-
-    private boolean isFinished = false;
     private BranchAndBoundAlgorithm bnb;
     private int timerCounter;
     private org.graphstream.graph.Graph graphS;
 
     @FXML
-    public void initialize() {
+    public void initialize(SchedulingOptions options) {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
-        Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        numProcessors = 2;
-        numCores = 4;
-        isParallel = true;
+        graph = io.readDot(directory + options.inputFileName);
+        numProcessors = options.numProcessors;
+        numCores = options.numCores;
+        isParallel = options.isParallel;
 
         if (isParallel) {
             bnb = new BranchAndBoundParallel();
@@ -181,6 +181,9 @@ public class VisualisationController {
 
     }
 
+    public void configureOptions(SchedulingOptions options) {
+
+    }
 
     @FXML
     public void handleZoom(ScrollEvent event) {

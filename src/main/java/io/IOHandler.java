@@ -46,11 +46,15 @@ public class IOHandler {
             return new Graph(nodes, edges);
 
         } catch (IOException e) {
-            System.out.println(e);
+            throw new RuntimeException("Ensure the input dot graph is valid");
         }
-        return null;
     }
 
+    /**
+     * Construct a String containing all edges to add to output file.
+     *
+     * @param edge edge to add to String
+     */
     private void appendToEdgesString(String edge) {
         edgesString += edgesString.isEmpty() ? "\t" + edge : "\n" + "\t" + edge;
     }
@@ -61,7 +65,6 @@ public class IOHandler {
      * @param schedule schedule to create output file from
      * @param fileName file name of the output file
      */
-    // TODO after cmd arguments completed: Output file name (INPUT-output.dot or custom)
     public void writeDot(Schedule schedule, String fileName) {
         try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)))) {
             bw.write("digraph \"" + fileName + "\" {");
@@ -80,7 +83,7 @@ public class IOHandler {
             bw.write("}");
 
         } catch (IOException e) {
-            System.out.println(e);
+            throw new RuntimeException("Encountered error while creating output file");
         }
     }
 }

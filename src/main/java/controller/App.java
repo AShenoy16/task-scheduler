@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.IOException;
+
+import io.SchedulingOptions;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -29,8 +31,11 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+    }
+
+    public void runVisualisation(SchedulingOptions options) {
         Platform.runLater(() -> {
-            visualisationController.initialize();
+            visualisationController.initialize(options);
         });
     }
 

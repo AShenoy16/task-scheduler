@@ -1,9 +1,12 @@
 package scheduler;
+import algorithm.astar.AstarParallel;
 import algorithm.astar.AstarScheduler;
 import com.sun.javafx.application.PlatformImpl;
 import controller.App;
 import controller.VisualisationController;
+import io.CMDArgumentHandler;
 import io.IOHandler;
+import io.SchedulingOptions;
 import model.Graph;
 import javafx.stage.Stage;
 import model.Schedule;
@@ -11,70 +14,40 @@ import model.Schedule;
 public class Main {
     public static void main(String[] args) {
 
-        visualise();
-
-
-        int argsLength = args.length;
-        if (args == null || argsLength < 2) {
-            throw new RuntimeException("InputFileName or numProcessors arguments not supplied");
-        }
-        String inputFileName = args[0];
-        String outputFileName = inputFileName + "-output.dot";
-
-        // remove .dot extension from input file name when including in output file name
-        int lastDotIndex = inputFileName.lastIndexOf('.');
-        if (lastDotIndex > 0) {
-            // Remove the file extension
-            outputFileName = inputFileName.substring(0, lastDotIndex) + "-output.dot";
-        }
-
-        int numProcessors = Integer.parseInt(args[1]);
-
-        if(argsLength > 2){
-            //Get option arguments
-            String customName =getOutputFileName(args);
-            if(customName != null){
-                outputFileName = customName;
-            }
+        var options = CMDArgumentHandler.getSchedulingOptions(args);
+        if (options.isVisualised) {
+            visualise(options);
+            return;
         }
 
         System.out.println("Starting schedule creation...");
 
         IOHandler io = new IOHandler();
-        Graph graph = io.readDot(inputFileName);
-        AstarScheduler scheduler = new AstarScheduler();
-        Schedule schedule = scheduler.run(graph, numProcessors);
+        Graph graph = io.readDot(options.inputFileName);
 
-        io.writeDot(schedule, outputFileName);
+        Schedule schedule;
+        if (options.isParallel) {
+            AstarParallel parallelScheduler = new AstarParallel();
+            schedule = parallelScheduler.run(graph, options.numProcessors, options.numCores);
+        } else {
+            AstarScheduler sequentialScheduler = new AstarScheduler();
+            schedule = sequentialScheduler.run(graph, options.numProcessors);
+        }
+
+        io.writeDot(schedule, options.outputFileName);
 
         System.out.println("created!");
-
-        // just for us to see memory usage
-        printMemoryUsage();
     }
 
-    public static void visualise(){
+    public static void visualise(SchedulingOptions options){
         PlatformImpl.startup(() -> {
             App visualisation = new App();
             try {
                 visualisation.start(new Stage());
+                visualisation.runVisualisation(options);
             } catch (Exception e) {
                 e.printStackTrace();
             }});
-    }
-    private static String getOutputFileName(String[] args) {
-        for (int i = 2; i < args.length; i++) {
-            if (args[i].equals("-o")) {
-                if(i + 1 < args.length){
-                    // get output file
-                    return args[i + 1] + ".dot";
-                } else {
-                    // this throws when empty string after -o
-                    throw new RuntimeException("Output filename not specified");
-                }
-            }
-        }
-        return null;
     }
 
     private static void printMemoryUsage() {
