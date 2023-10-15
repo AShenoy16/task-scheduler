@@ -18,6 +18,8 @@ public class VisualiseGraph extends FxViewer {
 
     /**
      * Constructor for visualise graph
+     * @param graph graphstream class graph
+     * @param threadingModel thread on where graph is loaded
      */
     public VisualiseGraph(org.graphstream.graph.Graph graph, Viewer.ThreadingModel threadingModel) {
         super(graph, threadingModel);
