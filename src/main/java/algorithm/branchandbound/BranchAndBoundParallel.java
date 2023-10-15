@@ -249,7 +249,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
      * @return true if dependencies of destNode is full visited, false if not
      */
     private boolean isFullyVisited(PartialSolution partialSolution, Node destNode) {
-        for (int row = 0; row < graph.getN(); row++) {
+        for (int row = 0; row < graph.getNumberOfNodes(); row++) {
             // 'row' being source node, 'destNode' being dest, check if source node is fully visited
             if (graph.getAdjacencyMatrix()[row][destNode.getId()] != 0 && !partialSolution.getVisitedNodes().contains(graph.getNodes()[row])) {
                 return false;
