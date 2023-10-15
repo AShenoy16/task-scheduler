@@ -9,11 +9,11 @@ import java.util.Objects;
  * This ScheduleTask class essentially represents a node with more attributes.
  */
 public class ScheduledTask {
-    private int startTime;
-    private int processorId;
-    private Node node;
-    private ScheduledTask parent;
-    private int taskLength;
+    private final int startTime;
+    private final int processorId;
+    private final Node node;
+    private final ScheduledTask parent;
+    private final int taskLength;
 
     public ScheduledTask(int startTime, int processorId, Node node,ScheduledTask parent, int taskLength){
         this.startTime = startTime;

@@ -16,6 +16,11 @@ public class VisualiseGraph extends FxViewer {
     private int nodeIndex;
     private List<Node> nodes;
 
+    /**
+     * Constructor for visualise graph
+     * @param graph graphstream class graph
+     * @param threadingModel thread on where graph is loaded
+     */
     public VisualiseGraph(org.graphstream.graph.Graph graph, Viewer.ThreadingModel threadingModel) {
         super(graph, threadingModel);
         this.graph = graph;
@@ -24,6 +29,9 @@ public class VisualiseGraph extends FxViewer {
         initialiseLabels();
     }
 
+    /**
+     * Set node styling in graph
+     */
     public void initialiseLabels() {
         for (org.graphstream.graph.Node node : graph) {
             node.setAttribute("ui.label", node.getId() + "");
@@ -39,6 +47,7 @@ public class VisualiseGraph extends FxViewer {
      * Visualize traversal of a schedule
      */
     public boolean visualizeQueuedSchedule() {
+        // reset graph
         if (nodeIndex > n + 1) {
             if (partialSolutionQueue.isEmpty()) {
                 return false;
@@ -47,7 +56,7 @@ public class VisualiseGraph extends FxViewer {
             nodes = partialSolutionQueue.poll().getVisitedNodes();
             resetNodeColours();
         }
-
+        // traverse the nodes in schedule and update node colours
         if (nodeIndex < n) {
             org.graphstream.graph.Node node = graph.getNode(String.valueOf(nodes.get(nodeIndex).getId()));
             if (nodeIndex > 0) {

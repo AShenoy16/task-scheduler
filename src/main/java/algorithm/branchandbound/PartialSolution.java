@@ -10,30 +10,26 @@ import java.util.*;
  * The PartialSolution class is created everytime for every new schedule.
  */
 public class PartialSolution {
-    private List<Node> visitedNodes;
-    private Map<Node, List<ScheduledTask>> childrenQueue;
-    private int[] processorTimes;
-    private ScheduledTask scheduledTask;
-
+    private final List<Node> visitedNodes;
+    private final Map<Node, List<ScheduledTask>> childrenQueue;
+    private final int[] processorTimes;
+    private final ScheduledTask scheduledTask;
     private int cost;
-
-    private List<Task> allTasks;
-
-    private CalculateCostFunction calculateCostFunction;
+    private final List<Task> allTasks;
 
     /**
      * Partial solution for the first root level node
      * @param scheduledTask the scheduled task of this partial solution
      * @param numProcessors number of processors that can perform this task
+     * @param cost cost value of the partial solution
      */
-    public PartialSolution(ScheduledTask scheduledTask, int numProcessors, int cost, CalculateCostFunction calculateCostFunction){
+    public PartialSolution(ScheduledTask scheduledTask, int numProcessors, int cost){
         this.visitedNodes = new ArrayList<>();
         this.childrenQueue = new HashMap<>();
         this.scheduledTask = scheduledTask;
         this.processorTimes = new int[numProcessors];
         this.allTasks = new ArrayList<>();
         this.cost = cost;
-        this.calculateCostFunction = calculateCostFunction;
 
         // updates root node
         processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
@@ -41,20 +37,6 @@ public class PartialSolution {
         // add all scheduled tasks to task
         this.allTasks.add(scheduledTask.toTask());
     }
-
-//    public PartialSolution(ScheduledTask scheduledTask, int numProcessors){
-//        this.visitedNodes = new ArrayList<>();
-//        this.childrenQueue = new HashMap<>();
-//        this.scheduledTask = scheduledTask;
-//        this.processorTimes = new int[numProcessors];
-//        this.allTasks = new ArrayList<>();
-//
-//        // updates root node
-//        processorTimes[scheduledTask.getProcessorId()] = scheduledTask.getStartTime() + scheduledTask.getNode().getVal();
-//        this.visitedNodes.add(scheduledTask.getNode());
-//        // add all scheduled tasks to task
-//        this.allTasks.add(scheduledTask.toTask());
-//    }
 
     /**
      * Partial solution for child tasks
@@ -65,7 +47,6 @@ public class PartialSolution {
         this.childrenQueue = new HashMap<>();
         this.visitedNodes = new ArrayList<>();
         this.visitedNodes.addAll(parentPartialSolution.visitedNodes);
-        this.calculateCostFunction = calculateCostFunction;
 
         parentPartialSolution.childrenQueue.forEach((node, dependencyList) -> {
             childrenQueue.put(node, new ArrayList<>(dependencyList));
@@ -112,7 +93,12 @@ public class PartialSolution {
         this.cost = cost;
     }
 
-    // checks if partial solution satisfies dependencies
+
+    /**
+     * Method checks if partial solutions satisfies all dependencies
+     * @param graph
+     * @return
+     */
     public boolean isValidScheduleSatisfyDependencies(Graph graph){
 
         for(Task task: allTasks){
@@ -121,12 +107,11 @@ public class PartialSolution {
             List<Node> dependencies = graph.getDependenciesByNode(node);
 
             for(Node dependency: dependencies){
-                // if parent on the same processor as child
-                // make sure dependency finish time > task start time
-                // no communication cost
+
 
                 Task task1 = getTaskByNode(dependency);
 
+                // no task check
                 if(task1 == null){
                     return false;
                 }
@@ -139,10 +124,7 @@ public class PartialSolution {
                     }
 
                 }else{
-                    // Parent, child on different processors, need to account for
-                    // communication cost
-
-                    //get the edge weight from parent to child from the graph
+                    // Parent, child on different processors account for communication cost
 
                     int edgeWeight = graph.getAdjacencyMatrix()[task1.getNode().getId()][task.getNode().getId()];
 
@@ -157,7 +139,11 @@ public class PartialSolution {
 
     }
 
-
+    /**
+     * Method gets the task by it's Node in the partial solution
+     * @param node
+     * @return
+     */
     private Task getTaskByNode(Node node){
         for(Task task: allTasks){
             if(task.getNode().getId() == node.getId()){
@@ -167,6 +153,11 @@ public class PartialSolution {
         return null;
     }
 
+    /**
+     * Method gets the task by it's processor
+     * @param processorId
+     * @return
+     */
     private List<Task> getTaskByProcessor(int processorId){
 
         ArrayList<Task> processorTask = new ArrayList<>();
@@ -181,9 +172,11 @@ public class PartialSolution {
         return processorTask;
     }
 
-
+    /**
+     * Method checks if any schedules overlap[
+     * @return
+     */
     public boolean isValidScheduleNoOverlap(){
-
         for( int i = 0; i < processorTimes.length; i++){
             // loop through all the processors
             // get all the tasks on that processor
@@ -193,7 +186,7 @@ public class PartialSolution {
                 Task currentTask = sortedTasks.get(j);
                 Task nextTask = sortedTasks.get(j + 1);
 
-                //make sure there's no overlap
+                // condition to check no overlap
                 if (!(currentTask.getStartTime() < currentTask.getFinishTime() &&
                         currentTask.getFinishTime() <= nextTask.getStartTime() &&
                         nextTask.getStartTime() < nextTask.getFinishTime())) {
@@ -202,24 +195,27 @@ public class PartialSolution {
             }
 
         }
-
         return true;
-
     }
 
     public int getCost() {
         return cost;
     }
 
-    public boolean isValid(Graph graph){
+    /**
+     * Method checks if partial solution is valid
+     * @param graph the current graph
+     * @return
+     */
+    public boolean isValid(Graph graph) {
         return (isValidScheduleNoOverlap() && isValidScheduleSatisfyDependencies(graph));
     }
 
-
-
-
-    // hash code if two PartialSolution instances have exactly the same tasks
-    // (i.e., all the same nodes, on the same processors with the same start times) in the same order.
+    /**
+     * hash code if two PartialSolution instances have exactly the same tasks
+     * (i.e., all the same nodes, on the same processors with the same start times) in the same order.
+     * @return the hashcode of the allTasks list
+     */
     @Override
     public int hashCode() {
         return allTasks.hashCode();

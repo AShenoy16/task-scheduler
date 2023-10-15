@@ -31,7 +31,7 @@
                      <children>
                         <VBox alignment="CENTER" prefWidth="85.0">
                            <children>
-                              <Label fx:id="timerLabel" alignment="TOP_LEFT" prefHeight="71.0" prefWidth="190.0" styleClass="sectionValue" text="99:99:99" />
+                              <Label fx:id="timerLabel" alignment="TOP_LEFT" prefHeight="71.0" prefWidth="190.0" styleClass="sectionValue" text="00:00:00" />
                               <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Running Time" wrappingWidth="145.68972778320312">
                                  <font>
                                     <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
@@ -64,7 +64,7 @@
                      <children>
                         <VBox alignment="CENTER" prefWidth="85.0">
                            <children>
-                              <Label id="bestCurrentText" fx:id="bestCurrentText" alignment="TOP_LEFT" prefHeight="86.0" prefWidth="159.0" styleClass="sectionValue" stylesheets="@../css/visualisation.css" text="100" textOverrun="CENTER_WORD_ELLIPSIS">
+                              <Label id="bestCurrentText" fx:id="bestCurrentText" alignment="TOP_LEFT" prefHeight="86.0" prefWidth="159.0" styleClass="sectionValue" stylesheets="@../css/visualisation.css" text="0" textOverrun="CENTER_WORD_ELLIPSIS">
                                  <font>
                                     <Font size="24.0" />
                                  </font>
