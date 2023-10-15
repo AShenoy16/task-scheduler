@@ -15,7 +15,6 @@ public class AstarScheduler {
 
     private HashSet<Integer> openHash = new HashSet<>();
 
-    //TODO sort out CalculateCostFunction instances (maybe make into singleton?)
     private CalculateCostFunction calculateCostFunction;
 
     /**
@@ -26,8 +25,6 @@ public class AstarScheduler {
      * @return A complete schedule
      */
     public Schedule run(Graph graph, int numProcessors){
-        long startTimeNano = System.nanoTime();
-        long finishTimeNano;
 
         List<Schedule> newSchedules;
         calculateCostFunction = new CalculateCostFunction(graph);
@@ -43,10 +40,12 @@ public class AstarScheduler {
         List<Node> validEntryNodes = calculateCostFunction.getHighestBottomLevelNodes();
 
 
+        // create initial schedules and add to priority queue
         List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
 
         while (open.size() != 0){
+            // pop top schedule from queue
             Schedule partialSchedule = open.poll();
 
             if(partialSchedule.isCompleteSchedule(graph)){
