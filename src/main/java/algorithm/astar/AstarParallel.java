@@ -106,17 +106,17 @@ public class AstarParallel {
      * @return The optimal schedule
      */
     private Schedule getOptimalSchedule(Schedule schedule, int numProcessors, Graph graph) {
-        PriorityQueue<Schedule> open2 = new PriorityQueue<>(new CostFunctionComparator());
-        open2.add(schedule);
+        PriorityQueue<Schedule> localOpen = new PriorityQueue<>(new CostFunctionComparator());
+        localOpen.add(schedule);
 
-        while (open2.size() != 0) {
-            Schedule partialSchedule = open2.poll();
+        while (localOpen.size() != 0) {
+            Schedule partialSchedule = localOpen.poll();
             if(globalCost <= partialSchedule.getCost()){
-                open2.clear();
+                localOpen.clear();
                 return null;
             }
             if (partialSchedule.isCompleteSchedule(graph)) {
-                open2.clear();
+                localOpen.clear();
                 globalCost = partialSchedule.getCost();
                 return partialSchedule;
             }
@@ -126,7 +126,7 @@ public class AstarParallel {
                     .toList();
             List<Schedule> newSchedules = createPartialSchedules(sortedNodes, numProcessors, partialSchedule, graph);
 
-            open2.addAll(newSchedules);
+            localOpen.addAll(newSchedules);
             newSchedules.parallelStream().forEach(s -> openHash.add(s.hashCode()));
         }
 
