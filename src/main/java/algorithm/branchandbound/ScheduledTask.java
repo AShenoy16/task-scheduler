@@ -45,7 +45,13 @@ public class ScheduledTask {
     public int getTaskLength() {
         return taskLength;
     }
-    // if two schduledTasks have same startTime, processorId and node Id they're equivalent
+
+    /**
+     * Two scheduled tasks are equal if they have same
+     * start times, node Id and processor
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,7 +59,7 @@ public class ScheduledTask {
         ScheduledTask that = (ScheduledTask) o;
         return startTime == that.startTime && processorId == that.processorId && Objects.equals(node.getId(), that.node.getId());
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(startTime, processorId, node.getId());
