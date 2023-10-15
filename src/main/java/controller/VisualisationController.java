@@ -19,8 +19,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Text;
@@ -107,7 +108,6 @@ public class VisualisationController {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
         Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-
         numProcessors = 2;
         numCores = 4;
         isParallel = true;
