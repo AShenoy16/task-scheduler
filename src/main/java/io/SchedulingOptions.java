@@ -28,6 +28,6 @@ public class SchedulingOptions {
             throw new RuntimeException("Output filename not specified");
         }
 
-        outputFileName = arg.contains(".dot") ? arg : arg + ".dot";
+        outputFileName = arg + ".dot";
     }
 }
