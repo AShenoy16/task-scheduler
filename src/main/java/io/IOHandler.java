@@ -1,5 +1,6 @@
 package io;
 
+import algorithm.branchandbound.ScheduledTask;
 import model.*;
 
 import java.io.*;
@@ -72,6 +73,34 @@ public class IOHandler {
 
             for (Task t : schedule.getTasks()) {
                 bw.write("\t\t" + t.getNode().getId() + "\t" + "[" + "Weight=" + t.getNode().getVal() + ",Start=" + t.getStartTime() + ",Processor=" + t.getProcessor() + "];");
+                bw.newLine();
+            }
+
+            if (!edgesString.isEmpty()) {
+                bw.write(edgesString);
+                bw.newLine();
+            }
+
+            bw.write("}");
+
+        } catch (IOException e) {
+            throw new RuntimeException("Encountered error while creating output file");
+        }
+    }
+
+    /**
+     * This method writes the Branch and Bound schedule to an output dot file
+     * @param bnbSchedule the branch and bound schedule
+     * @param fileName to write to
+     */
+    public void bnbWriteDot(algorithm.branchandbound.Schedule bnbSchedule, String fileName) {
+        try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)))) {
+            bw.write("digraph \"" + fileName + "\" {");
+            bw.newLine();
+
+            for (ScheduledTask scheduledTask: bnbSchedule.getScheduledTaskList()) {
+
+                bw.write("\t\t" + scheduledTask.getNode().getId() + "\t" + "[" + "Weight=" + scheduledTask.getNode().getVal() + ",Start=" + scheduledTask.getStartTime() + ",Processor=" + scheduledTask.getProcessorId() + "];");
                 bw.newLine();
             }
 
