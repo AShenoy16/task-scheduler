@@ -155,7 +155,7 @@ public class VisualisationController {
 
         // initialise schedule charts and graphs beforehand
         initGraphVisualisation(graph);
-        initializeScheduleChart();
+        initializeCharts();
 
         // start cpu and memory updates
         timeline.play();
@@ -233,15 +233,22 @@ public class VisualisationController {
     /**
      * Initialises the schedule bar chart from the initialization of this application but before algo starts
      */
-    private void initializeScheduleChart() {
+    private void initializeCharts() {
         String[] processorNames = new String[numProcessors];
         processorStartTimes = new int[numProcessors];
         // initialises array of processor names
         for (int i = 0; i < numProcessors; i++) {
             processorNames[i] = "P" + i;
         }
-        // set processor names as x axis labels
+        // set processor names as x axis labels for schedule bar chart
         currentScheduleAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(processorNames)));
+
+        String[] threadNames = new String[numCores];
+        for (int i = 0; i < numCores; i++) {
+            threadNames[i] = "T" + i;
+        }
+        // set thread names as y-axis labels for parallel bar chart
+        parallelYAxis.setCategories(FXCollections.observableArrayList(Arrays.asList(threadNames)));
     }
 
     /**
