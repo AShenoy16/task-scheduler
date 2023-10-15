@@ -179,6 +179,7 @@ public class VisualisationController {
      * @param graph - input graph provided by user
      */
     private void initGraphVisualisation(Graph graph){
+        // convert custom graph class to GraphStream graph
         System.setProperty("org.graphstream.ui", "javafx");
         org.graphstream.graph.Graph graphS = new SingleGraph("bnb");
         Node[] nodes = graph.getNodes();
@@ -194,6 +195,7 @@ public class VisualisationController {
                 }
             }
         }
+        // display graph and set layout in javafx
         graphS.setAttribute("ui.stylesheet", "graph { fill-color: #282828; }");
         viewer = new VisualiseGraph(graphS, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
@@ -366,9 +368,9 @@ public class VisualisationController {
         MemoryUsage heapMemoryUsage = memoryBean.getHeapMemoryUsage();
         memoryUsage = (double) heapMemoryUsage.getUsed() / heapMemoryUsage.getMax();
 
+        // update the cpu and memory in UI
         cpuText.setText(String.format("%.2f", cpuUsage*100) + "%");
         memoryText.setText(String.format("%.2f", memoryUsage*100) + "%");
-
         updateCPU();
         updateMemory();
     }
