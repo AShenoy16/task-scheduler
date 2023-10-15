@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 public class AstarParallel {
     private CalculateCostFunction calculateCostFunction;
     private int globalCost = Integer.MAX_VALUE;
-    HashSet<Integer> closed = new HashSet<>();
-    HashSet<Integer> openHash = new HashSet<>();
+    private HashSet<Integer> closed = new HashSet<>();
+    private HashSet<Integer> openHash = new HashSet<>();
 
     /**
      * This runs the Astar algorithm using multiple threads in parallel on an input graph and number of processors
