@@ -13,8 +13,7 @@ import model.Schedule;
 public class Main {
     public static void main(String[] args) {
 
-        // Construct options from command line arguments
-        var options = CMDArgumentHandler.getSchedulingOptions(args);
+        SchedulingOptions options = CMDArgumentHandler.getSchedulingOptions(args);
         if (options.isVisualised) {
             // Run visualisation
             visualise(options);

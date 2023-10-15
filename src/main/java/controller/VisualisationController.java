@@ -126,6 +126,8 @@ public class VisualisationController {
         numCores = options.numCores;
         isParallel = options.isParallel;
 
+        updateHomeScreen(options.inputFileName, numProcessors, numCores, isParallel);
+
         if (isParallel) {
             bnb = new BranchAndBoundParallel();
             sequentialContainer.setVisible(false);
@@ -178,6 +180,17 @@ public class VisualisationController {
             }
         });
 
+    }
+
+    private void updateHomeScreen(String inputFileName, int numProcessors, int numCores, boolean isParallel) {
+        String argsLabel = "PROCESSORS - " + numProcessors + " | ";
+        if (isParallel) {
+            argsLabel += "CORES -" + numCores + " | PARALLEL - TRUE";
+        } else {
+            argsLabel += "PARALLEL - FALSE";
+        }
+        homeArgsLabel.setText(argsLabel);
+        homeGraphLabel.setText("GRAPH - " + inputFileName);
     }
 
     public void configureOptions(SchedulingOptions options) {
