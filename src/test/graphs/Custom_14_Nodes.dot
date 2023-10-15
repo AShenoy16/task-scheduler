@@ -1,0 +1,44 @@
+digraph "CUSTOM_TEST_14_NODES" {
+	0	 [Weight=50];
+	1	 [Weight=70];
+	2	 [Weight=90];
+	3	 [Weight=100];
+	4	 [Weight=40];
+	5	 [Weight=20];
+	6	 [Weight=100];
+	7	 [Weight=80];
+	8	 [Weight=50];
+	9	 [Weight=20];
+	10	 [Weight=20];
+    11   [Weight=22];
+	12	 [Weight=25];
+    13	 [Weight=27];
+	0 -> 1	 [Weight=9];
+	0 -> 2	 [Weight=7];
+	0 -> 3	 [Weight=34];
+	0 -> 4	 [Weight=24];
+	1 -> 4	 [Weight=10];
+	1 -> 5	 [Weight=7];
+	1 -> 6	 [Weight=5];
+	2 -> 7	 [Weight=5];
+	2 -> 8	 [Weight=3];
+	2 -> 9	 [Weight=10];
+	2 -> 11	 [Weight=3];
+	3 -> 10	 [Weight=4];
+	3 -> 11	 [Weight=10];
+	4 -> 12	 [Weight=8];
+	4 -> 6	 [Weight=10];
+	4 -> 7	 [Weight=10];
+	4 -> 8	 [Weight=48];
+	4 -> 9	 [Weight=7];
+	5 -> 12	 [Weight=20];
+	6 -> 7	 [Weight=15];
+	6 -> 8	 [Weight=8];
+	6 -> 9	 [Weight=9];
+	6 -> 13	 [Weight=8];
+	7 -> 13	 [Weight=2];
+    8 -> 9	 [Weight=5];
+    10 -> 11 [Weight=2];
+}
+
+
