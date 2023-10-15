@@ -47,6 +47,11 @@ public class App extends Application {
 
     }
 
+    @Override
+    public void stop() throws Exception {
+        System.exit(0);
+    }
+
     public void runVisualisation(SchedulingOptions options) {
         Platform.runLater(() -> {
             visualisationController.initialize(options);

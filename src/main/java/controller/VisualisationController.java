@@ -369,7 +369,7 @@ public class VisualisationController {
                             j.getNode().setStyle("-fx-background-color: #" +  colourCSS);
 
                             StackPane bar = (StackPane) j.getNode();
-                            Text dataText = new Text(j.getXValue().toString());
+                            Text dataText = new Text("CORE " + t.getName() + ": " + j.getXValue().toString());
                             dataText.getStyleClass().add("dataValue");
                             bar.getChildren().add(dataText);
                         });
