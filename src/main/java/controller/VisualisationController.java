@@ -190,8 +190,9 @@ public class VisualisationController {
         for (int i = 0; i < edges.length; i++) {
             for (int j = 0; j < edges.length; j++){
                 if (edges[i][j] != 0) {
-                    org.graphstream.graph.Edge edge = graphS.addEdge(i + "," + j, i, j);
-                    edge.setAttribute("ui.style", "fill-color: #EFEFEF; size: 8px;");
+                    org.graphstream.graph.Edge edge = graphS.addEdge(i + "," + j, i, j, true);
+                    edge.setAttribute("ui.style", "fill-color: #EFEFEF; size: 2px;");
+                    edge.setAttribute("ui.arrow-shape", "arrow;");
                 }
             }
         }
