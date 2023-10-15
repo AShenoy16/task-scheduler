@@ -47,6 +47,7 @@ public class VisualiseGraph extends FxViewer {
      * Visualize traversal of a schedule
      */
     public boolean visualizeQueuedSchedule() {
+        // reset graph
         if (nodeIndex > n + 1) {
             if (partialSolutionQueue.isEmpty()) {
                 return false;

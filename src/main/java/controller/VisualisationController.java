@@ -179,9 +179,11 @@ public class VisualisationController {
      * @param graph - input graph provided by user
      */
     private void initGraphVisualisation(Graph graph){
-        // convert custom graph class to GraphStream graph
+        // initialise GraphStream graph
         System.setProperty("org.graphstream.ui", "javafx");
         org.graphstream.graph.Graph graphS = new SingleGraph("bnb");
+
+        // convert custom graph class, nodes and edges to graphstream graph
         Node[] nodes = graph.getNodes();
         for (Node value : nodes) {
             graphS.addNode(String.valueOf(value.getId()));
