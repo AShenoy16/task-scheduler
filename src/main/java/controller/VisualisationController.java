@@ -120,9 +120,8 @@ public class VisualisationController {
 
     @FXML
     public void initialize(SchedulingOptions options) {
-        final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
-        graph = io.readDot(directory + options.inputFileName);
+        graph = io.readDot(options.inputFileName);
         numProcessors = options.numProcessors;
         numCores = options.numCores;
         isParallel = options.isParallel;
