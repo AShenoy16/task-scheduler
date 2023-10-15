@@ -24,7 +24,7 @@ public class Schedule {
         this.shortestPath = shortestPath;
     }
 
-
-
-
+    public List<ScheduledTask> getScheduledTaskList() {
+        return scheduledTaskList;
+    }
 }
