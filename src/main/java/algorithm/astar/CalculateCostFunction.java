@@ -10,9 +10,12 @@ import java.util.*;
 
 import static java.lang.Math.max;
 
+
+/**
+ * This class is used to calculate the cost function for our astar algorithm
+ */
 public class CalculateCostFunction {
-    // possibly make this class a singleton - reasoning - because we will need to use the getScheduleCost method
-    // Maybe make method into a static method?
+
     private Graph graph;
     private HashMap<Node,Integer> bottomLevelMap = new HashMap<>();
 
@@ -20,19 +23,13 @@ public class CalculateCostFunction {
         return bottomLevelMap;
     }
 
+    /**
+     * Default constructor
+     */
     public CalculateCostFunction() {}
 
     public CalculateCostFunction(Graph graph) {
         this.graph = graph;
-    }
-
-    private static CalculateCostFunction instance;
-
-    public static CalculateCostFunction getInstance(Graph graph) {
-        if (instance == null) {
-            instance = new CalculateCostFunction(graph);
-        }
-        return instance;
     }
 
     /**
@@ -74,11 +71,12 @@ public class CalculateCostFunction {
 
         for (Task task: tasks){
             int startTime = task.getStartTime();
-            // calculate lower bound
             // heuristic = max(start time of scheduled tasks plus their bottom level)
             cost = Math.max(cost, startTime + bottomLevelMap.get(task.getNode()));
 
         }
+
+        // this calculates the idle time for a scheduler
         int sumOfNodeWeights = 0;
         int trailTimes = 0;
         int idleTimeHeuristic = 0;
@@ -95,15 +93,21 @@ public class CalculateCostFunction {
                 sumOfNodeWeights += task.getNode().getVal();
             }
             // ending trailtimes for a specific processor
-            // will be zero for the processor with the latest scheduled task
             trailTimes += currentSchedule.getFinishTime() - maxFinishTime;
         }
 
         // idle time from equation
         idleTimeHeuristic = (currentSchedule.getGapTimes() + trailTimes + sumOfNodeWeights)/currentSchedule.getNumProcessors();
+
+        //set cost value to be max of bottom level and heuristic
+
         currentSchedule.setCost(Math.max(cost, idleTimeHeuristic));
     }
 
+    /**
+     * This set the cost value for a partial solution via bottom levels
+     * @param partialSolution
+     */
     public void setPartialSolutionCost(PartialSolution partialSolution){
         int cost = 0;
         List<Task> tasks = partialSolution.getAllTasks();
