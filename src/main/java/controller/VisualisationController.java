@@ -21,6 +21,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Text;
@@ -88,11 +90,9 @@ public class VisualisationController {
     private int numProcessors;
     private int numCores;
     private boolean isParallel;
-    private String[] processorNames;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
-    private ScheduledExecutorService scheduledExecutorServiceGraph;
     private ScheduledExecutorService scheduledExecutorServiceParallel;
 
     private double currentScale = 1.0;
@@ -109,7 +109,6 @@ public class VisualisationController {
         final String directory = "src/test/graphs/";
         IOHandler io = new IOHandler();
         Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-
         numProcessors = 2;
         numCores = 4;
         isParallel = true;
@@ -222,7 +221,7 @@ public class VisualisationController {
             if (!viewer.visualizeQueuedSchedule()) {
                 executorService.shutdownNow();
             }
-        }, 2000, 400, TimeUnit.MILLISECONDS);
+        }, 200, 320, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -305,7 +304,7 @@ public class VisualisationController {
                     scheduledExecutorService.shutdown();
                 }
             });
-        }, 75, 500, TimeUnit.MILLISECONDS);
+        }, 70, 500, TimeUnit.MILLISECONDS);
 
         if (isParallel) {
 

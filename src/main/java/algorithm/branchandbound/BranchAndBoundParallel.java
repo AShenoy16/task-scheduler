@@ -22,11 +22,10 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     private ScheduledTask currentShortestTask;
     private CalculateCostFunction calculateCostFunction;
     private HashMap<Node, Integer> bottomLevels;
-    private int[] parallelThreadTimes;
-    private static ForkJoinPool pool;
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
     private boolean isFinished = false;
+    private int[] parallelThreadTimes;
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -138,13 +137,13 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
             if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
-
                 var threadId = Integer.valueOf(Thread.currentThread().getName());
                 parallelThreadTimes[threadId] = Math.min(parallelThreadTimes[threadId], pathTime);
-                System.out.println("Thread Id: " + String.valueOf(threadId) + " - New shortest path: " + String.valueOf(parallelThreadTimes[threadId]));
+                System.out.println("Thread Id: " + threadId + " - New shortest path: " + parallelThreadTimes[threadId]);
 
 
-                // print path on console
+                controller.queuePartialSolution(partialSolution);
+
                 printCurrentPath(currentTask);
             }
 
