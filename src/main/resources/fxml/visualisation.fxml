@@ -271,7 +271,7 @@
                                     <Insets top="15.0" />
                                  </VBox.margin>
                               </Label>
-                              <StackedBarChart fx:id="parallelBarChart" animated="false" categoryGap="30.0" horizontalGridLinesVisible="false" legendVisible="false" styleClass="mainFont">
+                              <StackedBarChart fx:id="parallelBarChart" animated="false" categoryGap="25.0" horizontalGridLinesVisible="false" legendVisible="false" styleClass="mainFont">
                                 <xAxis>
                                    <NumberAxis animated="false" tickLabelFill="#dadada" />
                                 </xAxis>

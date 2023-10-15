@@ -318,7 +318,6 @@ public class VisualisationController {
         }, 70, 500, TimeUnit.MILLISECONDS);
 
         if (isParallel) {
-            //parallelBarChart.setCategoryGap(100*(1.0/numCores));
 
             scheduledExecutorServiceParallel = Executors.newSingleThreadScheduledExecutor();
             scheduledExecutorServiceParallel.scheduleAtFixedRate(() -> {
@@ -332,9 +331,23 @@ public class VisualisationController {
                     if (threadTimes[i] != Integer.MAX_VALUE) {
                         XYChart.Series<Number, String> series = new XYChart.Series<>();
                         series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
+                        series.setName(String.valueOf(i));
                         parallelBarChart.getData().addAll(series);
                     }
                 }
+                // styles the previous mentioned series
+                parallelBarChart.getData().forEach((t) -> {
+                    t.getData().forEach((j) -> {
+                        String colourCSS = colours[Integer.parseInt(t.getName())%colours.length];
+                        j.getNode().getStyleClass().add("dataSeries");
+                        j.getNode().setStyle("-fx-background-color: #" +  colourCSS);
+
+                        StackPane bar = (StackPane) j.getNode();
+                        Text dataText = new Text(j.getXValue().toString());
+                        dataText.getStyleClass().add("dataValue");
+                        bar.getChildren().add(dataText);
+                    });
+                });
                 if (bnb.getIsFinished()) {
                     scheduledExecutorServiceParallel.shutdown();
                 }
