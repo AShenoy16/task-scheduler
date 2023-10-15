@@ -14,11 +14,11 @@ public class Schedule {
     private List<Task> tasks;
     private int cost;
     private int gapTimes;
-    private int finishTime;
     private int numProcessors;
 
     /**
      * This creates a new schedule with a list of tasks
+     *
      * @param tasks list of tasks to add
      * @param numProcessors number of processors
      */
@@ -35,10 +35,10 @@ public class Schedule {
     /**
      * This creates a new initial schedule with only one task (entry node)
      *
-     * @param intialTask The initial task to add
+     * @param initialTask The initial task to add
      */
-    public Schedule(Task intialTask, int numProcessors) {
-        this.tasks = new ArrayList<>(List.of(intialTask));
+    public Schedule(Task initialTask, int numProcessors) {
+        this.tasks = new ArrayList<>(List.of(initialTask));
         this.numProcessors = numProcessors;
     }
 
@@ -64,9 +64,10 @@ public class Schedule {
     }
 
     /**
-     * get all the tasks for a particular processor id
-     * @param processorId
-     * @return
+     * This method gets all the tasks for a particular processor id
+     *
+     * @param processorId The processor id
+     * @return The tasks with the processor id
      */
     private List<Task> getTaskByProcessor(int processorId){
 
@@ -86,9 +87,10 @@ public class Schedule {
 
 
     /**
-     * This gets the free tasks for a specific schedule
-     * @param graph
-     * @return
+     * This method gets the free task nodes for a specific schedule
+     *
+     * @param graph The graph to get the nodes
+     * @return The free task nodes
      */
     public List<Node> getFreeNodes(Graph graph) {
         List<Node> freeTaskNodes = new ArrayList<>();
@@ -125,7 +127,7 @@ public class Schedule {
     }
 
     /**
-     * This method gets all of the nodes in the schedule
+     * This method gets all the nodes in the schedule
      *
      * @return A list of nodes in the schedule
      */
@@ -141,7 +143,8 @@ public class Schedule {
 
     /**
      * Method to check if a schedule has any overlapping tasks
-     * @return
+     *
+     * @return True if the schedule is valid, False otherwise
      */
     public boolean isValidScheduleNoOverlap(){
 
@@ -169,18 +172,16 @@ public class Schedule {
     }
 
     /**
-     * Checks if schedule satifisies all dependencies in the graph
-     * @param graph
-     * @return
+     * Checks if schedule satisfies all dependencies in the graph
+     *
+     * @param graph The graph to get dependencies
+     * @return True if the schedule is valid, False otherwise
      */
 
     public boolean isValidScheduleSatisfyDependencies(Graph graph){
-
         for(Task task: tasks){
             Node node = task.getNode();
-
             List<Node> dependencies = graph.getDependenciesByNode(node);
-
 
             for(Node dependency: dependencies){
                 // if parent on the same processor as child
@@ -193,16 +194,12 @@ public class Schedule {
                 }
 
                 if(task1.getProcessor() == task.getProcessor()){
-
                     // dependency not yet finished but child already started
                     if (task1.getFinishTime() > task.getStartTime()){
                         return false;
                     }
-
                 }else{
                     // Parent, child on different processors, account for communication cost
-
-
                     int edgeWeight = graph.getAdjacencyMatrix()[task1.getNode().getId()][task.getNode().getId()];
 
                     // overlap occurs
@@ -211,7 +208,6 @@ public class Schedule {
                     }
                 }
             }
-
         }
 
         // no overlap occurs
@@ -222,7 +218,7 @@ public class Schedule {
     /**
      * This method gets the Task of a schedule by its Node
      * @param node
-     * @return
+     * @return The task
      */
     private Task getTaskByNode(Node node){
         for(Task task: tasks){
@@ -251,13 +247,12 @@ public class Schedule {
 
     /**
      * Checks if a solution is valid
-     * @param graph
-     * @return
+     * @param graph The graph to check validity
+     * @return True if the schedule is valid, False otherwise
      */
     public boolean isValid(Graph graph){
         return (isValidScheduleNoOverlap() && isValidScheduleSatisfyDependencies(graph));
     }
-
 
     @Override
     public int hashCode() {
