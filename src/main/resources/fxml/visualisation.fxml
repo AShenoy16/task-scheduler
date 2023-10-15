@@ -28,7 +28,7 @@
          <children>
             <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
                <children>
-                  <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section" stylesheets="@../css/visualisation.css">
+                  <HBox fx:id="timeSection" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section" stylesheets="@../css/visualisation.css">
                      <children>
                         <VBox alignment="CENTER" prefWidth="85.0">
                            <children>
@@ -61,7 +61,7 @@
                         </DropShadow>
                      </effect>
                   </HBox>
-                  <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="252.5" styleClass="section" stylesheets="@../css/visualisation.css">
+                  <HBox fx:id="bestSection" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="252.5" styleClass="section" stylesheets="@../css/visualisation.css">
                      <children>
                         <VBox alignment="CENTER" prefWidth="85.0">
                            <children>
@@ -98,7 +98,7 @@
                         </DropShadow>
                      </effect>
                   </HBox>
-                  <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
+                  <HBox fx:id="cpuSection" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
                      <children>
                         <VBox id="cpuSection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="235.0" stylesheets="@../css/visualisation.css">
                            <children>
@@ -139,7 +139,7 @@
                         </DropShadow>
                      </effect>
                   </HBox>
-                  <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
+                  <HBox fx:id="memorySection" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
                      <children>
                         <VBox id="memorySection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="201.0" stylesheets="@../css/visualisation.css">
                            <children>
