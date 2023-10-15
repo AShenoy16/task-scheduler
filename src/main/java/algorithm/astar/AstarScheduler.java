@@ -100,7 +100,7 @@ public class AstarScheduler {
      * @param numOfProcessors The number of processors
      * @param schedule The existing schedule
      * @param graph The graph
-     * @return A new list of partial schedules with the an additional task added
+     * @return A new list of partial schedules with an additional task added
      */
     public List<Schedule> createPartialSchedules(List<Node> validNodes, int numOfProcessors, Schedule schedule, Graph graph){
         // create empty list of schedules, parent nodes and new tasks to add
@@ -173,7 +173,7 @@ public class AstarScheduler {
                 int hash = newlyMadeSchedule.hashCode();
 
                 // Prune 2:
-                // check if in open or closed
+                // remove duplicates
                 if(closed.contains(hash) || openHash.contains(hash)){
                     continue;
                 }

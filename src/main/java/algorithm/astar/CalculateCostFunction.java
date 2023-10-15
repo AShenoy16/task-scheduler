@@ -106,7 +106,7 @@ public class CalculateCostFunction {
 
     /**
      * This set the cost value for a partial solution via bottom levels
-     * @param partialSolution
+     * @param partialSolution to set cost value for
      */
     public void setPartialSolutionCost(PartialSolution partialSolution){
         int cost = 0;
@@ -123,53 +123,9 @@ public class CalculateCostFunction {
     }
 
     /**
-     * This method returns the nodes ordered in descending order by their bottom level
-     * as a list of nodes, needed for the start of Astar
-     *
-     * @return The list of nodes sorted in reverse order by bottom level value
+     * Method gets the nodes with the highest bottom level which are the entry nodes
+     * @return list of nodes with the higest bottom level
      */
-    public List<Node> getSortedBottomLevel() {
-        List<Map.Entry<Node, Integer>> bottomLevelList = new ArrayList<>(bottomLevelMap.entrySet());
-
-        // Reversed order sort
-        bottomLevelList.sort(Map.Entry.<Node, Integer>comparingByValue().reversed());
-
-        ArrayList<Node> sinkNodes = graph.getEndNodes();
-        List<Node> sortedSinkNodes = new ArrayList<>();
-
-        List<Node> bottomLevelOrder = new ArrayList<>();
-
-        // Separate exit and non exit nodes
-        for (Map.Entry<Node, Integer> entry : bottomLevelList) {
-            Node currentNode = entry.getKey();
-            if(sinkNodes.contains(currentNode)){
-                sortedSinkNodes.add(currentNode);
-                // Need to make sure if it's an exit node the one with the least number of parents is first
-            }else{
-                // Non exit node
-                bottomLevelOrder.add(currentNode);
-            }
-        }
-
-        // Sort exit nodes by the number of parents in ascending order
-        sortedSinkNodes.sort(Comparator.comparingInt(this::countParents));
-
-        // Add sorted sink nodes to the end of the order
-        bottomLevelOrder.addAll(sortedSinkNodes);
-
-        return bottomLevelOrder;
-
-    }
-
-    /**
-     * This method counts the number of parents of a particular node
-     * @param node The node
-     * @return The number of parents
-     */
-    private int countParents(Node node){
-        return graph.getParentNodes(node).size();
-    }
-
     public List<Node> getHighestBottomLevelNodes(){
         // Find the highest value in the HashMap, this value should belong to an entry node
         int maxValue = Integer.MIN_VALUE;
