@@ -115,6 +115,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
         protected void compute() {
             ScheduledTask currentTask = partialSolution.getScheduledTask();
             currentDFSTask = currentTask;
+            controller.setStarted();
             int pathTime = getCurrentLatestTaskTime(currentTask);
 
             // bound the search of this node

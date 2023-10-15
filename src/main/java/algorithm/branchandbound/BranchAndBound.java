@@ -95,6 +95,7 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
         currentDFSTask = currentTask;
+        controller.setStarted();
         int pathTime = getCurrentLatestTaskTime(currentTask);
 
         // bound the search of this node
