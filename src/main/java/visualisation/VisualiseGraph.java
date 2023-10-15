@@ -20,7 +20,7 @@ public class VisualiseGraph extends FxViewer {
         super(graph, threadingModel);
         this.graph = graph;
         n = graph.getNodeCount();
-        nodeIndex = n + 3;
+        nodeIndex = n + 2;
         initialiseLabels();
     }
 
@@ -39,7 +39,7 @@ public class VisualiseGraph extends FxViewer {
      * Visualize traversal of a schedule
      */
     public boolean visualizeQueuedSchedule() {
-        if (nodeIndex > n + 2) {
+        if (nodeIndex > n + 1) {
             if (partialSolutionQueue.isEmpty()) {
                 return false;
             }

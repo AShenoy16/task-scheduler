@@ -19,6 +19,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -220,7 +221,7 @@ public class VisualisationController {
             if (!viewer.visualizeQueuedSchedule()) {
                 executorService.shutdownNow();
             }
-        }, 2000, 400, TimeUnit.MILLISECONDS);
+        }, 200, 320, TimeUnit.MILLISECONDS);
     }
 
     /**

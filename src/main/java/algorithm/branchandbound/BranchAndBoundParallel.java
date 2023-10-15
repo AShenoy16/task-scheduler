@@ -22,7 +22,10 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     private ScheduledTask currentShortestTask;
     private CalculateCostFunction calculateCostFunction;
     private HashMap<Node, Integer> bottomLevels;
-    private int[] threadShortestTasks;
+    private VisualisationController controller;
+    private ScheduledTask currentDFSTask;
+    private boolean isFinished = false;
+    private int[] parallelThreadTimes;
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -52,8 +55,8 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
         ForkJoinPool pool = new ForkJoinPool(numCores, factory, null, true);
 
         // Initialize arraylist with the shortest path values of each thread
-        threadShortestTasks = new int[numCores];
-        Arrays.fill(threadShortestTasks, Integer.MAX_VALUE);
+        parallelThreadTimes = new int[numCores];
+        Arrays.fill(parallelThreadTimes, Integer.MAX_VALUE);
 
 
         calculateCostFunction = new CalculateCostFunction(graph);
@@ -141,16 +144,13 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
                 var threadId = Integer.valueOf(Thread.currentThread().getName());
-                threadShortestTasks[threadId] = Math.min(threadShortestTasks[threadId], pathTime);
-                System.out.println("Thread Id: " + String.valueOf(threadId) + " - New shortest path: " + String.valueOf(threadShortestTasks[threadId]));
+                parallelThreadTimes[threadId] = Math.min(parallelThreadTimes[threadId], pathTime);
+                System.out.println("Thread Id: " + threadId + " - New shortest path: " + parallelThreadTimes[threadId]);
 
 
                 controller.queuePartialSolution(partialSolution);
 
                 printCurrentPath(currentTask);
-
-                // update thread times
-                parallelThreadTimes[this.id.get()] = currentShortestPath;
             }
 
             // branch and bound algorithm for queued children
