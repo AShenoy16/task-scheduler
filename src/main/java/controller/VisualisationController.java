@@ -19,11 +19,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -49,6 +51,14 @@ public class VisualisationController {
     private HBox parallelContainer;
     @FXML
     private HBox sequentialContainer;
+    @FXML
+    private HBox timeSection;
+    @FXML
+    private HBox bestSection;
+    @FXML
+    private HBox cpuSection;
+    @FXML
+    private HBox memorySection;
     @FXML
     private StackedBarChart<Number, String> parallelBarChart;
     @FXML
@@ -302,6 +312,7 @@ public class VisualisationController {
                 });
                 if (bnb.getIsFinished()) {
                     scheduledExecutorService.shutdown();
+
                 }
             });
         }, 70, 500, TimeUnit.MILLISECONDS);
@@ -410,8 +421,25 @@ public class VisualisationController {
                 Platform.runLater(() -> timerLabel.setText(timeText));
                 if (bnb.getIsFinished()) {
                     myTimer.cancel();
+                    updateFinish();
                 }
             }
         }, 0, 10);
+    }
+
+    private void updateFinish() {
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setColor(Color.rgb(72, 255, 157));
+        dropShadow.setHeight(30);
+        dropShadow.setWidth(30);
+        dropShadow.setRadius(14.5);
+
+        bestSection.setEffect(dropShadow);
+        timeSection.setEffect(dropShadow);
+        cpuSection.setEffect(dropShadow);
+        memorySection.setEffect(dropShadow);
+
+        bestCurrentText.setTextFill(Color.rgb(72, 255, 157));
+        timerLabel.setTextFill(Color.rgb(72, 255, 157));
     }
 }

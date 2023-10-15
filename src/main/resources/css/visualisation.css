@@ -54,6 +54,13 @@
     -fx-font-family: "SHUTTLE-X";
 }
 
+.sectionFinishTitle {
+    -fx-font-size: 12;
+    -fx-fill: #dadada;
+    -fx-alignment: center-left;
+    -fx-font-family: "SHUTTLE-X";
+}
+
 .sectionOSValues {
     -fx-text-fill: #dadada;
     -fx-font-size: 12;
