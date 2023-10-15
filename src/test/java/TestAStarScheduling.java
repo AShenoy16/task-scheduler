@@ -27,7 +27,7 @@ public class TestAStarScheduling {
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
-        assertEquals(28, schedule.getCost());
+        assertEquals(28, schedule.getFinishTime());
 //        // Need to add output file name logic after CMD argument parsing is completed
 //        // Example of how to write output. Possibly create separate IO test later.
 //        io.writeDot(schedule,"Nodes_7_OutTree-OUTPUT.dot");
@@ -40,7 +40,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(28, schedule.getCost());
+        assertEquals(28, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes7() {
@@ -50,7 +50,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(22, schedule.getCost());
+        assertEquals(22, schedule.getFinishTime());
     }
 
     @Test
@@ -61,7 +61,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(22, schedule.getCost());
+        assertEquals(22, schedule.getFinishTime());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 2);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(581, schedule.getCost());
+        assertEquals(581, schedule.getFinishTime());
     }
     @Test
     public void TestAStarTwoProcessorsNodes8Parallel() {
@@ -82,7 +82,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(581, schedule.getCost());
+        assertEquals(581, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes8() {
@@ -92,7 +92,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(581, schedule.getCost());
+        assertEquals(581, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes8Parallel() {
@@ -102,7 +102,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(581, schedule.getCost());
+        assertEquals(581, schedule.getFinishTime());
     }
     @Test
     public void TestAStarTwoProcessorsNodes9() {
@@ -112,7 +112,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 2);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(55, schedule.getCost());
+        assertEquals(55, schedule.getFinishTime());
     }
     @Test
     public void TestAStarTwoProcessorsNodes9Parallel() {
@@ -122,7 +122,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(55, schedule.getCost());
+        assertEquals(55, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes9() {
@@ -132,7 +132,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(55, schedule.getCost());
+        assertEquals(55, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes9Parallel() {
@@ -142,7 +142,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(55, schedule.getCost());
+        assertEquals(55, schedule.getFinishTime());
     }
     @Test
     public void TestAStarTwoProcessorsNodes10() {
@@ -152,7 +152,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 2);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(50, schedule.getCost());
+        assertEquals(50, schedule.getFinishTime());
     }
     @Test
     public void TestAStarTwoProcessorsNodes10Parallel() {
@@ -162,7 +162,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(50, schedule.getCost());
+        assertEquals(50, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes10() {
@@ -172,7 +172,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(50, schedule.getCost());
+        assertEquals(50, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNodes10Paralell() {
@@ -182,7 +182,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(50, schedule.getCost());
+        assertEquals(50, schedule.getFinishTime());
     }
     @Test
     public void TestAStarTwoProcessorsNodes11() {
@@ -192,7 +192,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 2);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(350, schedule.getCost());
+        assertEquals(350, schedule.getFinishTime());
     }
 
     @Test
@@ -203,7 +203,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(350, schedule.getCost());
+        assertEquals(350, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNode11() {
@@ -213,7 +213,7 @@ public class TestAStarScheduling {
         schedule = scheduler.run(graph, 4);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(227, schedule.getCost());
+        assertEquals(227, schedule.getFinishTime());
     }
     @Test
     public void TestAStarFourProcessorsNode11Parallel() {
@@ -223,7 +223,7 @@ public class TestAStarScheduling {
         schedule = parallelSchduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
-        assertEquals(227, schedule.getCost());
+        assertEquals(227, schedule.getFinishTime());
     }
 
 

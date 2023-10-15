@@ -48,7 +48,7 @@ public class AstarScheduler {
         }
 
         List<Node> sortedList =  calculateCostFunction.getSortedBottomLevel();
-        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes);
+        List<Schedule> initialSchedules = createInitialSchedules(validEntryNodes, numProcessors);
         open.addAll(initialSchedules);
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -90,14 +90,14 @@ public class AstarScheduler {
      * @param entryNodes The valid entry nodes
      * @return A list of the initial schedules
      */
-    public List<Schedule> createInitialSchedules(List<Node> entryNodes){
+    public List<Schedule> createInitialSchedules(List<Node> entryNodes, int numProcessors){
         // create empty list of schedules
         List<Schedule> newSchedules = new ArrayList<>();
 
         // Create new schedule for every valid entry node
         for(Node entryNode : entryNodes){
             Task task = new Task(entryNode, 0, entryNode.getVal(), 1);
-            Schedule newlyMadeSchedule = new Schedule(task);
+            Schedule newlyMadeSchedule = new Schedule(task, numProcessors);
             calculateCostFunction.setScheduleCost(newlyMadeSchedule);
             newSchedules.add(newlyMadeSchedule);
         }
@@ -168,9 +168,18 @@ public class AstarScheduler {
                 // Add task
                 Task task = new Task(validNode, earliestTimeTaskCanStart, earliestTimeTaskCanStart + validNode.getVal(), processorID);
                 newTasks = new ArrayList<>(schedule.getTasks());
+                int gapStartTime = 0;
+                for(Task task1 : newTasks){
+                    if(task1.getProcessor() == processorID){
+                        gapStartTime = Math.max(gapStartTime, task1.getFinishTime());
+                    }
+                }
+                int gapTime = earliestTimeTaskCanStart - gapStartTime;
+
                 newTasks.add(task);
 //                Collections.sort(newTasks,  Comparator.comparing(Task::getProcessor));
                 Schedule newlyMadeSchedule = new Schedule(newTasks, numOfProcessors);
+                newlyMadeSchedule.setGapTimes(schedule.getGapTimes() + gapTime);
 
                 // Set cost
                 calculateCostFunction.setScheduleCost(newlyMadeSchedule);
@@ -214,12 +223,6 @@ public class AstarScheduler {
 //                if(task.getNode().getId() == 9 && newlyMadeSchedule.getTasks().size() == 8 && earliestStartTimeForProcessor == 120){
 //                    System.out.println("Yuh");
 //                }
-
-
-
-                if(task.getNode().getId() == 11 && newlyMadeSchedule.getTasks().size() == 9 && earliestStartTimeForProcessor == 45){
-                    System.out.println("Yuh");
-                }
 
 
 

@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 public class Schedule {
     private List<Task> tasks;
     private int cost;
+    private int gapTimes;
+    private int finishTime;
     private int numProcessors;
 
     /**
@@ -32,8 +34,26 @@ public class Schedule {
      *
      * @param intialTask The initial task to add
      */
-    public Schedule(Task intialTask){
+    public Schedule(Task intialTask, int numProcessors) {
         this.tasks = new ArrayList<>(List.of(intialTask));
+        this.numProcessors = numProcessors;
+    }
+
+    public int getFinishTime(){
+        Task maxtask = Collections.max(this.tasks, (obj1, obj2) -> Integer.compare(obj1.getFinishTime(), obj2.getFinishTime()));
+        return maxtask.getFinishTime();
+    }
+
+    public int getNumProcessors() {
+        return numProcessors;
+    }
+
+    public int getGapTimes() {
+        return gapTimes;
+    }
+
+    public void setGapTimes(int gapTimes) {
+        this.gapTimes = gapTimes;
     }
 
     public List<Task> getTasks() {
@@ -68,23 +88,23 @@ public class Schedule {
                 .collect(Collectors.toList()); // Collect the result into a List
     }
 
-    public boolean isValidScheduleNoOverlap2() {
-        for (int i = 1; i <= this.numProcessors; i++) {
-            List<Task> sortedTasks = getTaskByProcessorID(i);
-
-            for (int j = 0; j < sortedTasks.size() - 1; j++) {
-                Task currentTask = sortedTasks.get(j);
-                Task nextTask = sortedTasks.get(j + 1);
-
-                // Make sure there's no overlap
-                if (currentTask.getFinishTime() > nextTask.getStartTime()) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
+//    public boolean isValidScheduleNoOverlap2() {
+//        for (int i = 1; i <= this.numProcessors; i++) {
+//            List<Task> sortedTasks = getTaskByProcessorID(i);
+//
+//            for (int j = 0; j < sortedTasks.size() - 1; j++) {
+//                Task currentTask = sortedTasks.get(j);
+//                Task nextTask = sortedTasks.get(j + 1);
+//
+//                // Make sure there's no overlap
+//                if (currentTask.getFinishTime() > nextTask.getStartTime()) {
+//                    return false;
+//                }
+//            }
+//        }
+//
+//        return true;
+//    }
 
 
 
@@ -121,31 +141,31 @@ public class Schedule {
         return freeTaskNodes;
     }
 
-    public int getEarliestStartTimeForProcessor(int processor) {
-        int earliestStartTime = 0;
-        for (Task task : tasks) {
-            if (task.getProcessor() == processor && task.getFinishTime() > earliestStartTime) {
-                earliestStartTime = task.getFinishTime();
-            }
-        }
-        return earliestStartTime;
-    }
-
-    public int getLatestParentStartTime(Node node, Graph graph) {
-        int latestParentStartTime = 0;
-        List<Node> parentNodes = graph.getParentNodes(node);
-
-        for (Task task : tasks) {
-            if (parentNodes.contains(task.getNode())) {
-                int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][node.getId()];
-                if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
-                    latestParentStartTime = task.getFinishTime() + edgeWeight;
-                }
-            }
-        }
-
-        return latestParentStartTime;
-    }
+//    public int getEarliestStartTimeForProcessor(int processor) {
+//        int earliestStartTime = 0;
+//        for (Task task : tasks) {
+//            if (task.getProcessor() == processor && task.getFinishTime() > earliestStartTime) {
+//                earliestStartTime = task.getFinishTime();
+//            }
+//        }
+//        return earliestStartTime;
+//    }
+//
+//    public int getLatestParentStartTime(Node node, Graph graph) {
+//        int latestParentStartTime = 0;
+//        List<Node> parentNodes = graph.getParentNodes(node);
+//
+//        for (Task task : tasks) {
+//            if (parentNodes.contains(task.getNode())) {
+//                int edgeWeight = graph.getAdjacencyMatrix()[task.getNode().getId()][node.getId()];
+//                if (task.getFinishTime() + edgeWeight > latestParentStartTime) {
+//                    latestParentStartTime = task.getFinishTime() + edgeWeight;
+//                }
+//            }
+//        }
+//
+//        return latestParentStartTime;
+//    }
 
 
 
