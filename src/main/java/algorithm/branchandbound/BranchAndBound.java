@@ -56,7 +56,7 @@ public class BranchAndBound extends BranchAndBoundAlgorithm{
             }
             // cost will be bottom level of the entry node
             ScheduledTask task = new ScheduledTask(0,0, n,null, 1);
-            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(n), calculateCostFunction);
+            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(n));
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
             dfs(partialSolution); // start recursive dfs branch and bound

@@ -73,7 +73,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                     .collect(Collectors.toMap(node -> node, node -> new ArrayList<>()));
 
             ScheduledTask task = new ScheduledTask(0, 0, startNode, null, 1);
-            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode), calculateCostFunction);
+            PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode));
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
             pool.invoke(new dfs(partialSolution));
