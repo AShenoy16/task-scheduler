@@ -18,7 +18,6 @@ public class TestAStarScheduling {
     Graph graph;
     AstarScheduler scheduler;
     Schedule schedule;
-
     AstarParallel parallelSchduler;
 
     @Test
@@ -28,9 +27,6 @@ public class TestAStarScheduling {
         scheduler = new AstarScheduler();
         schedule = scheduler.run(graph, 2);
         assertEquals(28, schedule.getFinishTime());
-//        // Need to add output file name logic after CMD argument parsing is completed
-//        // Example of how to write output. Possibly create separate IO test later.
-//        io.writeDot(schedule,"Nodes_7_OutTree-OUTPUT.dot");
     }
     @Test
     public void TestAStarTwoProcessorsNodes7Parallel() {
@@ -52,7 +48,6 @@ public class TestAStarScheduling {
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(22, schedule.getFinishTime());
     }
-
     @Test
     public void TestAStarFourProcessorsNodes7Parallel() {
         io = new IOHandler();
@@ -63,7 +58,6 @@ public class TestAStarScheduling {
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(22, schedule.getFinishTime());
     }
-
     @Test
     public void TestAStarTwoProcessorsNodes8() {
         io = new IOHandler();
@@ -194,7 +188,6 @@ public class TestAStarScheduling {
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(350, schedule.getFinishTime());
     }
-
     @Test
     public void TestAStarTwoProcessorsNodes11Parallel() {
         io = new IOHandler();
@@ -225,8 +218,6 @@ public class TestAStarScheduling {
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(227, schedule.getFinishTime());
     }
-
-
     @After
     public void tearDown(){
         graph = null;
