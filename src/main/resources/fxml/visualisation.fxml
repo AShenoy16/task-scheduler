@@ -18,13 +18,12 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="595.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<AnchorPane prefHeight="595.0" prefWidth="1200.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
-      <VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="595.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css">
+      <VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="595.0" prefWidth="1200.0" spacing="3.0" styleClass="backgroundImg" stylesheets="@../css/visualisation.css">
          <children>
             <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
                <children>
@@ -307,10 +306,46 @@
             </Group>
          </children>
       </VBox>
-      <Pane fx:id="startPage">
+      <Pane fx:id="startPage" prefHeight="595.0" prefWidth="1200.0">
          <children>
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#a3b2bf" height="595.0" stroke="BLACK" strokeType="INSIDE" width="1200.0" />
-            <Button fx:id="startBtn" layoutX="573.0" layoutY="282.0" mnemonicParsing="false" text="Button" />
+            <ImageView fitHeight="595.0" fitWidth="1200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/homebg.jpg" />
+               </image>
+            </ImageView>
+            <Button id="startBtn" fx:id="startBtn" layoutX="531.0" layoutY="342.0" mnemonicParsing="false" stylesheets="@../css/visualisation.css" text="START">
+               <effect>
+                  <DropShadow height="40.0" radius="19.5" width="40.0">
+                     <color>
+                        <Color red="1.0" green="1.0" blue="1.0" />
+                     </color>
+                  </DropShadow>
+               </effect></Button>
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="75.0" prefHeight="89.0" prefWidth="1200.0" styleClass="mainFont" text="BRANCH AND BOUND" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="72.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutY="180.0" prefWidth="1200.0" styleClass="mainFont" text="SETTINGS" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutY="50.0" prefWidth="1200.0" styleClass="mainFont" text="TEAM 10: GASLIGHT GUYS" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="homeGraphLabel" alignment="CENTER" layoutX="325.0" layoutY="240.0" prefHeight="23.0" prefWidth="550.0" styleClass="mainFont" text="GRAPH NAME - RANDOMGRAPH" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="homeArgsLabel" alignment="CENTER" layoutY="280.0" prefWidth="1200.0" styleClass="mainFont" text="PROCESSORS - 2  |  CORES - 4  |  PARALLEL - TRUE" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
          </children>
       </Pane>
    </children>

@@ -88,6 +88,10 @@ public class VisualisationController {
     private Button startBtn;
     @FXML
     Pane startPage;
+    @FXML
+    Label homeArgsLabel;
+    @FXML
+    Label homeGraphLabel;
     private StackedBarChart<String, Number> currentScheduleBarChart;
     private CategoryAxis currentScheduleAxis;
     private BorderPane currentGraphContainer;

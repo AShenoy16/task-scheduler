@@ -1,6 +1,5 @@
 #stage {
     -fx-padding: 10px;
-    -fx-background-color: #121212;
 }
 
 #scheduleBarChart .chart-content .chart-plot-background {
@@ -9,6 +8,23 @@
 
 #parallelBarChart .chart-content .chart-plot-background {
     -fx-background-color: transparent;
+}
+
+.backgroundImg {
+    -fx-background-image: url('/images/homebg.jpg');
+    -fx-background-repeat: no-repeat; /* Prevent the image from repeating */
+    -fx-background-size: cover; /* Scale the image to cover the entire pane */
+}
+
+#startBtn {
+    -fx-background-color: #34c2b6; /* Green */
+    -fx-border-width: none;
+    -fx-text-fill: white;
+    -fx-font-family: "SHUTTLE-X";
+    -fx-padding: 15px 32px;
+    -fx-text-alignment: center;
+    -fx-font-size: 24px;
+    -fx-background-radius: 20;
 }
 
 .chart-horizontal-grid-lines {
