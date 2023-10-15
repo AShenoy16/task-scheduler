@@ -1,28 +1,31 @@
 package algorithm.branchandbound;
 
 import algorithm.astar.CalculateCostFunction;
+import controller.VisualisationController;
 import model.Graph;
 import model.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
  * The branch and bound class is needed to run the dfs branch and bound algorithm.
  */
-public class BranchAndBoundParallel {
+public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
     private ScheduledTask currentShortestTask;
     private CalculateCostFunction calculateCostFunction;
     private HashMap<Node, Integer> bottomLevels;
-    private static ForkJoinPool pool;
+    private VisualisationController controller;
+    private ScheduledTask currentDFSTask;
+    private boolean isFinished = false;
+    private int[] parallelThreadTimes;
 
     /**
      * This run method will initialise the necessary variables for the dfs branch and bound recursive method. It will
@@ -36,7 +39,24 @@ public class BranchAndBoundParallel {
         this.numProcessors = numProcesses;
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
-        pool = new ForkJoinPool(numCores);
+
+        // Create thread factory to keep track of threads for visualisation
+        final ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
+            int i = 0;
+            @Override
+            public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
+                final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+                worker.setName(String.valueOf(i));
+                i++;
+                return worker;
+            }
+        };
+
+        ForkJoinPool pool = new ForkJoinPool(numCores, factory, null, true);
+
+        // Initialize arraylist with the shortest path values of each thread
+        parallelThreadTimes = new int[numCores];
+        Arrays.fill(parallelThreadTimes, Integer.MAX_VALUE);
 
         calculateCostFunction = new CalculateCostFunction(graph);
 
@@ -67,18 +87,23 @@ public class BranchAndBoundParallel {
             shortestPathTask = shortestPathTask.getParent();
         }
 
+        // finalise visualiser with best shortest task
+        currentDFSTask = currentShortestTask;
+        isFinished = true;
+
         Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
         schedule.setShortestPath(currentShortestPath);
+
         return schedule;
     }
-
 
     /**
      * Represents a unit of work to be processed in parallel. Take partial solution as workload to execute.
      */
     private class dfs extends RecursiveAction {
 
-        private PartialSolution partialSolution;
+        public PartialSolution partialSolution;
+
         dfs(PartialSolution partialSolution) {
             this.partialSolution = partialSolution;
         }
@@ -89,6 +114,7 @@ public class BranchAndBoundParallel {
         @Override
         protected void compute() {
             ScheduledTask currentTask = partialSolution.getScheduledTask();
+            currentDFSTask = currentTask;
             int pathTime = getCurrentLatestTaskTime(currentTask);
 
             // bound the search of this node
@@ -111,10 +137,14 @@ public class BranchAndBoundParallel {
             if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
+                var threadId = Integer.valueOf(Thread.currentThread().getName());
+                parallelThreadTimes[threadId] = Math.min(parallelThreadTimes[threadId], pathTime);
+                System.out.println("Thread Id: " + threadId + " - New shortest path: " + parallelThreadTimes[threadId]);
 
-                // print path on console
+
+                controller.queuePartialSolution(partialSolution);
+
                 printCurrentPath(currentTask);
-
             }
 
             // branch and bound algorithm for queued children
@@ -224,6 +254,33 @@ public class BranchAndBoundParallel {
             }
         }
         return true;
+    }
+
+    public void setController(VisualisationController controller) {
+        this.controller = controller;
+    }
+
+    public ScheduledTask getCurrentDFSTask() {
+        return currentDFSTask;
+    }
+
+    @Override
+    public Schedule run(Graph graph, int numProcessors) {
+        return null;
+    }
+
+    @Override
+    public int getShortestPathText() {
+        return currentShortestPath;
+    }
+
+    @Override
+    public boolean getIsFinished() {
+        return isFinished;
+    }
+
+    public int[] getParallelThreadTimes() {
+        return parallelThreadTimes;
     }
 
 }

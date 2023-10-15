@@ -20,7 +20,7 @@ public class VisualiseGraph extends FxViewer {
         super(graph, threadingModel);
         this.graph = graph;
         n = graph.getNodeCount();
-        nodeIndex = n + 3;
+        nodeIndex = n + 2;
         initialiseLabels();
     }
 
@@ -31,7 +31,7 @@ public class VisualiseGraph extends FxViewer {
                     +"\tstroke-mode: plain; stroke-color:grey; stroke-width: 3px;"
                     + "\tfill-mode: plain; fill-color: grey;\n"
                     + "\tsize: 30px, 30px;\n"
-                    + "\ttext-size: 15px; text-color: black; text-style: bold;\n");
+                    + "\ttext-size: 15px; text-color: black; text-style: bold; text-font: 'SHUTTLE-X';\n");
         }
     }
 
@@ -39,7 +39,7 @@ public class VisualiseGraph extends FxViewer {
      * Visualize traversal of a schedule
      */
     public boolean visualizeQueuedSchedule() {
-        if (nodeIndex > n + 2) {
+        if (nodeIndex > n + 1) {
             if (partialSolutionQueue.isEmpty()) {
                 return false;
             }

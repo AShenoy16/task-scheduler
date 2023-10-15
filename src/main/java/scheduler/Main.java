@@ -11,7 +11,7 @@ import model.Schedule;
 public class Main {
     public static void main(String[] args) {
 
-        //visualise();
+        visualise();
 
 
         int argsLength = args.length;

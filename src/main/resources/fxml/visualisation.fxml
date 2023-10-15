@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.StackedBarChart?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -18,206 +21,332 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="664.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
+<AnchorPane prefHeight="595.0" prefWidth="1200.0" stylesheets="@../css/visualisation.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
-      <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
+      <VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="595.0" prefWidth="1200.0" spacing="3.0" styleClass="backgroundImg" stylesheets="@../css/visualisation.css">
          <children>
-            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section" stylesheets="@../css/visualisation.css">
+            <HBox id="iconsSection" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="1125.0" spacing="20.0" stylesheets="@../css/visualisation.css">
                <children>
-                  <VBox alignment="CENTER" prefWidth="85.0">
+                  <HBox fx:id="timeSection" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section" stylesheets="@../css/visualisation.css">
                      <children>
-                        <Label fx:id="timerLabel" alignment="TOP_LEFT" prefHeight="71.0" prefWidth="190.0" styleClass="sectionValue" text="99:99:99" />
-                        <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Running Time" wrappingWidth="145.68972778320312">
-                           <font>
-                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
-                           </font>
-                        </Text>
-                     </children>
-                     <HBox.margin>
-                        <Insets right="40.0" />
-                     </HBox.margin>
-                  </VBox>
-                  <StackPane alignment="CENTER_RIGHT">
-                     <children>
-                        <ImageView fx:id="bestIcon1" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/timeIcon.png" />
-                           </image>
-                        </ImageView>
-                     </children>
-                  </StackPane>
-               </children>
-               <effect>
-                  <DropShadow>
-                     <color>
-                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </HBox>
-            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="252.5" styleClass="section" stylesheets="@../css/visualisation.css">
-               <children>
-                  <VBox alignment="CENTER" prefWidth="85.0">
-                     <children>
-                        <Label id="bestCurrentText" fx:id="bestCurrentText" alignment="TOP_LEFT" prefHeight="86.0" prefWidth="159.0" styleClass="sectionValue" stylesheets="@../css/visualisation.css" text="100" textOverrun="CENTER_WORD_ELLIPSIS">
-                           <font>
-                              <Font size="24.0" />
-                           </font>
-                        </Label>
-                        <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Current Best" wrappingWidth="87.4615478515625">
-                           <font>
-                              <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
-                           </font>
-                        </Text>
-                     </children>
-                     <HBox.margin>
-                        <Insets right="50.0" />
-                     </HBox.margin>
-                  </VBox>
-                  <StackPane alignment="CENTER_RIGHT">
-                     <children>
-                        <ImageView fx:id="bestIcon" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/bestIcon.png" />
-                           </image>
-                        </ImageView>
-                     </children>
-                  </StackPane>
-               </children>
-               <effect>
-                  <DropShadow>
-                     <color>
-                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </HBox>
-            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
-               <children>
-                  <VBox id="cpuSection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="235.0" stylesheets="@../css/visualisation.css">
-                     <children>
-                        <StackPane id="cpuPane" prefHeight="150.0" prefWidth="256.0" stylesheets="@../css/visualisation.css">
+                        <VBox alignment="CENTER" prefWidth="85.0">
                            <children>
-                              <Canvas id="cpuIcon" fx:id="cpuWheel" height="86.0" width="86.0" />
-                              <Label id="cpuText" fx:id="cpuText" styleClass="sectionOSValues" stylesheets="@../css/visualisation.css" text="99.99%">
+                              <Label fx:id="timerLabel" alignment="TOP_LEFT" prefHeight="71.0" prefWidth="190.0" styleClass="sectionValue" text="99:99:99" />
+                              <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Running Time" wrappingWidth="145.68972778320312">
                                  <font>
-                                    <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                                    <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
                                  </font>
-                              </Label>
+                              </Text>
                            </children>
-                        </StackPane>
-                     </children>
-                     <HBox.margin>
-                        <Insets right="50.0" />
-                     </HBox.margin>
-                  </VBox>
-                  <VBox alignment="CENTER_RIGHT" spacing="5.0">
-                     <children>
+                           <HBox.margin>
+                              <Insets right="40.0" />
+                           </HBox.margin>
+                        </VBox>
                         <StackPane alignment="CENTER_RIGHT">
                            <children>
-                              <ImageView fx:id="bestIcon2" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="bestIcon1" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../images/cpuIcon.png" />
+                                    <Image url="@../images/timeIcon.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </StackPane>
                      </children>
-                  </VBox>
-               </children>
-               <effect>
-                  <DropShadow>
-                     <color>
-                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </HBox>
-            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
-               <children>
-                  <VBox id="memorySection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="201.0" stylesheets="@../css/visualisation.css">
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </HBox>
+                  <HBox fx:id="bestSection" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="252.5" styleClass="section" stylesheets="@../css/visualisation.css">
                      <children>
-                        <StackPane id="memoryPane" prefHeight="100.0" prefWidth="222.0" stylesheets="@../css/visualisation.css">
+                        <VBox alignment="CENTER" prefWidth="85.0">
                            <children>
-                              <Canvas id="memoryIcon" fx:id="memoryWheel" height="86.0" width="86.0" />
-                              <Label id="memoryText" fx:id="memoryText" styleClass="sectionOSValues" stylesheets="@../css/visualisation.css" text="99.99%">
+                              <Label id="bestCurrentText" fx:id="bestCurrentText" alignment="TOP_LEFT" prefHeight="86.0" prefWidth="159.0" styleClass="sectionValue" stylesheets="@../css/visualisation.css" text="100" textOverrun="CENTER_WORD_ELLIPSIS">
                                  <font>
-                                    <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                                    <Font size="24.0" />
                                  </font>
                               </Label>
+                              <Text id="bestCurrentTitle" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="sectionTitle" text="Current Best" wrappingWidth="87.4615478515625">
+                                 <font>
+                                    <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="26.0" />
+                                 </font>
+                              </Text>
                            </children>
-                        </StackPane>
-                     </children>
-                     <HBox.margin>
-                        <Insets right="50.0" />
-                     </HBox.margin>
-                  </VBox>
-                  <VBox alignment="CENTER_RIGHT" spacing="5.0">
-                     <children>
-                        <StackPane>
+                           <HBox.margin>
+                              <Insets right="50.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <StackPane alignment="CENTER_RIGHT">
                            <children>
-                              <ImageView fx:id="bestIcon3" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="bestIcon" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../images/memoryIcon.png" />
+                                    <Image url="@../images/bestIcon.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </StackPane>
                      </children>
-                  </VBox>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </HBox>
+                  <HBox fx:id="cpuSection" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
+                     <children>
+                        <VBox id="cpuSection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="235.0" stylesheets="@../css/visualisation.css">
+                           <children>
+                              <StackPane id="cpuPane" prefHeight="150.0" prefWidth="256.0" stylesheets="@../css/visualisation.css">
+                                 <children>
+                                    <Canvas id="cpuIcon" fx:id="cpuWheel" height="86.0" width="86.0" />
+                                    <Label id="cpuText" fx:id="cpuText" styleClass="sectionOSValues" stylesheets="@../css/visualisation.css" text="99.99%">
+                                       <font>
+                                          <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </StackPane>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="50.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                           <children>
+                              <StackPane alignment="CENTER_RIGHT">
+                                 <children>
+                                    <ImageView fx:id="bestIcon2" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/cpuIcon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </StackPane>
+                           </children>
+                        </VBox>
+                     </children>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </HBox>
+                  <HBox fx:id="memorySection" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" styleClass="section">
+                     <children>
+                        <VBox id="memorySection" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="130.0" prefWidth="201.0" stylesheets="@../css/visualisation.css">
+                           <children>
+                              <StackPane id="memoryPane" prefHeight="100.0" prefWidth="222.0" stylesheets="@../css/visualisation.css">
+                                 <children>
+                                    <Canvas id="memoryIcon" fx:id="memoryWheel" height="86.0" width="86.0" />
+                                    <Label id="memoryText" fx:id="memoryText" styleClass="sectionOSValues" stylesheets="@../css/visualisation.css" text="99.99%">
+                                       <font>
+                                          <Font name="JetBrains Mono NL ExtraBold Nerd Font Complete Mono" size="17.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </StackPane>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="50.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                           <children>
+                              <StackPane>
+                                 <children>
+                                    <ImageView fx:id="bestIcon3" fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/memoryIcon.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </StackPane>
+                           </children>
+                        </VBox>
+                     </children>
+                     <effect>
+                        <DropShadow height="30.0" radius="14.5" width="30.0">
+                           <color>
+                              <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </HBox>
                </children>
-               <effect>
-                  <DropShadow>
-                     <color>
-                        <Color red="1.0" green="0.5509259104728699" blue="0.9550926089286804" />
-                     </color>
-                  </DropShadow>
-               </effect>
             </HBox>
+            <Group>
+               <children>
+                  <HBox id="stage" fx:id="sequentialContainer" layoutX="4.0" layoutY="4.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="412.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css">
+                     <children>
+                        <VBox alignment="CENTER_LEFT" prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
+                           <children>
+                              <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets top="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
+                                <xAxis>
+                                  <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
+                                </xAxis>
+                                <yAxis>
+                                  <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
+                                </yAxis>
+                                 <padding>
+                                    <Insets right="10.0" />
+                                 </padding>
+                              </StackedBarChart>
+                           </children>
+                           <effect>
+                              <DropShadow height="30.0" radius="14.5" width="30.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                        </VBox>
+                        <Pane prefHeight="451.0" prefWidth="719.0" styleClass="section">
+                           <children>
+                                    <BorderPane fx:id="graphContainer" layoutX="10.0" layoutY="43.0" prefHeight="337.0" prefWidth="677.0" style="-fx-background-color: #282828;" />
+                              <Label alignment="CENTER" layoutY="16.0" prefHeight="23.0" prefWidth="697.0" styleClass="chartTitle" text="NODE GRAPH" textAlignment="CENTER" />
+                           </children>
+                           <effect>
+                              <DropShadow height="30.0" radius="14.5" width="30.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                        </Pane>
+                     </children>
+                  </HBox>
+                  <HBox id="stage" fx:id="parallelContainer" layoutX="14.0" layoutY="14.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="1161.0" spacing="20.0" stylesheets="@../css/visualisation.css">
+                     <children>
+                        <VBox alignment="CENTER_LEFT" prefHeight="378.0" prefWidth="396.0" spacing="5.0" styleClass="sectionCharts">
+                           <children>
+                              <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets top="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChartPara" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
+                                 <xAxis>
+                                    <CategoryAxis fx:id="scheduleXAxisPara" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
+                                 </yAxis>
+                                 <padding>
+                                    <Insets right="10.0" />
+                                 </padding>
+                              </StackedBarChart>
+                           </children>
+                           <effect>
+                              <DropShadow height="30.0" radius="14.5" width="30.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                        </VBox>
+                        <VBox prefHeight="378.0" prefWidth="476.0" styleClass="sectionCharts">
+                           <effect>
+                              <DropShadow height="30.0" radius="14.5" width="30.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                           <children>
+                              <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="PARALLEL THREADS" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets top="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <StackedBarChart fx:id="parallelBarChart" animated="false" categoryGap="25.0" horizontalGridLinesVisible="false" legendVisible="false" styleClass="mainFont">
+                                <xAxis>
+                                   <NumberAxis animated="false" tickLabelFill="#dadada" />
+                                </xAxis>
+                                <yAxis>
+                                   <CategoryAxis fx:id="parallelYAxis" animated="false" endMargin="0.0" side="LEFT" startMargin="0.0" tickLabelFill="#dadada" tickMarkVisible="false" />
+                                </yAxis>
+                                 <padding>
+                                    <Insets left="10.0" right="10.0" />
+                                 </padding>
+                              </StackedBarChart>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" prefHeight="378.0" prefWidth="481.0" spacing="5.0" styleClass="sectionCharts">
+                           <children>
+                              <Label alignment="CENTER" prefHeight="23.0" prefWidth="697.0" styleClass="chartTitle" text="NODE GRAPH" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets top="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <BorderPane fx:id="graphContainerPara" prefHeight="345.0" prefWidth="684.0" style="-fx-background-color: #282828; -fx-background-radius: 15;" />
+                           </children>
+                           <effect>
+                              <DropShadow height="30.0" radius="14.5" width="30.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </Group>
          </children>
-      </HBox>
-      <HBox id="stage" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="1160.0" spacing="20.0" stylesheets="@../css/visualisation.css">
+      </VBox>
+      <Pane fx:id="startPage" prefHeight="595.0" prefWidth="1200.0">
          <children>
-            <VBox alignment="CENTER_LEFT" prefHeight="483.0" prefWidth="444.0" spacing="5.0" styleClass="sectionCharts">
-               <children>
-                  <Label alignment="CENTER" prefHeight="23.0" prefWidth="446.0" styleClass="chartTitle" text="SCHEDULES" textAlignment="CENTER">
-                     <VBox.margin>
-                        <Insets top="15.0" />
-                     </VBox.margin>
-                  </Label>
-                  <StackedBarChart id="scheduleBarChart" fx:id="scheduleBarChart" animated="false" legendVisible="false" prefHeight="414.0" prefWidth="444.0" styleClass="mainFont" verticalGridLinesVisible="false">
-                    <xAxis>
-                      <CategoryAxis fx:id="scheduleXAxis" side="BOTTOM" styleClass="mainFont" tickLabelFill="#dadada" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" styleClass="mainFont" tickLabelFill="#dadada" tickLabelGap="7.0" />
-                    </yAxis>
-                     <padding>
-                        <Insets right="10.0" />
-                     </padding>
-                  </StackedBarChart>
-               </children>
+            <ImageView fitHeight="595.0" fitWidth="1200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/homebg.jpg" />
+               </image>
+            </ImageView>
+            <Button id="startBtn" fx:id="startBtn" layoutX="531.0" layoutY="342.0" mnemonicParsing="false" stylesheets="@../css/visualisation.css" text="START">
                <effect>
-                  <DropShadow height="30.0" radius="14.5" width="30.0">
+                  <DropShadow height="40.0" radius="19.5" width="40.0">
                      <color>
                         <Color red="1.0" green="1.0" blue="1.0" />
                      </color>
                   </DropShadow>
-               </effect>
-            </VBox>
-            <Pane prefHeight="451.0" prefWidth="719.0" styleClass="section">
-               <children>
-                        <BorderPane fx:id="graphContainer" onScroll="#handleZoom" layoutX="10.0" layoutY="11.0" prefHeight="428.0" prefWidth="677.0" style="-fx-background-color: #282828; "/>
-               </children>
-               <effect>
-                  <DropShadow height="30.0" radius="14.5" width="30.0">
-                     <color>
-                        <Color red="1.0" green="1.0" blue="1.0" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Pane>
+               </effect></Button>
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="75.0" prefHeight="89.0" prefWidth="1200.0" styleClass="mainFont" text="BRANCH AND BOUND" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="72.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutY="180.0" prefWidth="1200.0" styleClass="mainFont" text="SETTINGS" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutY="50.0" prefWidth="1200.0" styleClass="mainFont" text="TEAM 10: GASLIGHT GUYS" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="homeGraphLabel" alignment="CENTER" layoutX="325.0" layoutY="240.0" prefHeight="23.0" prefWidth="550.0" styleClass="mainFont" text="GRAPH NAME - RANDOMGRAPH" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="homeArgsLabel" alignment="CENTER" layoutY="280.0" prefWidth="1200.0" styleClass="mainFont" text="PROCESSORS - 2  |  CORES - 4  |  PARALLEL - TRUE" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
          </children>
-      </HBox>
+      </Pane>
    </children>
-</VBox>
+</AnchorPane>

@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * The branch and bound class is needed to run the dfs branch and bound algorithm.
  */
-public class BranchAndBound {
+public class BranchAndBound extends BranchAndBoundAlgorithm{
     private int numProcessors;
     private Graph graph;
     private int currentShortestPath;
@@ -20,7 +20,6 @@ public class BranchAndBound {
 
     private VisualisationController controller;
     private ScheduledTask currentDFSTask;
-    private PartialSolution currentPS;
     private boolean isFinished = false;
 
     private CalculateCostFunction calculateCostFunction;
@@ -71,7 +70,6 @@ public class BranchAndBound {
             dfs(partialSolution); // start recursive dfs branch and bound
 
         }
-        isFinished = true;
 
         // returns a schedule of the shortest path found
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -81,6 +79,10 @@ public class BranchAndBound {
             scheduledTasksList.add(shortestPathTask);
             shortestPathTask = shortestPathTask.getParent();
         }
+
+        isFinished = true;
+        currentDFSTask = currentShortestTask;
+
         Schedule schedule = new Schedule(numProcesses, scheduledTasksList);
         schedule.setShortestPath(currentShortestPath);
         return schedule;
@@ -93,7 +95,6 @@ public class BranchAndBound {
     private void dfs(PartialSolution partialSolution) {
         ScheduledTask currentTask = partialSolution.getScheduledTask();
         currentDFSTask = currentTask;
-        this.currentPS = partialSolution;
         int pathTime = getCurrentLatestTaskTime(currentTask);
 
         // bound the search of this node
@@ -263,16 +264,17 @@ public class BranchAndBound {
         this.controller = controller;
     }
 
+    @Override
+    public Schedule run(Graph graph, int numProcessors, int i) {
+        return null;
+    }
+
     public ScheduledTask getCurrentDFSTask() {
         return currentDFSTask;
     }
 
     public boolean getIsFinished() {
         return isFinished;
-    }
-
-    public PartialSolution getCurrentPS() {
-        return currentPS;
     }
 
     public void setShortestPathText(int currentShortestPath) {
