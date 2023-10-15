@@ -34,6 +34,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
      * @param numProcesses - number of processors specified by the user
      * @return an optimal schedule found by the branch and bound algorithm
      */
+    @Override
     public Schedule run(Graph graph, int numProcesses, int numCores){
         this.graph = graph;
         this.numProcessors = numProcesses;
@@ -97,11 +98,35 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
         return schedule;
     }
 
+    @Override
+    public void setController(VisualisationController controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public ScheduledTask getCurrentDFSTask() {
+        return currentDFSTask;
+    }
+
+    @Override
+    public Schedule run(Graph graph, int numProcessors) {
+        return null;
+    }
+
+    @Override
+    public int getShortestPathText() {
+        return currentShortestPath;
+    }
+
+    @Override
+    public boolean getIsFinished() {
+        return isFinished;
+    }
+
     /**
      * Represents a unit of work to be processed in parallel. Take partial solution as workload to execute.
      */
     private class dfs extends RecursiveAction {
-
         public PartialSolution partialSolution;
 
         dfs(PartialSolution partialSolution) {
@@ -138,14 +163,9 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
             if (partialSolution.getChildrenQueue().size() == 0 && pathTime < currentShortestPath) {
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
-                var threadId = Integer.valueOf(Thread.currentThread().getName());
+                int threadId = Integer.parseInt(Thread.currentThread().getName());
                 parallelThreadTimes[threadId] = Math.min(parallelThreadTimes[threadId], pathTime);
-                System.out.println("Thread Id: " + threadId + " - New shortest path: " + parallelThreadTimes[threadId]);
-
-
                 controller.queuePartialSolution(partialSolution);
-
-                printCurrentPath(currentTask);
             }
 
             // branch and bound algorithm for queued children
@@ -175,7 +195,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                     // check if processor is free after earliestStartTime
                     int possibleStartTime = Math.max(earliestStartTime, partialSolution.getProcessorTimes()[i]);
 
-                    if(earliestStartTime + bottomLevels.get(destNode) >= currentShortestPath){
+                    if (earliestStartTime + bottomLevels.get(destNode) >= currentShortestPath){
                         continue;
                     }
                     // create new partial solution with new task for this child and add it to dfs branch and bound recursion
@@ -185,12 +205,12 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
 
                     calculateCostFunction.setPartialSolutionCost(newPartialSolution);
 
-                    if(newPartialSolution.getCost() >= currentShortestPath){
+                    if (newPartialSolution.getCost() >= currentShortestPath){
                         continue;
                     }
 
                     // check if newPartial Solution is valid
-                    if(!newPartialSolution.isValid(graph)){
+                    if (!newPartialSolution.isValid(graph)){
                         continue;
                     }
 
@@ -223,24 +243,6 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
     }
 
     /**
-     * Prints out the schedule whenever a new shorter complete schedule is found.
-     * It displays start time, end time, node ID, and processor ID of each task in the schedule
-     * @param task - the task of the new schedule
-     */
-    private void printCurrentPath(ScheduledTask task) {
-        int pathLength = 0;
-        System.out.println("New Shortest Task: " + task.getNode().getId());
-
-        System.out.println("Start | Finish | Node ID | Processor ID");
-        while (task != null) {
-            System.out.println(task.getStartTime() + " | " + (task.getStartTime()+task.getNode().getVal()) + " | " + task.getNode().getId() + " | " + task.getProcessorId());
-            pathLength = Math.max(pathLength, task.getStartTime() + task.getNode().getVal());
-            task = task.getParent();
-        }
-        System.out.println("New Shortest Path: " + pathLength + "\n");
-    }
-
-    /**
      * This helper function checks whether the destination node has all dependencies visited already before it can be
      * visited
      * @param partialSolution - the current partial solution in the dfs recursion
@@ -257,31 +259,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
         return true;
     }
 
-    public void setController(VisualisationController controller) {
-        this.controller = controller;
-    }
-
-    public ScheduledTask getCurrentDFSTask() {
-        return currentDFSTask;
-    }
-
-    @Override
-    public Schedule run(Graph graph, int numProcessors) {
-        return null;
-    }
-
-    @Override
-    public int getShortestPathText() {
-        return currentShortestPath;
-    }
-
-    @Override
-    public boolean getIsFinished() {
-        return isFinished;
-    }
-
     public int[] getParallelThreadTimes() {
         return parallelThreadTimes;
     }
-
 }
