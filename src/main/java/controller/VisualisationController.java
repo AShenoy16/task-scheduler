@@ -311,23 +311,22 @@ public class VisualisationController {
 
             scheduledExecutorServiceParallel = Executors.newSingleThreadScheduledExecutor();
             scheduledExecutorServiceParallel.scheduleAtFixedRate(() -> {
+                Platform.runLater(() -> {
                 BranchAndBoundParallel bnbParallel = (BranchAndBoundParallel) bnb;
                 int[] threadTimes = bnbParallel.getParallelThreadTimes();
-
-                // initialises array of processor names
+                parallelBarChart.getData().clear();
+                    // initialises array of processor names
                 for (int i = 0; i < threadTimes.length; i++) {
 
                     XYChart.Series<Number, String> series = new XYChart.Series<>();
                     series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
-                    Platform.runLater(() -> {
-                        parallelBarChart.getData().clear();
-                        parallelBarChart.getData().addAll(series);
-                    });
+                    parallelBarChart.getData().addAll(series);
                 }
                 if (bnb.getIsFinished()) {
                     scheduledExecutorServiceParallel.shutdown();
                 }
-            }, 0, 100, TimeUnit.MILLISECONDS);
+                });
+            }, 50, 100, TimeUnit.MILLISECONDS);
         }
     }
 

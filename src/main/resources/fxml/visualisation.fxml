@@ -23,7 +23,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <AnchorPane prefHeight="595.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VisualisationController">
    <children>
       <VBox id="stage" fx:id="stage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="595.0" prefWidth="1200.0" spacing="3.0" stylesheets="@../css/visualisation.css">
@@ -273,12 +272,12 @@
                                     <Insets top="15.0" />
                                  </VBox.margin>
                               </Label>
-                              <BarChart fx:id="parallelBarChart" animated="false" legendVisible="false" styleClass="mainFont" verticalGridLinesVisible="false">
+                              <BarChart fx:id="parallelBarChart" animated="false" horizontalGridLinesVisible="false" legendVisible="false" styleClass="mainFont">
                                 <xAxis>
                                    <NumberAxis tickLabelFill="#dadada" />
                                 </xAxis>
                                 <yAxis>
-                                   <CategoryAxis fx:id="parallelXAxis" side="LEFT" tickLabelFill="#dadada" />
+                                   <CategoryAxis fx:id="parallelXAxis" animated="false" endMargin="0.0" side="LEFT" startMargin="0.0" tickLabelFill="#dadada" tickMarkVisible="false" />
                                 </yAxis>
                                  <padding>
                                     <Insets right="10.0" />

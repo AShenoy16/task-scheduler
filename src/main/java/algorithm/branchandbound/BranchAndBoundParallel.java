@@ -5,11 +5,9 @@ import controller.VisualisationController;
 import model.Graph;
 import model.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -42,8 +40,24 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
         this.numProcessors = numProcesses;
         this.currentShortestPath = Integer.MAX_VALUE;
         this.currentShortestTask = null;
-        this.parallelThreadTimes = new int[graph.getStartNodes().size()];
-        pool = new ForkJoinPool(numCores);
+
+        // Create thread factory to keep track of threads for visualisation
+        final ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
+            int i = 0;
+            @Override
+            public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
+                final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+                worker.setName(String.valueOf(i));
+                i++;
+                return worker;
+            }
+        };
+
+        ForkJoinPool pool = new ForkJoinPool(numCores, factory, null, true);
+
+        // Initialize arraylist with the shortest path values of each thread
+        parallelThreadTimes = new int[numCores];
+        Arrays.fill(parallelThreadTimes, Integer.MAX_VALUE);
 
         calculateCostFunction = new CalculateCostFunction(graph);
 
@@ -54,7 +68,6 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
 
         bottomLevels = calculateCostFunction.getBottomLevelMap();
 
-        AtomicInteger i = new AtomicInteger();
         graph.getStartNodes().forEach(startNode -> {
             Map<Node, List<ScheduledTask>> childrenQueue = graph.getStartNodes().stream()
                     .filter(node -> !node.equals(startNode))
@@ -64,9 +77,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
             PartialSolution partialSolution = new PartialSolution(task, numProcesses, bottomLevels.get(startNode), calculateCostFunction);
             partialSolution.getChildrenQueue().putAll(childrenQueue);
 
-            dfs dfs = new dfs(partialSolution, i);
-            pool.invoke(dfs);
-            i.getAndIncrement();
+            pool.invoke(new dfs(partialSolution));
         });
 
         List<ScheduledTask> scheduledTasksList = new ArrayList<>();
@@ -92,12 +103,10 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
      */
     private class dfs extends RecursiveAction {
 
-        private AtomicInteger id;
         public PartialSolution partialSolution;
 
-        dfs(PartialSolution partialSolution, AtomicInteger id) {
+        dfs(PartialSolution partialSolution) {
             this.partialSolution = partialSolution;
-            this.id = id;
         }
 
         /**
@@ -130,11 +139,13 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                 currentShortestPath = pathTime;
                 currentShortestTask = currentTask;
 
+                var threadId = Integer.valueOf(Thread.currentThread().getName());
+                parallelThreadTimes[threadId] = Math.min(parallelThreadTimes[threadId], pathTime);
+                System.out.println("Thread Id: " + String.valueOf(threadId) + " - New shortest path: " + String.valueOf(parallelThreadTimes[threadId]));
+
+
                 // print path on console
                 printCurrentPath(currentTask);
-
-                // update thread times
-                parallelThreadTimes[this.id.get()] = currentShortestPath;
             }
 
             // branch and bound algorithm for queued children
@@ -183,7 +194,7 @@ public class BranchAndBoundParallel extends BranchAndBoundAlgorithm{
                         continue;
                     }
 
-                    taskList.add(new dfs(newPartialSolution, this.id));
+                    taskList.add(new dfs(newPartialSolution));
                 }
 
                 // Fork subtasks (execute in parallel). InvokeAll will return will all tasks are completed.

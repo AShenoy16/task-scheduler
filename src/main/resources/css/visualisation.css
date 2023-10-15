@@ -18,6 +18,13 @@
     -fx-stroke-dash-array: 5 5;
 }
 
+.chart-vertical-grid-lines {
+    -fx-stroke: #dadada;
+    -fx-opacity: 0.25;
+    -fx-stroke-width: 1px;
+    -fx-stroke-dash-array: 5 5;
+}
+
 .section {
     -fx-background-color: #282828;
     -fx-padding: 30;
