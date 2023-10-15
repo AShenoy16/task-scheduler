@@ -31,7 +31,7 @@ public class VisualiseGraph extends FxViewer {
                     +"\tstroke-mode: plain; stroke-color:grey; stroke-width: 3px;"
                     + "\tfill-mode: plain; fill-color: grey;\n"
                     + "\tsize: 30px, 30px;\n"
-                    + "\ttext-size: 15px; text-color: black; text-style: bold;\n");
+                    + "\ttext-size: 15px; text-color: black; text-style: bold; text-font: 'SHUTTLE-X';\n");
         }
     }
 

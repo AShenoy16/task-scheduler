@@ -101,4 +101,5 @@
 
 .mainFont {
     -fx-font-family: "SHUTTLE-X";
+    -fx-tick-label-font: 7pt "SHUTTLE-X";
 }
