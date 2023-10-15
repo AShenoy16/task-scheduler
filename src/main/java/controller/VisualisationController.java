@@ -105,20 +105,24 @@ public class VisualisationController {
     private boolean isParallel;
     private Graph graph;
     private int[] processorStartTimes;
+    private IOHandler io;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
     private ScheduledExecutorService scheduledExecutorServiceParallel;
     private BranchAndBoundAlgorithm bnb;
+    private Schedule finalSchedule;
+    private String outputFileName;
     private int timerCounter;
     private boolean isStarted = false;
 
     @FXML
     public void initialize(SchedulingOptions options) {
-        IOHandler io = new IOHandler();
+        io = new IOHandler();
         graph = io.readDot(options.inputFileName);
         numProcessors = options.numProcessors;
         numCores = options.numCores;
         isParallel = options.isParallel;
+        outputFileName = options.outputFileName;
 
         updateHomeScreen(options.inputFileName, numProcessors, numCores, isParallel);
 
@@ -150,9 +154,9 @@ public class VisualisationController {
         // Start the scheduler in a separate thread, and run depending on user's parallel arg
         Thread schedulerThread = new Thread(() -> {
             if (isParallel) {
-                bnb.run(graph, numProcessors, numCores);
+                finalSchedule = bnb.run(graph, numProcessors, numCores);
             } else {
-                bnb.run(graph, numProcessors);
+                finalSchedule = bnb.run(graph, numProcessors);
             }
         });
 
@@ -477,6 +481,7 @@ public class VisualisationController {
                 if (bnb.getIsFinished()) {
                     myTimer.cancel();
                     updateFinish();
+                    io.bnbWriteDot(finalSchedule, outputFileName);
                 }
             }
         }, 0, 10);
