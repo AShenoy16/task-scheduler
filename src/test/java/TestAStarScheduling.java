@@ -18,7 +18,7 @@ public class TestAStarScheduling {
     Graph graph;
     AstarScheduler scheduler;
     Schedule schedule;
-    AstarParallel parallelSchduler;
+    AstarParallel parallelScheduler;
 
     @Test
     public void TestAStarTwoProcessorsNodes7() {
@@ -32,8 +32,8 @@ public class TestAStarScheduling {
     public void TestAStarTwoProcessorsNodes7Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 2, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(28, schedule.getFinishTime());
@@ -52,8 +52,8 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNodes7Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_7_OutTree.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 4, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(22, schedule.getFinishTime());
@@ -72,8 +72,8 @@ public class TestAStarScheduling {
     public void TestAStarTwoProcessorsNodes8Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_8_Random.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 2, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(581, schedule.getFinishTime());
@@ -92,8 +92,8 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNodes8Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_8_Random.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 4, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(581, schedule.getFinishTime());
@@ -112,8 +112,8 @@ public class TestAStarScheduling {
     public void TestAStarTwoProcessorsNodes9Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 2, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(55, schedule.getFinishTime());
@@ -132,8 +132,8 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNodes9Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_9_SeriesParallel.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 4, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(55, schedule.getFinishTime());
@@ -152,8 +152,8 @@ public class TestAStarScheduling {
     public void TestAStarTwoProcessorsNodes10Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_10_Random.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 2, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(50, schedule.getFinishTime());
@@ -172,8 +172,8 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNodes10Paralell() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_10_Random.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 4, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(50, schedule.getFinishTime());
@@ -192,8 +192,8 @@ public class TestAStarScheduling {
     public void TestAStarTwoProcessorsNodes11Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 2, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(350, schedule.getFinishTime());
@@ -212,17 +212,138 @@ public class TestAStarScheduling {
     public void TestAStarFourProcessorsNode11Parallel() {
         io = new IOHandler();
         graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        parallelSchduler = new AstarParallel();
-        schedule = parallelSchduler.run(graph, 4, numThreads);
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4, numThreads);
         assertTrue(schedule.isValidScheduleNoOverlap());
         assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
         assertEquals(227, schedule.getFinishTime());
+    }
+    @Test
+    public void TwoProcessorsNodes13() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_13_Nodes.dot");
+        scheduler = new AstarScheduler();
+        schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(145, schedule.getFinishTime());
+    }
+    @Test
+    public void TwoProcessorsNodes13Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_13_Nodes.dot");
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2,numThreads);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(145, schedule.getFinishTime());
+    }
+    @Test
+    public void ThreeProcessorsNodes13() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_13_Nodes.dot");
+        scheduler = new AstarScheduler();
+        schedule = scheduler.run(graph, 3);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(133, schedule.getFinishTime());
+    }
+
+    @Test
+    public void ThreeProcessorsNodes13Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_13_Nodes.dot");
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 3,numThreads);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(133, schedule.getFinishTime());
+    }
+    @Test
+    public void TwoProcessorsNodes14() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_14_Nodes.dot");
+        scheduler = new AstarScheduler();
+        schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(386, schedule.getFinishTime());
+    }
+    @Test
+    public void TwoProcessorsNodes14Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_14_Nodes.dot");
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2,numThreads);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(386, schedule.getFinishTime());
+    }
+    @Test
+    public void FourProcessorsNodes14() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_14_Nodes.dot");
+        scheduler = new AstarScheduler();
+        schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(367, schedule.getFinishTime());
+    }
+    @Test
+    public void FourProcessorsNodes14Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_14_Nodes.dot");
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4,numThreads);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(367, schedule.getFinishTime());
+    }
+    @Test
+    public void TwoProcessorsNodes15() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_15_Nodes.dot");
+        scheduler = new AstarScheduler();
+        schedule = scheduler.run(graph, 2);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(391, schedule.getFinishTime());
+    }
+    @Test
+    public void TwoProcessorsNodes15Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_15_Nodes.dot");
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 2,numThreads);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(391, schedule.getFinishTime());
+    }
+    @Test
+    public void FourProcessorsNodes15() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_15_Nodes.dot");
+        scheduler = new AstarScheduler();
+        schedule = scheduler.run(graph, 4);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(357, schedule.getFinishTime());
+    }
+    @Test
+    public void FourProcessorsNodes15Parallel() {
+        io = new IOHandler();
+        graph = io.readDot(directory + "Custom_15_Nodes.dot");
+        parallelScheduler = new AstarParallel();
+        schedule = parallelScheduler.run(graph, 4,numThreads);
+        assertTrue(schedule.isValidScheduleNoOverlap());
+        assertTrue(schedule.isValidScheduleSatisfyDependencies(graph));
+        assertEquals(357, schedule.getFinishTime());
     }
     @After
     public void tearDown(){
         graph = null;
         scheduler = null;
         schedule = null;
-        parallelSchduler = null;
+        parallelScheduler = null;
     }
 }
