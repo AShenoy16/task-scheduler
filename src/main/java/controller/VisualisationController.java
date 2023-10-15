@@ -305,7 +305,7 @@ public class VisualisationController {
                     scheduledExecutorService.shutdown();
                 }
             });
-        }, 50, 500, TimeUnit.MILLISECONDS);
+        }, 75, 500, TimeUnit.MILLISECONDS);
 
         if (isParallel) {
 
