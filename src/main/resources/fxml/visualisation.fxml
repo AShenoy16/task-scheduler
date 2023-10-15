@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.StackedBarChart?>
@@ -272,17 +271,17 @@
                                     <Insets top="15.0" />
                                  </VBox.margin>
                               </Label>
-                              <BarChart fx:id="parallelBarChart" animated="false" horizontalGridLinesVisible="false" legendVisible="false" styleClass="mainFont">
+                              <StackedBarChart fx:id="parallelBarChart" animated="false" categoryGap="30.0" horizontalGridLinesVisible="false" legendVisible="false" styleClass="mainFont">
                                 <xAxis>
-                                   <NumberAxis tickLabelFill="#dadada" />
+                                   <NumberAxis animated="false" tickLabelFill="#dadada" />
                                 </xAxis>
                                 <yAxis>
-                                   <CategoryAxis fx:id="parallelXAxis" animated="false" endMargin="0.0" side="LEFT" startMargin="0.0" tickLabelFill="#dadada" tickMarkVisible="false" />
+                                   <CategoryAxis fx:id="parallelYAxis" animated="false" endMargin="0.0" side="LEFT" startMargin="0.0" tickLabelFill="#dadada" tickMarkVisible="false" />
                                 </yAxis>
                                  <padding>
-                                    <Insets right="10.0" />
+                                    <Insets left="10.0" right="10.0" />
                                  </padding>
-                              </BarChart>
+                              </StackedBarChart>
                            </children>
                         </VBox>
                         <VBox alignment="CENTER_LEFT" prefHeight="378.0" prefWidth="481.0" spacing="5.0" styleClass="sectionCharts">

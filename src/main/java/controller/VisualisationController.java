@@ -50,7 +50,7 @@ public class VisualisationController {
     @FXML
     private HBox sequentialContainer;
     @FXML
-    private BarChart<Number, String> parallelBarChart;
+    private StackedBarChart<Number, String> parallelBarChart;
     @FXML
     private Label bestCurrentText;
     @FXML
@@ -61,7 +61,7 @@ public class VisualisationController {
     private StackedBarChart<String, Number> scheduleBarChart;
     @FXML
     private StackedBarChart<String, Number> scheduleBarChartPara;
-    @FXML CategoryAxis parallelXAxis;
+    @FXML CategoryAxis parallelYAxis;
     @FXML CategoryAxis scheduleXAxis;
     @FXML CategoryAxis scheduleXAxisPara;
     @FXML
@@ -307,6 +307,7 @@ public class VisualisationController {
         }, 70, 500, TimeUnit.MILLISECONDS);
 
         if (isParallel) {
+            //parallelBarChart.setCategoryGap(100*(1.0/numCores));
 
             scheduledExecutorServiceParallel = Executors.newSingleThreadScheduledExecutor();
             scheduledExecutorServiceParallel.scheduleAtFixedRate(() -> {
@@ -317,9 +318,11 @@ public class VisualisationController {
                     // initialises array of processor names
                 for (int i = 0; i < threadTimes.length; i++) {
 
-                    XYChart.Series<Number, String> series = new XYChart.Series<>();
-                    series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
-                    parallelBarChart.getData().addAll(series);
+                    if (threadTimes[i] != Integer.MAX_VALUE) {
+                        XYChart.Series<Number, String> series = new XYChart.Series<>();
+                        series.getData().add(new XYChart.Data<>(threadTimes[i], "T" + i));
+                        parallelBarChart.getData().addAll(series);
+                    }
                 }
                 if (bnb.getIsFinished()) {
                     scheduledExecutorServiceParallel.shutdown();
