@@ -117,7 +117,7 @@ public class VisualisationController {
         Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
         numProcessors = 2;
         numCores = 4;
-        isParallel = false;
+        isParallel = true;
 
         if (isParallel) {
             bnb = new BranchAndBoundParallel();
