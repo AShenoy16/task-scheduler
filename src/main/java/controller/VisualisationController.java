@@ -3,6 +3,7 @@ package controller;
 import algorithm.branchandbound.*;
 import com.sun.management.OperatingSystemMXBean;
 import io.IOHandler;
+import io.SchedulingOptions;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -102,6 +103,7 @@ public class VisualisationController {
     private int numProcessors;
     private int numCores;
     private boolean isParallel;
+    private Graph graph;
     private int[] processorStartTimes;
     private ScheduledExecutorService scheduledExecutorService;
     private VisualiseGraph viewer;
@@ -111,13 +113,14 @@ public class VisualisationController {
     private boolean isStarted = false;
 
     @FXML
-    public void initialize() {
-        final String directory = "src/test/graphs/";
+    public void initialize(SchedulingOptions options) {
         IOHandler io = new IOHandler();
-        Graph graph = io.readDot(directory + "Nodes_11_OutTree.dot");
-        numProcessors = 2;
-        numCores = 4;
-        isParallel = true;
+        graph = io.readDot(options.inputFileName);
+        numProcessors = options.numProcessors;
+        numCores = options.numCores;
+        isParallel = options.isParallel;
+
+        updateHomeScreen(options.inputFileName, numProcessors, numCores, isParallel);
 
         if (isParallel) {
             bnb = new BranchAndBoundParallel();
@@ -172,6 +175,17 @@ public class VisualisationController {
             startTimer();
             visualiseSchedules();
         });
+    }
+
+    private void updateHomeScreen(String inputFileName, int numProcessors, int numCores, boolean isParallel) {
+        String argsLabel = "PROCESSORS - " + numProcessors + " | ";
+        if (isParallel) {
+            argsLabel += "CORES -" + numCores + " | PARALLEL - TRUE";
+        } else {
+            argsLabel += "PARALLEL - FALSE";
+        }
+        homeArgsLabel.setText(argsLabel);
+        homeGraphLabel.setText("GRAPH - " + inputFileName);
     }
 
     /**
