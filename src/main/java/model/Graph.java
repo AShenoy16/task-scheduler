@@ -1,7 +1,5 @@
 package model;
 
-import algorithm.astar.CalculateCostFunction;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.List;
  * This class represents a graph object
  */
 public class Graph {
-    private final int n;
+    private final int numberOfNodes;
     private int[][] adjacencyMatrix;
     private int[] nodeWeightings;
     private ArrayList<Node> startNodes = new ArrayList<>();
@@ -22,12 +20,13 @@ public class Graph {
 
     /**
      * Create a graph instance
-     * @param nodes
-     * @param edges
+     *
+     * @param nodes The list of nodes to add to the graph
+     * @param edges The list of edges to add to the graph
      */
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
-        this.n = nodes.size();
-        adjacencyMatrix = new int[n][n];
+        this.numberOfNodes = nodes.size();
+        adjacencyMatrix = new int[numberOfNodes][numberOfNodes];
         fillNodeWeightings(nodes);
         fillAdjacencyMatrix(edges);
         findStartNodes();
@@ -35,8 +34,8 @@ public class Graph {
         orderNodes(nodes);
     }
 
-    public int getN() {
-        return n;
+    public int getNumberOfNodes() {
+        return numberOfNodes;
     }
 
     public int[][] getAdjacencyMatrix() {
@@ -47,13 +46,6 @@ public class Graph {
         return startNodes;
     }
 
-    public ArrayList<Node> getEndNodes() {
-        return endNodes;
-    }
-
-    public int[] getNodeWeightings() {
-        return nodeWeightings;
-    }
 
     /**
      * Fill nodeWeightings array
@@ -63,7 +55,7 @@ public class Graph {
      * @param nodes Nodes from dot file to process
      */
     private void fillNodeWeightings(ArrayList<Node> nodes) {
-        nodeWeightings = new int[n];
+        nodeWeightings = new int[numberOfNodes];
         for (Node n : nodes) {
             nodeWeightings[n.getId()] = n.getVal();
         }
@@ -83,7 +75,7 @@ public class Graph {
 
     /**
      * This method a hashmap of dependencies for a node
-     * @param node
+     * @param node The node to process
      */
     public void createDependencies(Node node){
 
@@ -107,19 +99,9 @@ public class Graph {
 
     }
 
-    public HashMap<Node, List<Node>> getDependencies() {
-        return dependencies;
-    }
-
     public List<Node> getDependenciesByNode(Node node) {
         return dependencies.get(node);
     }
-
-    public List<Node> getParentsByNode(Node node) {
-        return parentNodes.get(node);
-    }
-
-
 
     /**
      * This method gets the children nodes of a particular node
@@ -131,7 +113,7 @@ public class Graph {
         ArrayList<Node> childNodes = new ArrayList<>();
         int row = node.getId();
 
-        for (int j = 0; j < n; j++) {
+        for (int j = 0; j < numberOfNodes; j++) {
             if (adjacencyMatrix[row][j] > 0) {
                 // get the node with correct value
                 Node childNode = createNodeById(j);
@@ -153,7 +135,7 @@ public class Graph {
 
         int col = node.getId();
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < numberOfNodes; i++) {
             if (adjacencyMatrix[i][col] > 0) {
                 //get node with correct getter
                 Node parentNode = createNodeById(i);
@@ -165,22 +147,22 @@ public class Graph {
     }
 
     public List<Node> getParentNodes(Node node) {
-
         return this.parentNodes.get(node);
     }
+
     /**
      * This method sets all the entry nodes
      */
     private void findStartNodes() {
-        for (int j = 0;  j < n; j++) {
+        for (int j = 0; j < numberOfNodes; j++) {
             int count = 0;
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < numberOfNodes; i++) {
                 if (adjacencyMatrix[i][j] == 0) {
                     count++;
                 }
             }
 
-            if (count == n) {
+            if (count == numberOfNodes) {
                 startNodes.add(createNodeById(j));
             }
         }
@@ -190,15 +172,15 @@ public class Graph {
      * This method sets oll the exit nodes
      */
     private void findEndNodes() {
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < numberOfNodes; i++) {
             int count = 0;
-            for (int j = 0; j < n; j++) {
+            for (int j = 0; j < numberOfNodes; j++) {
                 if (adjacencyMatrix[i][j] == 0) {
                     count++;
                 }
             }
 
-            if (count == n) {
+            if (count == numberOfNodes) {
                 endNodes.add(createNodeById(i));
             }
         }
@@ -230,5 +212,4 @@ public class Graph {
     public Node[] getNodes() {
         return nodes;
     }
-
 }
