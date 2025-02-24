@@ -37,6 +37,11 @@ java -jar scheduler.jar INPUT.dot P [OPTIONS]
 - `INPUT`: Name of dot file of the task graph with integer weights
 - `P`: Number of processors to schedule the `INPUT` graph on
 
+## Example:
+  ```bash
+  java -jar scheduler.jar .\src\test\graphs\Custom_14_Nodes.dot 2 -v
+  ```
+
 ## Options
 
 - `-o OUTPUT`: Write the algorithm's output to a custom-named output file. For example, you can use `-o custom_output` to specify a custom output filename. If not specified, the default output file will be named `INPUT-output.dot`. Feel free to customize the output filename as needed to analyze the results.
